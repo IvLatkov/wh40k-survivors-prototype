@@ -4,7 +4,7 @@ extends Area2D
 const EXPLOSION_EFFECT_SCENE := preload("res://scenes/effects/explosion_effect.tscn")
 const ENEMY_COLLISION_MASK := 2
 
-@export var projectile_speed: float = 900.0
+@export var projectile_speed: float = 600.0
 @export var damage: float = 25.0
 @export var lifetime: float = 2.0
 @export var splash_radius: float = 70.0

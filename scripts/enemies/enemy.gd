@@ -102,12 +102,15 @@ func _physics_process(delta: float) -> void:
 		return
 
 	var chase_direction := Vector2.ZERO
-	if chase_distance_squared > stop_distance_squared:
-		chase_direction = global_position.direction_to(chase_target_position)
+	if distance_squared > stop_distance_squared:
+		if chase_distance_squared > stop_distance_squared:
+			chase_direction = global_position.direction_to(chase_target_position)
+		else:
+			chase_direction = global_position.direction_to(target.global_position)
 
 	var separation_direction := _get_separation_direction(delta) if uses_full_simulation else Vector2.ZERO
 	var movement_direction := chase_direction + separation_direction * separation_strength
-	velocity = movement_direction.normalized() * _individual_movement_speed
+	velocity = movement_direction.limit_length(1.0) * _individual_movement_speed
 	_update_visual_facing(velocity.x)
 
 	move_and_slide()
