@@ -1,0 +1,61 @@
+[gd_scene load_steps=10 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/enemy.gd" id="1_enemy"]
+[ext_resource type="Texture2D" path="res://assets/art/effects/enemy/squig/squig_green_walking_0001.png" id="2_green_1"]
+[ext_resource type="Texture2D" path="res://assets/art/effects/enemy/squig/squig_green_walking_0002.png" id="3_green_2"]
+[ext_resource type="Texture2D" path="res://assets/art/effects/enemy/squig/squig_red_walking_0001.png" id="4_red_1"]
+[ext_resource type="Texture2D" path="res://assets/art/effects/enemy/squig/squig_red_walking_0002.png" id="5_red_2"]
+[ext_resource type="Texture2D" path="res://assets/art/effects/enemy/squig/squig_purple_walking_0001.png" id="6_purple_1"]
+[ext_resource type="Texture2D" path="res://assets/art/effects/enemy/squig/squig_purple_walking_0002.png" id="7_purple_2"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_enemy"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_green_1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_green_2")
+}],
+"loop": true,
+"name": &"walk_green",
+"speed": 9.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("6_purple_1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("7_purple_2")
+}],
+"loop": true,
+"name": &"walk_purple",
+"speed": 9.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("4_red_1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_red_2")
+}],
+"loop": true,
+"name": &"walk_red",
+"speed": 9.0
+}]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_enemy"]
+radius = 13.0
+
+[node name="Enemy" type="CharacterBody2D"]
+texture_filter = 1
+collision_layer = 2
+collision_mask = 1
+script = ExtResource("1_enemy")
+
+[node name="Visual" type="AnimatedSprite2D" parent="."]
+scale = Vector2(0.1, 0.1)
+sprite_frames = SubResource("SpriteFrames_enemy")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_enemy")

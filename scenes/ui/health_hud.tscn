@@ -1,0 +1,67 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/health_hud.gd" id="1_hud"]
+
+[node name="HealthHUD" type="CanvasLayer"]
+process_mode = 3
+script = ExtResource("1_hud")
+
+[node name="HUD" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="PerformanceLabel" type="Label" parent="HUD"]
+layout_mode = 1
+offset_left = 12.0
+offset_top = 12.0
+offset_right = 162.0
+offset_bottom = 58.0
+text = "FPS: 0\nEnemies: 0 / 200"
+
+[node name="PerformanceUpdateTimer" type="Timer" parent="."]
+wait_time = 0.5
+
+[node name="HealthDisplay" type="VBoxContainer" parent="HUD"]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -150.0
+offset_top = -72.0
+offset_right = 150.0
+offset_bottom = -24.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_constants/separation = 4
+
+[node name="HealthLabel" type="Label" parent="HUD/HealthDisplay"]
+layout_mode = 2
+text = "HP 50 / 50"
+horizontal_alignment = 1
+
+[node name="HealthBar" type="ProgressBar" parent="HUD/HealthDisplay"]
+custom_minimum_size = Vector2(300, 22)
+layout_mode = 2
+max_value = 50.0
+value = 50.0
+show_percentage = false
+
+[node name="DeathLabel" type="Label" parent="HUD"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 48
+text = "YOU DIED"
+horizontal_alignment = 1
+vertical_alignment = 1

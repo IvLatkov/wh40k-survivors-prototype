@@ -1,0 +1,28 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/effects/explosion_effect.gd" id="1_effect"]
+[ext_resource type="Texture2D" path="res://assets/art/effects/explosions/bolter_explosion.png" id="2_initial"]
+[ext_resource type="Texture2D" path="res://assets/art/effects/explosions/bolter_explosion_after.png" id="3_after"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_explosion"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_initial")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_after")
+}],
+"loop": false,
+"name": &"impact",
+"speed": 1.0
+}]
+
+[node name="ExplosionEffect" type="Node2D"]
+texture_filter = 1
+z_index = 5
+script = ExtResource("1_effect")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_explosion")
+animation = &"impact"
