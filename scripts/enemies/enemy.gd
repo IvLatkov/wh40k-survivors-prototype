@@ -11,7 +11,7 @@ const SQUIG_ANIMATIONS: Array[StringName] = [
 @export var max_health: float = 50.0
 @export var stop_distance: float = 35.0
 @export var separation_radius: float = 40.0
-@export_range(0.0, 2.0, 0.05) var separation_strength: float = 0.6
+@export_range(0.0, 2.0, 0.05) var separation_strength: float = 0.4
 @export_range(0.016, 0.2, 0.001) var separation_update_interval: float = 0.05
 @export var knockback_distance: float = 20.0
 @export var knockback_duration: float = 0.12
@@ -35,10 +35,14 @@ var _full_simulation_enabled: bool = true
 var _separation_elapsed_time: float = 0.0
 var _cached_separation_direction: Vector2 = Vector2.ZERO
 var _separation_candidates: Array[Enemy] = []
+var _chase_offset: Vector2 = Vector2.ZERO
+var _movement_speed_multiplier: float = 1.0
+var _individual_movement_speed: float
 
 
 func _ready() -> void:
 	current_health = max_health
+	_individual_movement_speed = movement_speed * _movement_speed_multiplier
 	visual.play(SQUIG_ANIMATIONS.pick_random())
 
 
@@ -48,6 +52,12 @@ func set_target(new_target: Node2D) -> void:
 
 func set_spatial_grid(new_spatial_grid: EnemySpatialGrid) -> void:
 	spatial_grid = new_spatial_grid
+
+
+func configure_swarm_variation(chase_offset: Vector2, speed_multiplier: float) -> void:
+	_chase_offset = chase_offset
+	_movement_speed_multiplier = clampf(speed_multiplier, 0.1, 2.0)
+	_individual_movement_speed = movement_speed * _movement_speed_multiplier
 
 
 func take_damage(amount: float) -> void:
@@ -65,7 +75,9 @@ func _physics_process(delta: float) -> void:
 		velocity = Vector2.ZERO
 		return
 
+	var chase_target_position := target.global_position + _chase_offset
 	var distance_squared := global_position.distance_squared_to(target.global_position)
+	var chase_distance_squared := global_position.distance_squared_to(chase_target_position)
 	var stop_distance_squared := stop_distance * stop_distance
 	var full_simulation_distance_squared := full_simulation_distance * full_simulation_distance
 	var reduced_simulation_distance_squared := reduced_simulation_distance * reduced_simulation_distance
@@ -90,12 +102,12 @@ func _physics_process(delta: float) -> void:
 		return
 
 	var chase_direction := Vector2.ZERO
-	if distance_squared > stop_distance * stop_distance:
-		chase_direction = global_position.direction_to(target.global_position)
+	if chase_distance_squared > stop_distance_squared:
+		chase_direction = global_position.direction_to(chase_target_position)
 
 	var separation_direction := _get_separation_direction(delta) if uses_full_simulation else Vector2.ZERO
 	var movement_direction := chase_direction + separation_direction * separation_strength
-	velocity = movement_direction.normalized() * movement_speed
+	velocity = movement_direction.normalized() * _individual_movement_speed
 	_update_visual_facing(velocity.x)
 
 	move_and_slide()
@@ -150,8 +162,8 @@ func _process_very_far_movement(delta: float) -> void:
 	if _very_far_elapsed_time < very_far_update_interval:
 		return
 
-	var movement_direction := global_position.direction_to(target.global_position)
-	velocity = movement_direction * movement_speed
+	var movement_direction := global_position.direction_to(target.global_position + _chase_offset)
+	velocity = movement_direction * _individual_movement_speed
 	_update_visual_facing(velocity.x)
 	global_position += velocity * _very_far_elapsed_time
 	_very_far_elapsed_time = 0.0
