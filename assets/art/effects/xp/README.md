@@ -16,9 +16,11 @@ The boss resource references the existing gold PNG in `bosses/`; it has not
 been moved or duplicated. Future boss artwork can go in `boss/`.
 
 To replace artwork, put a PNG in the corresponding tier folder and assign it
-to **Texture** on that tier's `xp_reward.tres` resource. No code changes are
-needed. Use 16x16 artwork: sprites remain centered at scale 1 with nearest
-filtering. The standalone pickup scene retains the original white skull.
+to **Texture** on that tier's `xp_reward.tres` resource. Use 16x16 artwork:
+sprites remain centered with nearest filtering and a visual base scale of 1.12.
+The shared outline mapping in `XPPickup.TIER_TEXTURES` uses the shipped textures;
+update that mapping as well when replacing tier artwork. The standalone pickup
+scene retains the original white skull.
 
 Reward resources are shared. Editing a resource changes every enemy using it.
 For an enemy-specific reward, use **Make Unique** on its reward resource in
@@ -35,3 +37,16 @@ toward the player and becomes unmonitorable. Only flying skulls process
 movement: 220px/s initially, accelerating at 600px/s² to 360px/s. XP is
 awarded once within 10px of the player center, then the pickup is removed.
 If its player is freed, the skull returns to idle and can be triggered again.
+
+## Readability
+
+The pickup's gameplay root and collision stay unchanged. A grounded shared oval
+shadow renders at effective z=-2, the skull at its original z=-1. `VisualRoot`
+keeps the existing 2px / 1.2s bob, while the sprite alone has 1.12 base scale.
+A shared shader adds a one-source-pixel colored outline and faint dark outer
+keyline; four fixed shared materials provide silver, cyan, violet and gold edges.
+The original skull pixels are retained. The shader pulses 0.97?1.03 over 1.6s
+with independent visual phases and no extra global RNG calls. Magnet acquisition
+raises only the instance's outline strength to 1.2; movement is unchanged.
+
+See `docs/xp_readability.md` for visibility checks, performance and regressions.
