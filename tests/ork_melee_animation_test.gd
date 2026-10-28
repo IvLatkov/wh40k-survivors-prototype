@@ -240,7 +240,9 @@ func run() -> void:
 		if child is XPPickup:
 			check(child.xp_value == 5, "Melee death still drops MID five XP skull")
 			skulls += 1
-		if child is CPUParticles2D:
+	# Blood now lives under its scene-owned pool; count active effects only.
+	for effect in main.find_children("*", "CPUParticles2D", true, false):
+		if (effect as CPUParticles2D).visible:
 			blood += 1
 	check(skulls in [1, 2] and blood == 1, "Normal death retains skull quantity rules and blood VFX")
 	# Every cancellation stage rejects late callbacks, even before queue_free flushes.

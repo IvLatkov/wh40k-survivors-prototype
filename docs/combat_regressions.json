@@ -1,0 +1,182 @@
+[
+  {
+    "test": "additive_ork_spawning_test.gd",
+    "passed": true,
+    "seconds": 1.44,
+    "output": "Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org\n\n0.000s: factor=0.000000, Squigs=22542, additional Orks=0, ratio=0.0000\n149.999s: factor=0.000000, Squigs=22580, additional Orks=0, ratio=0.0000\n150.000s: factor=0.100000, Squigs=22391, additional Orks=2214, ratio=0.0989\n225.000s: factor=0.300000, Squigs=22515, additional Orks=6782, ratio=0.3012\n299.999s: factor=0.499997, Squigs=22429, additional Orks=11132, ratio=0.4963\n300.000s: factor=1.000000, Squigs=22443, additional Orks=22394, ratio=0.9978\n600.000s: factor=1.000000, Squigs=22519, additional Orks=22394, ratio=0.9944\n140000 additive spawn cycles without scene allocation: 648.92 ms\nPASS: 50 additive Ork spawning checks\n"
+  },
+  {
+    "test": "armor_test.gd",
+    "passed": true,
+    "seconds": 0.81,
+    "output": "Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org\n\nPASS: 183 Armor checks\n"
+  },
+  {
+    "test": "chapter_perks_test.gd",
+    "passed": true,
+    "seconds": 3.03,
+    "output": "Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org\n\nPASS: 307 Chapter perk checks\n"
+  },
+  {
+    "test": "character_info_test.gd",
+    "passed": true,
+    "seconds": 0.81,
+    "output": "Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org\n\nPASS: 47 Character Info checks\n"
+  },
+  {
+    "test": "character_sheet_test.gd",
+    "passed": true,
+    "seconds": 0.89,
+    "output": "Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org\n\nPASS: 48 character sheet checks\n"
+  },
+  {
+    "test": "combat_optimization_test.gd",
+    "passed": true,
+    "seconds": 2.92,
+    "output": "Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org\n\nPASS: 2406 combat optimization checks\n"
+  },
+  {
+    "test": "damage_numbers_test.gd",
+    "passed": true,
+    "seconds": 5.17,
+    "output": "Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org\n\nPASS: 384 damage-number checks\n"
+  },
+  {
+    "test": "directional_knife_test.gd",
+    "passed": true,
+    "seconds": 1.66,
+    "output": "Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org\n\nPASS: 127 directional knife checks\n"
+  },
+  {
+    "test": "dynamic_bolter_splash_test.gd",
+    "passed": true,
+    "seconds": 1.27,
+    "output": "Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org\n\nPASS: 41 dynamic Bolter splash checks\n"
+  },
+  {
+    "test": "enemy_health_fractional_damage_test.gd",
+    "passed": true,
+    "seconds": 0.7,
+    "output": "Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org\n\nPASS: 28 enemy health and fractional damage checks\n"
+  },
+  {
+    "test": "enemy_spawner_test.gd",
+    "passed": true,
+    "seconds": 0.8,
+    "output": "Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org\n\nViewport: (1152.0, 648.0); old origin distance 1385.7..1641.7 (mean 1513.7); new sampled 388.7..793.3 (mean 574.4)\nEstimated screen entry at unchanged 60px/s, before burst offsets: 1.07..2.81s\nPASS: 3246 enemy spawner checks\n"
+  },
+  {
+    "test": "generic_upgrades_test.gd",
+    "passed": true,
+    "seconds": 2.3,
+    "output": "Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org\n\nSalvage sample: MID=20142 doubles=7073; dodge sample=2047\nPASS: 1204 Generic upgrade checks\n"
+  },
+  {
+    "test": "health_regeneration_test.gd",
+    "passed": true,
+    "seconds": 2.94,
+    "output": "Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org\n\nPASS: 58 health regeneration checks\n"
+  },
+  {
+    "test": "knife_range_upgrade_test.gd",
+    "passed": true,
+    "seconds": 1.16,
+    "output": "Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org\n\nPASS: 210 knife range upgrade checks\n"
+  },
+  {
+    "test": "normal_rate_health_upgrades_test.gd",
+    "passed": true,
+    "seconds": 3.48,
+    "output": "Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org\n\nPASS: 70 normal rate and health checks\n"
+  },
+  {
+    "test": "ork_boy_test.gd",
+    "passed": true,
+    "seconds": 1.47,
+    "output": "Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org\n\nOrk raw melee damage distribution: [64719, 25141, 10140]\n200 mixed-enemy local separation queries: 3.00 ms\nPASS: 100147 Ork Boy checks\n"
+  },
+  {
+    "test": "ork_melee_animation_test.gd",
+    "passed": true,
+    "seconds": 1.81,
+    "output": "Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org\n\nPASS: 131 Ork melee animation checks\n"
+  },
+  {
+    "test": "run_timer_test.gd",
+    "passed": true,
+    "seconds": 1.0,
+    "output": "Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org\n\nPASS: 1051 run timer and scaling checks\n"
+  },
+  {
+    "test": "terrain_artwork_test.gd",
+    "passed": true,
+    "seconds": 0.55,
+    "output": "Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org\n\nPASS terrain artwork: variants=[10427, 5488, 914, 6119, 1779, 873]; decoration density=6.55859375%; matching right neighbors=80.2734375%\n"
+  },
+  {
+    "test": "terrain_chunk_streaming_test.gd",
+    "passed": true,
+    "seconds": 7.55,
+    "output": "Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org\n\n100 streaming transitions: 3364.807 ms including frame waits; active terrain: 9\nMean chunk update CPU time: 26.07478 ms\nPASS: 901 terrain streaming checks\n"
+  },
+  {
+    "test": "terrain_determinism_test.gd",
+    "passed": true,
+    "seconds": 0.62,
+    "output": "Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org\n\nPASS: 25 chunks match original ground and current decoration reference bytes, including incremental generation\n"
+  },
+  {
+    "test": "terrain_prefetch_test.gd",
+    "passed": true,
+    "seconds": 0.61,
+    "output": "Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org\n\nPASS terrain prefetch: threshold, idle reuse, corners, reversals, consumption, partial task, teleport, bounded cache\n"
+  },
+  {
+    "test": "tier_1_contact_damage_test.gd",
+    "passed": true,
+    "seconds": 0.64,
+    "output": "Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org\n\nTier 1 distribution over 100000 rolls: [70217, 24851, 4932]\nPASS: 100621 Tier 1 contact damage checks\n"
+  },
+  {
+    "test": "tier_1_timed_xp_drop_test.gd",
+    "passed": true,
+    "seconds": 1.8,
+    "output": "Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org\n\n100000 rolls: MID=9961 LOW=90039 doubles=7073 MID doubles=715\nPASS: 103029 time-based Tier 1 XP checks\n"
+  },
+  {
+    "test": "ultimate_upgrades_test.gd",
+    "passed": true,
+    "seconds": 1.83,
+    "output": "Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org\n\n1000 local fork queries with 300 distant enemies: 31.60 ms\nPASS: 121 Ultimate checks\n"
+  },
+  {
+    "test": "upgrade_level_caps_test.gd",
+    "passed": true,
+    "seconds": 2.84,
+    "output": "Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org\n\nPASS: 658 upgrade level cap checks\n"
+  },
+  {
+    "test": "upgrade_system_test.gd",
+    "passed": true,
+    "seconds": 0.8,
+    "output": "Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org\n\nPASS: 88 upgrade checks\n"
+  },
+  {
+    "test": "weapon_upgrade_groups_test.gd",
+    "passed": true,
+    "seconds": 0.91,
+    "output": "Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org\n\nPASS: 71 Weapon group checks\n"
+  },
+  {
+    "test": "xp_pickup_visual_test.gd",
+    "passed": true,
+    "seconds": 0.52,
+    "output": "Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org\n\nPASS: 104 XP visual/isolation checks\n"
+  },
+  {
+    "test": "xp_progression_test.gd",
+    "passed": true,
+    "seconds": 0.91,
+    "output": "Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org\n\nPASS: 50 XP progression checks\n"
+  }
+]

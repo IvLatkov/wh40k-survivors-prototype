@@ -6,6 +6,8 @@ extends Node
 
 var _enemies: Array[Enemy] = []
 var _cells: Dictionary = {}
+var _enemy_cells: Dictionary = {}
+var _empty_bucket: Array[Enemy] = []
 var _elapsed_time: float = 0.0
 var _candidate_query_count: int = 0
 var _candidate_result_count: int = 0
@@ -23,10 +25,18 @@ func _physics_process(delta: float) -> void:
 func register_enemy(enemy: Enemy) -> void:
 	if not _enemies.has(enemy):
 		_enemies.append(enemy)
+		var remove := unregister_enemy.bind(enemy)
+		if not enemy.tree_exiting.is_connected(remove):
+			enemy.tree_exiting.connect(remove, CONNECT_ONE_SHOT)
 
 
 func unregister_enemy(enemy: Enemy) -> void:
 	_enemies.erase(enemy)
+	if _enemy_cells.has(enemy):
+		var cell: Vector2i = _enemy_cells[enemy]
+		var bucket: Array[Enemy] = _cells[cell]
+		bucket.erase(enemy)
+		_enemy_cells.erase(enemy)
 
 
 func append_nearby_candidates(world_position: Vector2, output: Array[Enemy]) -> void:
@@ -55,7 +65,17 @@ func get_average_candidate_count() -> float:
 
 
 func _rebuild_grid() -> void:
+	if not CombatProfile.enabled:
+		_profile_enemy_spatial_grid_rebuild_grid()
+		return
+	var profile_start := Time.get_ticks_usec()
+	_profile_enemy_spatial_grid_rebuild_grid()
+	CombatProfile.finish(&"grid_rebuild", profile_start)
+
+
+func _profile_enemy_spatial_grid_rebuild_grid() -> void:
 	_cells.clear()
+	_enemy_cells.clear()
 
 	for index: int in range(_enemies.size() - 1, -1, -1):
 		var candidate: Variant = _enemies[index]
@@ -69,9 +89,11 @@ func _rebuild_grid() -> void:
 
 		var cell := _world_to_cell(enemy.global_position)
 		if not _cells.has(cell):
-			_cells[cell] = []
-		var cell_enemies: Array = _cells[cell]
+			var bucket: Array[Enemy] = []
+			_cells[cell] = bucket
+		var cell_enemies: Array[Enemy] = _cells[cell]
 		cell_enemies.append(enemy)
+		_enemy_cells[enemy] = cell
 
 
 func _world_to_cell(world_position: Vector2) -> Vector2i:
@@ -94,3 +116,35 @@ func append_candidates_in_radius(world_position: Vector2, radius: float, output:
 			for candidate: Variant in _cells.get(Vector2i(x, y), []):
 				if is_instance_valid(candidate) and candidate is Enemy:
 					output.append(candidate)
+
+
+func calculate_separation(subject: Enemy) -> Vector2:
+	# Same cell/candidate order and live positions as the former two-pass query.
+	# Iterate buckets directly instead of copying and validating each candidate twice.
+	var origin := subject.global_position
+	var center := _world_to_cell(origin)
+	var radius := subject.separation_radius
+	var radius_squared := radius * radius
+	var separation := Vector2.ZERO
+	var candidate_count := 0
+	for y in range(center.y - 1, center.y + 2):
+		for x in range(center.x - 1, center.x + 2):
+			var bucket: Array[Enemy] = _cells.get(Vector2i(x, y), _empty_bucket)
+			candidate_count += bucket.size()
+			for enemy: Enemy in bucket:
+				if enemy == subject:
+					continue
+				var away := origin - enemy.global_position
+				var distance_squared := away.length_squared()
+				if distance_squared >= radius_squared:
+					continue
+				if distance_squared <= 0.0001:
+					separation += Vector2.RIGHT if subject.get_instance_id() < enemy.get_instance_id() else Vector2.LEFT
+					continue
+				var distance := sqrt(distance_squared)
+				var weight := 1.0 - distance / radius
+				separation += away / distance * weight
+	_candidate_query_count += 1
+	_candidate_result_count += candidate_count
+	CombatProfile.query(&"separation", candidate_count)
+	return separation.limit_length(1.0)

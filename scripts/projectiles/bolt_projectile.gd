@@ -42,9 +42,19 @@ func _ready() -> void:
 
 
 func _physics_process(delta: float) -> void:
+	if not CombatProfile.enabled:
+		_profile_bolt_projectile_physics_process(delta)
+		return
+	var profile_start := Time.get_ticks_usec()
+	_profile_bolt_projectile_physics_process(delta)
+	CombatProfile.finish(&"projectile_movement", profile_start)
+
+
+func _profile_bolt_projectile_physics_process(delta: float) -> void:
 	global_position += _direction * projectile_speed * delta
 	_remaining_lifetime -= delta
 	if _remaining_lifetime <= 0.0:
+		CombatProfile.count_event(&"queue_free_requests")
 		queue_free()
 
 
@@ -68,10 +78,20 @@ func _on_body_entered(body: Node2D) -> void:
 	else:
 		_has_impacted = true
 		set_deferred(&"monitoring", false)
+		CombatProfile.count_event(&"queue_free_requests")
 		queue_free()
 
 
 func _explode(direct_target: Enemy) -> void:
+	if not CombatProfile.enabled:
+		_profile_bolt_projectile_explode(direct_target)
+		return
+	var profile_start := Time.get_ticks_usec()
+	_profile_bolt_projectile_explode(direct_target)
+	CombatProfile.finish(&"impact", profile_start)
+
+
+func _profile_bolt_projectile_explode(direct_target: Enemy) -> void:
 	if can_fork:
 		_spawn_forks(direct_target)
 	_deal_damage(direct_target, damage, guaranteed_critical)
@@ -88,7 +108,11 @@ func _explode(direct_target: Enemy) -> void:
 	query.collide_with_bodies = true
 	query.collide_with_areas = false
 
+	var splash_start := Time.get_ticks_usec() if CombatProfile.enabled else 0
 	var hits := get_world_2d().direct_space_state.intersect_shape(query, 100)
+	CombatProfile.finish(&"splash_lookup", splash_start)
+	CombatProfile.query(&"splash", hits.size())
+	CombatProfile.count_event(&"splash_events")
 	for hit: Dictionary in hits:
 		var collider := hit.get("collider") as Node
 		# All direct targets of this projectile stay excluded, including after penetration.
@@ -99,6 +123,7 @@ func _explode(direct_target: Enemy) -> void:
 
 	for enemy: Enemy in splash_targets.values():
 		if is_instance_valid(enemy):
+			CombatProfile.count_event(&"splash_targets")
 			_deal_damage(enemy, splash_damage)
 
 	var effect := EXPLOSION_EFFECT_SCENE.instantiate() as ExplosionEffect
@@ -116,10 +141,20 @@ func _deal_damage(enemy: Enemy, base_damage: float, force_critical: bool = false
 
 
 func _spawn_forks(direct_target: Enemy) -> void:
+	if not CombatProfile.enabled:
+		_profile_bolt_projectile_spawn_forks(direct_target)
+		return
+	var profile_start := Time.get_ticks_usec()
+	_profile_bolt_projectile_spawn_forks(direct_target)
+	CombatProfile.finish(&"fork_lookup", profile_start)
+
+
+func _profile_bolt_projectile_spawn_forks(direct_target: Enemy) -> void:
 	if not is_instance_valid(spatial_grid):
 		return
 	var candidates: Array[Enemy] = []
 	spatial_grid.append_candidates_in_radius(global_position, fork_search_radius, candidates)
+	CombatProfile.query(&"fork", candidates.size())
 	# Keep only the closest two distinct living targets in one local pass.
 	var targets: Array[Enemy] = []
 	for enemy in candidates:

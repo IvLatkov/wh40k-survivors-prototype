@@ -56,6 +56,15 @@ func _ready() -> void:
 
 
 func _physics_process(delta: float) -> void:
+	if not CombatProfile.enabled:
+		_profile_ork_boy_physics_process(delta)
+		return
+	var profile_start := Time.get_ticks_usec()
+	_profile_ork_boy_physics_process(delta)
+	CombatProfile.finish(&"ork_update", profile_start)
+
+
+func _profile_ork_boy_physics_process(delta: float) -> void:
 	if current_health <= 0.0 or is_queued_for_deletion():
 		return
 	_cooldown_remaining = maxf(0.0, _cooldown_remaining - delta)
@@ -166,6 +175,15 @@ func _on_visual_frame_changed() -> void:
 
 
 func _spawn_slash() -> void:
+	if not CombatProfile.enabled:
+		_profile_ork_boy_spawn_slash()
+		return
+	var profile_start := Time.get_ticks_usec()
+	_profile_ork_boy_spawn_slash()
+	CombatProfile.finish(&"ork_slash", profile_start)
+
+
+func _profile_ork_boy_spawn_slash() -> void:
 	var effect := SLASH_SCENE.instantiate() as KnifeSlashEffect
 	var effect_parent := get_parent() as Node2D
 	effect.position = effect_parent.to_local(global_position + Vector2(slash_offset.x * _attack_facing, slash_offset.y))
@@ -182,6 +200,15 @@ func _on_damage_received(_amount: float, _critical: bool) -> void:
 
 
 func _update_tint() -> void:
+	if not CombatProfile.enabled:
+		_profile_ork_boy_update_tint()
+		return
+	var profile_start := Time.get_ticks_usec()
+	_profile_ork_boy_update_tint()
+	CombatProfile.finish(&"hit_flash", profile_start)
+
+
+func _profile_ork_boy_update_tint() -> void:
 	var tint := Color.WHITE
 	if _hit_flash_remaining > 0.0:
 		tint = hit_flash_tint

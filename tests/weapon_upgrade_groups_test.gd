@@ -158,8 +158,8 @@ func run() -> void:
 	check(shared.rolls == 4 and is_equal_approx(melee.current_health, 500.0 - knife.get_damage() * 1.5), "Same shared crit resource affects real Knife attack")
 	await process_frame
 	var red_numbers := 0
-	for child in main.get_children():
-		if child is FloatingDamageNumber:
+	for child in main.find_children("*", "Node2D", true, false):
+		if child is FloatingDamageNumber and child.visible:
 			check(child.is_critical and child.get_node("Label").modulate == Color.RED, "Critical damage number remains red")
 			red_numbers += 1
 	check(red_numbers == 4, "Four independently rolled critical hit numbers")

@@ -296,8 +296,8 @@ func run() -> void:
 	check(is_equal_approx(impact_target.max_health - impact_target.current_health, 25.0 * 1.75 * 1.5), "Real empowered critical direct hit excludes own splash and fork collisions")
 	check(fork_target_a.current_health < fork_target_a.max_health and fork_target_b.current_health < fork_target_b.max_health, "Real forks travel into nearby targets")
 	var red_numbers := 0
-	for child in fresh.get_children():
-		if child is FloatingDamageNumber:
+	for child in fresh.find_children("*", "Node2D", true, false):
+		if child is FloatingDamageNumber and child.visible:
 			check(child.is_critical and child.get_node("Label").modulate == Color.RED, "Ultimate crit damage numbers stay red")
 			red_numbers += 1
 	check(red_numbers >= 3, "Empowered shell and forks generate critical feedback")

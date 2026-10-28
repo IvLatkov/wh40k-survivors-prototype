@@ -38,7 +38,17 @@ func _physics_process(_delta: float) -> void:
 
 
 func _get_attack_targets(direction: Vector2, radius: float) -> Array[Enemy]:
+	if not CombatProfile.enabled:
+		return _profile_knife_get_attack_targets(direction, radius)
+	var profile_start := Time.get_ticks_usec()
+	var profile_result := _profile_knife_get_attack_targets(direction, radius)
+	CombatProfile.finish(&"knife_query", profile_start)
+	return profile_result
+
+
+func _profile_knife_get_attack_targets(direction: Vector2, radius: float) -> Array[Enemy]:
 	var targets: Array[Enemy] = []
+	CombatProfile.query(&"knife", _nearby_enemies.size())
 	var stale_ids: Array[int] = []
 	for enemy_id: int in _nearby_enemies:
 		var enemy := _nearby_enemies[enemy_id] as Enemy
@@ -57,6 +67,15 @@ func _get_attack_targets(direction: Vector2, radius: float) -> Array[Enemy]:
 
 
 func _attack() -> void:
+	if not CombatProfile.enabled:
+		_profile_knife_attack()
+		return
+	var profile_start := Time.get_ticks_usec()
+	_profile_knife_attack()
+	CombatProfile.finish(&"knife_attack", profile_start)
+
+
+func _profile_knife_attack() -> void:
 	if _nearby_enemies.is_empty() or not cooldown_timer.is_stopped():
 		return
 	var direction := Vector2.LEFT if _player != null and not _player.facing_right else Vector2.RIGHT
@@ -65,11 +84,15 @@ func _attack() -> void:
 	if targets.is_empty():
 		return
 
+	CombatProfile.count_event(&"knife_swings")
+	CombatProfile.count_event(&"knife_hits", targets.size())
 	cooldown_timer.start(get_attack_cooldown())
 	var damage := get_damage()
+	var damage_start := Time.get_ticks_usec() if CombatProfile.enabled else 0
 	for enemy in targets:
 		var hit := combat_stats.roll_hit(damage)
 		enemy.take_damage(hit.amount, hit.critical, combat_stats, &"knife")
+	CombatProfile.finish(&"knife_damage", damage_start)
 	if whirlwind_active:
 		var sweep := preload("res://scripts/effects/whirlwind_sweep.gd").new()
 		sweep.radius = radius

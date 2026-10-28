@@ -99,8 +99,8 @@ func run() -> void:
 	await process_frame
 	await process_frame
 	var found_fractional_crit := false
-	for child in main.get_children():
-		if child is FloatingDamageNumber and child.damage_amount == 18.75:
+	for child in main.find_children("*", "Node2D", true, false):
+		if child is FloatingDamageNumber and child.visible and child.damage_amount == 18.75:
 			check(child.is_critical and child.get_node("Label").text == "18.8" and child.get_node("Label").modulate == Color.RED, "Fractional critical splash formats red eighteen point eight")
 			found_fractional_crit = true
 	check(found_fractional_crit, "Real fractional splash creates expected damage number")

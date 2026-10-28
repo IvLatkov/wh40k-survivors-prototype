@@ -6,6 +6,12 @@ extends Node2D
 
 
 func _ready() -> void:
+	var blood_pool := BloodBurstPool.new()
+	blood_pool.name = "BloodBurstPool"
+	add_child(blood_pool)
+	var number_pool := DamageNumberPool.new()
+	number_pool.name = "DamageNumberPool"
+	add_child(number_pool)
 	health_hud.bind_run_clock($RunClock)
 	enemy_spawner.bind_run_clock($RunClock)
 	health_hud.bind_player(player)

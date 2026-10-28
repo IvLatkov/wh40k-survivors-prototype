@@ -125,8 +125,8 @@ func run() -> void:
 	check(critical_count > 0 and critical_count < 12, "Single swing independently rolls normal and critical hits")
 	await process_frame
 	var number_count := 0
-	for child in main.get_children():
-		if child is FloatingDamageNumber:
+	for child in main.find_children("*", "Node2D", true, false):
+		if child is FloatingDamageNumber and child.visible:
 			number_count += 1
 			check(child.get_node("Label").modulate == (Color.RED if child.is_critical else Color.WHITE), "Damage number color preserved")
 			check(is_equal_approx(child.damage_amount, 52.5 if child.is_critical else 35.0), "Damage number uses actual final damage")

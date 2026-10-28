@@ -120,7 +120,18 @@ func _spawn_burst(burst_size: int, enemy_scene: PackedScene = ENEMY_SCENE) -> vo
 
 
 func _spawn_enemy(spawn_position: Vector2, enemy_scene: PackedScene = ENEMY_SCENE) -> void:
+	if not CombatProfile.enabled:
+		_profile_enemy_spawner_spawn_enemy(spawn_position, enemy_scene)
+		return
+	var profile_start := Time.get_ticks_usec()
+	_profile_enemy_spawner_spawn_enemy(spawn_position, enemy_scene)
+	CombatProfile.finish(&"enemy_spawn", profile_start)
+
+
+func _profile_enemy_spawner_spawn_enemy(spawn_position: Vector2, enemy_scene: PackedScene = ENEMY_SCENE) -> void:
+	var instantiate_start := Time.get_ticks_usec() if CombatProfile.enabled else 0
 	var enemy := enemy_scene.instantiate() as Enemy
+	CombatProfile.finish(&"enemy_instantiate", instantiate_start)
 	if enemy == null:
 		return
 
@@ -137,8 +148,9 @@ func _spawn_enemy(spawn_position: Vector2, enemy_scene: PackedScene = ENEMY_SCEN
 		randf_range(1.0 - speed_variation, 1.0 + speed_variation)
 	)
 	enemy.tree_exiting.connect(_on_enemy_tree_exiting)
-	enemy.tree_exiting.connect(spatial_grid.unregister_enemy.bind(enemy))
+	var insertion_start := Time.get_ticks_usec() if CombatProfile.enabled else 0
 	get_parent().add_child(enemy)
+	CombatProfile.finish(&"enemy_insertion", insertion_start)
 	spatial_grid.register_enemy(enemy)
 	_active_enemy_count += 1
 	active_enemy_count_changed.emit(_active_enemy_count, get_target_enemy_count())
@@ -173,6 +185,15 @@ func _spawn_additional_orks() -> void:
 
 
 func _get_spawn_origin() -> Vector2:
+	if not CombatProfile.enabled:
+		return _profile_enemy_spawner_get_spawn_origin()
+	var profile_start := Time.get_ticks_usec()
+	var profile_result := _profile_enemy_spawner_get_spawn_origin()
+	CombatProfile.finish(&"spawn_selection", profile_start)
+	return profile_result
+
+
+func _profile_enemy_spawner_get_spawn_origin() -> Vector2:
 	var viewport_size := get_viewport().get_visible_rect().size
 	var camera := get_viewport().get_camera_2d()
 	var camera_zoom := camera.zoom if camera != null else Vector2.ONE

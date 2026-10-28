@@ -173,8 +173,8 @@ func run() -> void:
 	check(ork.current_health == 45.0 and neighbor.current_health == 97.5, "Whirlwind damages both Orks exactly once")
 	await process_frame
 	var critical_numbers := 0
-	for child in main.get_children():
-		if child is FloatingDamageNumber and child.is_critical:
+	for child in main.find_children("*", "Node2D", true, false):
+		if child is FloatingDamageNumber and child.visible and child.is_critical:
 			check(child.get_node("Label").modulate == Color.RED, "Ork critical damage numbers are red")
 			critical_numbers += 1
 	check(critical_numbers >= 3, "Shared damage-number feedback appears for Orks")
@@ -209,7 +209,9 @@ func run() -> void:
 	for child in main.get_children():
 		if child is XPPickup:
 			pickups.append(child)
-		if child is CPUParticles2D:
+	# Blood now lives under its scene-owned pool; count active effects only.
+	for effect in main.find_children("*", "CPUParticles2D", true, false):
+		if (effect as CPUParticles2D).visible:
 			blood += 1
 	check(blood == 1 and pickups.size() == 2, "Death emits existing blood effect and two MID skulls on double proc")
 	for pickup in pickups:

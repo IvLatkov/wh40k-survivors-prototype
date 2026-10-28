@@ -105,6 +105,8 @@ func configure_swarm_variation(chase_offset: Vector2, speed_multiplier: float) -
 func take_damage(amount: float, critical: bool = false, attacker_stats: CombatStats = null, source: StringName = &"") -> void:
 	if is_queued_for_deletion():
 		return
+	CombatProfile.count_event(&"damage_events")
+	if critical: CombatProfile.count_event(&"crits")
 	var previous_health := current_health
 	current_health -= amount
 	# Report the actual HP change after damage, including existing overkill behavior.
@@ -118,28 +120,68 @@ func take_damage(amount: float, critical: bool = false, attacker_stats: CombatSt
 
 
 func _show_damage_number(amount: float, critical: bool) -> void:
-	var number := DAMAGE_NUMBER_SCENE.instantiate() as FloatingDamageNumber
+	if not CombatProfile.enabled:
+		_profile_enemy_show_damage_number(amount, critical)
+		return
+	var profile_start := Time.get_ticks_usec()
+	_profile_enemy_show_damage_number(amount, critical)
+	CombatProfile.finish(&"number_creation", profile_start)
+
+
+func _profile_enemy_show_damage_number(amount: float, critical: bool) -> void:
 	var effect_parent := get_parent() as Node2D
+	var number_pool := effect_parent.get_node_or_null("DamageNumberPool") as DamageNumberPool
+	CombatProfile.count_event(&"numbers_spawned")
 	# Separate simultaneous direct/splash hits without consuming combat RNG.
 	var offset := Vector2((_damage_number_slot % 3 - 1) * 24.0, -30.0 - (_damage_number_slot % 2) * 18.0)
 	_damage_number_slot += 1
+	if number_pool != null:
+		number_pool.spawn(global_position + offset, amount, critical)
+		return
+	var number := DAMAGE_NUMBER_SCENE.instantiate() as FloatingDamageNumber
 	number.position = effect_parent.to_local(global_position + offset)
 	number.configure(amount, critical)
-	# The parent survives lethal hits; adding is safe during physics callbacks.
-	effect_parent.add_child.call_deferred(number)
+	# Standalone scenes keep the existing unpooled path.
+	if CombatProfile.enabled:
+		CombatProfile.insert_child.call_deferred(effect_parent, number, &"number_insertion")
+	else:
+		effect_parent.add_child.call_deferred(number)
 
 
 func die() -> void:
+	if not CombatProfile.enabled:
+		_profile_enemy_die()
+		return
+	var profile_start := Time.get_ticks_usec()
+	_profile_enemy_die()
+	CombatProfile.finish(&"death", profile_start)
+
+
+func _profile_enemy_die() -> void:
 	if is_queued_for_deletion():
 		return
 	set_physics_process(false)
 	velocity = Vector2.ZERO
 	_drop_xp()
 	_spawn_blood_burst()
+	CombatProfile.count_event(&"queue_free_requests")
 	queue_free()
 
 
 func _spawn_blood_burst() -> void:
+	if not CombatProfile.enabled:
+		_profile_enemy_spawn_blood_burst()
+		return
+	var profile_start := Time.get_ticks_usec()
+	_profile_enemy_spawn_blood_burst()
+	CombatProfile.finish(&"blood_creation", profile_start)
+
+
+func _profile_enemy_spawn_blood_burst() -> void:
+	var pool := get_parent().get_node_or_null("BloodBurstPool") as BloodBurstPool
+	if pool != null:
+		pool.spawn(global_position)
+		return
 	var effect := BLOOD_BURST_SCENE.instantiate() as Node2D
 	var effect_parent := get_parent() as Node2D
 	effect.position = effect_parent.to_local(global_position)
@@ -148,6 +190,15 @@ func _spawn_blood_burst() -> void:
 
 
 func _drop_xp() -> void:
+	if not CombatProfile.enabled:
+		_profile_enemy_drop_xp()
+		return
+	var profile_start := Time.get_ticks_usec()
+	_profile_enemy_drop_xp()
+	CombatProfile.finish(&"xp_creation", profile_start)
+
+
+func _profile_enemy_drop_xp() -> void:
 	var reward := roll_xp_reward()
 	# Tier 1 keeps its LOW quantity roll (7% double) even when upgraded to MID.
 	var quantity_reward := xp_quantity_reward if xp_quantity_reward != null else (low_xp_reward if _uses_tier_1_xp_rules() else reward)
@@ -167,7 +218,10 @@ func _drop_xp() -> void:
 			drop_position += Vector2.RIGHT.rotated(angle) * spread_radius
 		pickup.position = drop_parent.to_local(drop_position)
 		# Death can occur inside a physics overlap callback. The parent outlives us.
-		drop_parent.add_child.call_deferred(pickup)
+		if CombatProfile.enabled:
+			CombatProfile.insert_child.call_deferred(drop_parent, pickup, &"xp_insertion")
+		else:
+			drop_parent.add_child.call_deferred(pickup)
 
 
 func _uses_tier_1_xp_rules() -> bool:
@@ -220,6 +274,15 @@ func get_attack_damage() -> float:
 
 
 func _physics_process(delta: float) -> void:
+	if not CombatProfile.enabled:
+		_profile_enemy_physics_process(delta)
+		return
+	var profile_start := Time.get_ticks_usec()
+	_profile_enemy_physics_process(delta)
+	CombatProfile.finish(&"squig_update", profile_start)
+
+
+func _profile_enemy_physics_process(delta: float) -> void:
 	if not is_instance_valid(target):
 		velocity = Vector2.ZERO
 		return
@@ -337,25 +400,13 @@ func _get_separation_direction(delta: float) -> Vector2:
 
 
 func _calculate_separation_direction() -> Vector2:
-	var separation := Vector2.ZERO
-	var radius_squared := separation_radius * separation_radius
-	spatial_grid.append_nearby_candidates(global_position, _separation_candidates)
+	if not CombatProfile.enabled:
+		return _profile_enemy_calculate_separation_direction()
+	var profile_start := Time.get_ticks_usec()
+	var profile_result := _profile_enemy_calculate_separation_direction()
+	CombatProfile.finish(&"separation", profile_start)
+	return profile_result
 
-	for enemy: Enemy in _separation_candidates:
-		if enemy == self or not is_instance_valid(enemy):
-			continue
 
-		var away := global_position - enemy.global_position
-		var distance_squared := away.length_squared()
-		if distance_squared >= radius_squared:
-			continue
-
-		if distance_squared <= 0.0001:
-			separation += Vector2.RIGHT if get_instance_id() < enemy.get_instance_id() else Vector2.LEFT
-			continue
-
-		var distance := sqrt(distance_squared)
-		var proximity_weight := 1.0 - distance / separation_radius
-		separation += away / distance * proximity_weight
-
-	return separation.limit_length(1.0)
+func _profile_enemy_calculate_separation_direction() -> Vector2:
+	return spatial_grid.calculate_separation(self)

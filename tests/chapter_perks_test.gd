@@ -184,8 +184,8 @@ func run() -> void:
 	check(is_equal_approx(target.current_health, 12.5), "Guaranteed critical damage uses existing multiplier")
 	await process_frame
 	var red_numbers := 0
-	for child in main.get_children():
-		if child is FloatingDamageNumber:
+	for child in main.find_children("*", "Node2D", true, false):
+		if child is FloatingDamageNumber and child.visible:
 			check(child.is_critical and child.get_node("Label").modulate == Color.RED and is_equal_approx(child.damage_amount, 37.5), "Guaranteed crit displays red final damage")
 			red_numbers += 1
 	check(red_numbers == 1, "One guaranteed direct damage number")
