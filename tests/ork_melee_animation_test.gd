@@ -22,7 +22,9 @@ func begin_attack(offset: Vector2 = Vector2(60, 0)) -> void:
 	player.current_health = player.max_health
 	player.damage_invulnerability_timer.stop()
 	ork._physics_process(0.016)
-	check(ork.state == OrkBoy.State.ATTACK and ork.visual.animation == &"attack", "Range entry starts attack animation")
+	check(ork.state == OrkBoy.State.CHASE and ork._pre_attack_remaining >= 0.10 and ork._pre_attack_remaining <= 0.30, "Range entry schedules one short random preparation")
+	ork._physics_process(0.31)
+	check(ork.state == OrkBoy.State.WINDUP and ork.visual.animation == &"attack", "Range entry starts attack animation")
 	check(ork.velocity == Vector2.ZERO and ork.get_node("CollisionShape2D").disabled == false, "Swing stops movement while body collision remains enabled")
 
 func frame_ground() -> Vector2:
@@ -60,6 +62,29 @@ func run() -> void:
 			if index == 0:
 				sheet = atlas.atlas
 			check(atlas.atlas == sheet, "One original image per animation without duplicated PNGs")
+	check(is_equal_approx(frames.get_frame_duration(&"attack", 3) / 7.0, 0.25), "Recovery pose lasts 250ms")
+	check(is_equal_approx((frames.get_frame_duration(&"attack", 0) + frames.get_frame_duration(&"attack", 1)) / 7.0, 2.0 / 7.0), "Animation provides 286ms wind-up")
+	var squig := EnemySpawner.ENEMY_SCENE.instantiate() as Enemy
+	main.add_child(squig)
+	squig.set_physics_process(false)
+	check(squig.max_health == 25.0 and is_equal_approx(ork.separation_strength / squig.separation_strength, 1.25), "Orks have 25% stronger grid separation; Squig HP unchanged")
+	squig.queue_free()
+	ork.position = player.position - Vector2(60, 0)
+	ork._attack_rng.seed = 723
+	ork._physics_process(0.016)
+	var pending := ork._pre_attack_remaining
+	ork._physics_process(0.01)
+	check(is_equal_approx(ork._pre_attack_remaining, pending - 0.01), "Preparation delay is not rerolled every frame")
+	player.position.x += 120
+	ork._physics_process(0.016)
+	check(ork.state == OrkBoy.State.CHASE and ork._pre_attack_remaining < 0.0, "Escape before wind-up cancels preparation")
+	player.position = Vector2.ZERO
+	ork.take_damage(1.0)
+	check(ork.visual.self_modulate.r > 1.5, "All shared damage events brighten the Ork")
+	ork.take_damage(1.0)
+	ork._physics_process(0.09)
+	check(ork.visual.self_modulate == Color.WHITE, "Repeated hits expire back to original tint")
+	ork.current_health = ork.max_health
 	ork.position = Vector2(-200, 0)
 	ork._physics_process(0.016)
 	check(ork.velocity.x > 0 and ork.visual.animation == &"walk" and ork.visual.is_playing() and not ork.visual.flip_h, "Rightward chase walks facing right")
@@ -76,18 +101,36 @@ func run() -> void:
 	seed(83)
 	var raw := ork.get_attack_damage()
 	seed(83)
+	var slashes_before := 0
+	for child in main.get_children():
+		if child is KnifeSlashEffect: slashes_before += 1
 	ork.visual.frame = 2
+	var slashes_after := 0
+	var strike_slash: KnifeSlashEffect
+	for child in main.get_children():
+		if child is KnifeSlashEffect:
+			slashes_after += 1
+			strike_slash = child
+	check(slashes_after == slashes_before + 1 and is_zero_approx(strike_slash.rotation), "Right strike emits exactly one right-facing cosmetic slash")
+	check(strike_slash.global_position.is_equal_approx(ork.global_position + ork.slash_offset), "Slash is anchored to the locked strike side")
+	check(ork.state == OrkBoy.State.SWING and not ork.visual.is_playing() and is_equal_approx(ork._impact_pause_remaining, 0.05), "Successful strike pauses only this Ork for 50ms")
 	check(player.current_health == hp - raw and ork.attack_damage_applied, "Third frame applies exactly the weighted raw strike")
+	ork._physics_process(0.049)
+	check(not ork.visual.is_playing() and ork.state == OrkBoy.State.SWING, "Impact pause remains local through 49ms")
+	ork._physics_process(0.001)
+	check(ork.visual.is_playing() and is_zero_approx(ork._impact_pause_remaining), "Impact pause resumes at 50ms")
 	player.damage_invulnerability_timer.stop()
 	ork.visual.frame_changed.emit()
 	ork.visual.frame = 3
+	check(ork.state == OrkBoy.State.RECOVERY, "Final pose enters recovery")
 	check(player.current_health == hp - raw, "Duplicate frame signal and recovery never deal extra damage")
 	ork.visual.animation_finished.emit()
 	check(ork.state == OrkBoy.State.CHASE and ork.visual.animation == &"walk", "Attack finish returns to chase")
 	ork._physics_process(0.2)
 	check(ork.state == OrkBoy.State.CHASE, "Cooldown prevents immediate reattack")
 	ork._physics_process(1.1)
-	check(ork.state == OrkBoy.State.ATTACK, "Ready cooldown permits a new attack")
+	ork._physics_process(0.31)
+	check(ork.state == OrkBoy.State.WINDUP, "Ready cooldown permits a new attack")
 	# Misses consume the one strike without rolling raw damage.
 	begin_attack()
 	player.position += Vector2(100, 0)
@@ -99,6 +142,9 @@ func run() -> void:
 	player.position = Vector2.ZERO
 	begin_attack()
 	player.position = ork.position - Vector2(20, 0)
+	var locked_flip := ork.visual.flip_h
+	ork._physics_process(0.05)
+	check(ork.visual.flip_h == locked_flip and ork.state == OrkBoy.State.WINDUP and ork.velocity == Vector2.ZERO, "Committed wind-up keeps facing and position when player runs behind")
 	ork.visual.frame = 2
 	check(player.current_health == player.max_health, "Swing cannot hit behind its committed facing")
 	player.position = Vector2.ZERO
@@ -141,13 +187,22 @@ func run() -> void:
 	ork._physics_process(ork._attack_timeout + 0.1)
 	check(ork.state == OrkBoy.State.CHASE and player.current_health == player.max_health, "Stalled animation watchdog cancels without damage")
 	ork.visual.speed_scale = 1.0
+	begin_attack(Vector2(-60, 0))
+	ork.visual.frame = 2
+	var left_slash: KnifeSlashEffect
+	for child in main.get_children():
+		if child is KnifeSlashEffect: left_slash = child
+	check(is_equal_approx(cos(left_slash.rotation), -1.0), "Left-facing strike mirrors the slash direction")
+	check(left_slash.global_position.is_equal_approx(ork.global_position + Vector2(-ork.slash_offset.x, ork.slash_offset.y)), "Left slash stays on committed side")
 	# Actual playback verifies frame_changed and animation_finished signals.
 	begin_attack(Vector2(-60, 0))
 	check(ork.visual.flip_h, "Attack on left uses same flipped sprite")
 	var strike_frames: Array[int] = []
 	var record_hit := func(_current: float, _maximum: float) -> void: strike_frames.append(ork.visual.frame)
 	player.health_changed.connect(record_hit)
-	await create_timer(0.65).timeout
+	ork.set_physics_process(true)
+	await create_timer(0.85).timeout
+	ork.set_physics_process(false)
 	player.health_changed.disconnect(record_hit)
 	check(strike_frames == [2] and ork.state == OrkBoy.State.CHASE, "Real animation delivers one strike at frame three and completes")
 	check(spawner.spatial_grid._enemies.has(ork) and spawner.get_active_enemy_count() == 1, "Attacking Ork remains tracked in shared grid")
@@ -188,7 +243,24 @@ func run() -> void:
 		if child is CPUParticles2D:
 			blood += 1
 	check(skulls in [1, 2] and blood == 1, "Normal death retains skull quantity rules and blood VFX")
+	# Every cancellation stage rejects late callbacks, even before queue_free flushes.
+	for death_state: OrkBoy.State in [OrkBoy.State.CHASE, OrkBoy.State.WINDUP, OrkBoy.State.SWING, OrkBoy.State.RECOVERY]:
+		spawner._spawn_enemy(player.position - Vector2(60, 0), spawner.tier_2_enemy_scene)
+		var doomed := spawner.spatial_grid._enemies.back() as OrkBoy
+		doomed.set_physics_process(false)
+		doomed._start_attack()
+		doomed.state = death_state
+		if death_state == OrkBoy.State.CHASE: doomed._pre_attack_remaining = 0.2
+		doomed.visual.frame = 0
+		var hp_at_death := player.current_health
+		doomed.take_damage(1000.0)
+		doomed.visual.frame = doomed.hit_frame
+		doomed.visual.frame_changed.emit()
+		doomed._physics_process(1.0)
+		check(doomed.is_queued_for_deletion() and doomed._pre_attack_remaining < 0.0 and player.current_health == hp_at_death, "Death cancels all pending attack work in state %s" % death_state)
 	await create_timer(0.4).timeout
+	for child in main.get_children():
+		check(not child is KnifeSlashEffect, "Cosmetic slashes auto-free after strike")
 	main.queue_free()
 	await process_frame
 	print("PASS: %d Ork melee animation checks" % checks)
