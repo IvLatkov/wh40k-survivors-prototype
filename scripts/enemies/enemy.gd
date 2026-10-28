@@ -1,14 +1,33 @@
 class_name Enemy
 extends CharacterBody2D
 
+signal damage_received(amount: float, critical: bool)
+
+const XP_PICKUP_SCENE := preload("res://scenes/pickups/xp_pickup.tscn")
+const BLOOD_BURST_SCENE := preload("res://scenes/effects/blood_burst.tscn")
+const DAMAGE_NUMBER_SCENE := preload("res://scenes/ui/damage_number.tscn")
+
+enum XPTier { LOW, MID, HIGH, BOSS }
+enum DamageTier { TIER_1, MID, HIGH, BOSS, TIER_2 }
+
+# Cumulative Tier 1 thresholds: 70% one, 25% two, 5% three.
+const TIER_1_ONE_DAMAGE_CHANCE: float = 0.70
+const TIER_1_TWO_DAMAGE_THRESHOLD: float = 0.95
+const TIER_2_THREE_DAMAGE_CHANCE: float = 0.65
+const TIER_2_FOUR_DAMAGE_THRESHOLD: float = 0.90
+
 const SQUIG_ANIMATIONS: Array[StringName] = [
 	&"walk_green",
 	&"walk_red",
 	&"walk_purple",
 ]
 
-@export var movement_speed: float = 100.0
-@export var max_health: float = 50.0
+## An empty list preserves a scene's static, single-frame visual.
+@export var movement_animations: Array[StringName] = SQUIG_ANIMATIONS.duplicate()
+@export var sprite_faces_right: bool = true
+@export_range(0.0, 0.5, 0.01) var speed_variation_limit: float = 0.5
+@export var movement_speed: float = 60.0
+@export var max_health: float = 25.0
 @export var stop_distance: float = 35.0
 @export var separation_radius: float = 40.0
 @export_range(0.0, 2.0, 0.05) var separation_strength: float = 0.4
@@ -16,14 +35,30 @@ const SQUIG_ANIMATIONS: Array[StringName] = [
 @export var knockback_distance: float = 20.0
 @export var knockback_duration: float = 0.12
 @export var contact_damage: float = 1.0
+@export var contact_damage_enabled: bool = true
+@export var damage_tier: DamageTier = DamageTier.TIER_1
 @export var full_simulation_distance: float = 900.0
 @export var reduced_simulation_distance: float = 1500.0
 @export_range(0.05, 0.5, 0.01) var very_far_update_interval: float = 0.1
+
+@export_group("XP Drops")
+@export var xp_tier: XPTier = XPTier.LOW
+@export_range(0.0, 3600.0, 1.0) var tier_1_mid_xp_unlock_seconds: float = 300.0
+@export_range(0.0, 1.0, 0.01) var tier_1_mid_xp_chance: float = 0.10
+@export_range(0.0, 1.0, 0.01) var tier_1_mid_xp_chance_cap: float = 0.50
+@export_range(10.0, 40.0, 1.0) var xp_drop_offset: float = 10.0
+## Optional quantity rules independent of the selected skull's art/value.
+@export var xp_quantity_reward: XPReward
+@export var low_xp_reward: XPReward = preload("res://assets/art/effects/xp/low_level/xp_reward.tres")
+@export var mid_xp_reward: XPReward = preload("res://assets/art/effects/xp/mid_level/xp_reward.tres")
+@export var high_xp_reward: XPReward = preload("res://assets/art/effects/xp/high_level/xp_reward.tres")
+@export var boss_xp_reward: XPReward = preload("res://assets/art/effects/xp/boss/xp_reward.tres")
 
 @onready var visual: AnimatedSprite2D = $Visual
 
 var target: Node2D
 var spatial_grid: EnemySpatialGrid
+var run_clock: RunClock
 var current_health: float
 var _is_knocked_back: bool = false
 var _contact_knockback_ready: bool = true
@@ -38,12 +73,15 @@ var _separation_candidates: Array[Enemy] = []
 var _chase_offset: Vector2 = Vector2.ZERO
 var _movement_speed_multiplier: float = 1.0
 var _individual_movement_speed: float
+var _damage_number_slot: int = 0
 
 
 func _ready() -> void:
+	damage_received.connect(_show_damage_number)
 	current_health = max_health
 	_individual_movement_speed = movement_speed * _movement_speed_multiplier
-	visual.play(SQUIG_ANIMATIONS.pick_random())
+	if not movement_animations.is_empty():
+		visual.play(movement_animations.pick_random())
 
 
 func set_target(new_target: Node2D) -> void:
@@ -54,20 +92,131 @@ func set_spatial_grid(new_spatial_grid: EnemySpatialGrid) -> void:
 	spatial_grid = new_spatial_grid
 
 
+func set_run_clock(clock: RunClock) -> void:
+	run_clock = clock
+
+
 func configure_swarm_variation(chase_offset: Vector2, speed_multiplier: float) -> void:
 	_chase_offset = chase_offset
 	_movement_speed_multiplier = clampf(speed_multiplier, 0.1, 2.0)
 	_individual_movement_speed = movement_speed * _movement_speed_multiplier
 
 
-func take_damage(amount: float) -> void:
+func take_damage(amount: float, critical: bool = false, attacker_stats: CombatStats = null, source: StringName = &"") -> void:
+	if is_queued_for_deletion():
+		return
+	var previous_health := current_health
 	current_health -= amount
+	# Report the actual HP change after damage, including existing overkill behavior.
+	var applied_damage := previous_health - current_health
+	if applied_damage > 0.0:
+		damage_received.emit(applied_damage, critical)
+		if attacker_stats != null:
+			attacker_stats.report_damage_dealt(minf(applied_damage, maxf(previous_health, 0.0)), source, current_health <= 0.0)
 	if current_health <= 0.0:
 		die()
 
 
+func _show_damage_number(amount: float, critical: bool) -> void:
+	var number := DAMAGE_NUMBER_SCENE.instantiate() as FloatingDamageNumber
+	var effect_parent := get_parent() as Node2D
+	# Separate simultaneous direct/splash hits without consuming combat RNG.
+	var offset := Vector2((_damage_number_slot % 3 - 1) * 24.0, -30.0 - (_damage_number_slot % 2) * 18.0)
+	_damage_number_slot += 1
+	number.position = effect_parent.to_local(global_position + offset)
+	number.configure(amount, critical)
+	# The parent survives lethal hits; adding is safe during physics callbacks.
+	effect_parent.add_child.call_deferred(number)
+
+
 func die() -> void:
+	if is_queued_for_deletion():
+		return
+	set_physics_process(false)
+	velocity = Vector2.ZERO
+	_drop_xp()
+	_spawn_blood_burst()
 	queue_free()
+
+
+func _spawn_blood_burst() -> void:
+	var effect := BLOOD_BURST_SCENE.instantiate() as Node2D
+	var effect_parent := get_parent() as Node2D
+	effect.position = effect_parent.to_local(global_position)
+	# Death may happen in a physics callback; the parent survives this enemy.
+	effect_parent.add_child.call_deferred(effect)
+
+
+func _drop_xp() -> void:
+	var reward := roll_xp_reward()
+	# Tier 1 keeps its LOW quantity roll (7% double) even when upgraded to MID.
+	var quantity_reward := xp_quantity_reward if xp_quantity_reward != null else (low_xp_reward if _uses_tier_1_xp_rules() else reward)
+	var drop_count := quantity_reward.roll_pickup_count()
+	var start_angle := randf_range(0.0, TAU)
+	# Keep 16px sprites apart, including the four-pickup boss ring.
+	var spread_radius := maxf(xp_drop_offset, 10.0)
+	if drop_count > 2:
+		spread_radius = maxf(spread_radius, 12.0 / sin(PI / drop_count))
+	var drop_parent := get_parent() as Node2D
+	for index: int in drop_count:
+		var pickup := XP_PICKUP_SCENE.instantiate() as XPPickup
+		pickup.configure(reward)
+		var drop_position := global_position
+		if drop_count > 1:
+			var angle := start_angle + TAU * index / drop_count
+			drop_position += Vector2.RIGHT.rotated(angle) * spread_radius
+		pickup.position = drop_parent.to_local(drop_position)
+		# Death can occur inside a physics overlap callback. The parent outlives us.
+		drop_parent.add_child.call_deferred(pickup)
+
+
+func _uses_tier_1_xp_rules() -> bool:
+	return damage_tier == DamageTier.TIER_1 and xp_tier == XPTier.LOW
+
+
+func get_mid_xp_upgrade_chance() -> float:
+	var salvage_bonus := 0.0
+	if is_instance_valid(target) and target is Player:
+		salvage_bonus = maxf(0.0, (target as Player).combat_stats.get_modifier(&"better_xp_drop_chance"))
+	return clampf(tier_1_mid_xp_chance + salvage_bonus, 0.0, tier_1_mid_xp_chance_cap)
+
+
+func roll_xp_reward() -> XPReward:
+	# Called once at death; later time thresholds can be added here.
+	if _uses_tier_1_xp_rules() and is_instance_valid(run_clock):
+		if run_clock.elapsed_time >= tier_1_mid_xp_unlock_seconds and randf() < get_mid_xp_upgrade_chance():
+			return mid_xp_reward
+	return get_xp_reward()
+
+
+func get_xp_reward() -> XPReward:
+	match xp_tier:
+		XPTier.MID:
+			return mid_xp_reward
+		XPTier.HIGH:
+			return high_xp_reward
+		XPTier.BOSS:
+			return boss_xp_reward
+	return low_xp_reward
+
+
+func get_attack_damage() -> float:
+	if damage_tier == DamageTier.TIER_2:
+		var tier_2_roll := randf()
+		if tier_2_roll < TIER_2_THREE_DAMAGE_CHANCE:
+			return 3.0
+		if tier_2_roll < TIER_2_FOUR_DAMAGE_THRESHOLD:
+			return 4.0
+		return 5.0
+	# Other tiers retain their configured fixed damage until separately balanced.
+	if damage_tier != DamageTier.TIER_1:
+		return contact_damage
+	var roll := randf()
+	if roll < TIER_1_ONE_DAMAGE_CHANCE:
+		return 1.0
+	if roll < TIER_1_TWO_DAMAGE_THRESHOLD:
+		return 2.0
+	return 3.0
 
 
 func _physics_process(delta: float) -> void:
@@ -94,9 +243,11 @@ func _physics_process(delta: float) -> void:
 
 	if distance_squared > stop_distance_squared:
 		_contact_knockback_ready = true
-	elif _contact_knockback_ready:
+	elif contact_damage_enabled and _contact_knockback_ready:
 		if target is Player:
-			(target as Player).take_damage(contact_damage)
+			var player := target as Player
+			if player.can_take_damage():
+				player.take_damage(get_attack_damage())
 		_start_knockback()
 		_process_knockback(delta)
 		return
@@ -144,7 +295,7 @@ func _process_knockback(delta: float) -> void:
 
 func _update_visual_facing(horizontal_velocity: float) -> void:
 	if not is_zero_approx(horizontal_velocity):
-		visual.flip_h = horizontal_velocity < 0.0
+		visual.flip_h = (horizontal_velocity < 0.0) == sprite_faces_right
 
 
 func _set_full_simulation_enabled(enabled: bool) -> void:

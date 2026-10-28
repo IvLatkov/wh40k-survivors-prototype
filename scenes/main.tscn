@@ -1,18 +1,191 @@
-[gd_scene load_steps=7 format=3]
+[gd_scene load_steps=31 format=3]
 
 [ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="1_player"]
-[ext_resource type="Script" path="res://scripts/systems/world_grid.gd" id="2_grid"]
+[ext_resource type="PackedScene" path="res://scenes/systems/chunk_manager.tscn" id="2_chunks"]
 [ext_resource type="Script" path="res://scripts/systems/enemy_spawner.gd" id="3_spawner"]
 [ext_resource type="Script" path="res://scripts/systems/main.gd" id="4_main"]
 [ext_resource type="PackedScene" path="res://scenes/ui/health_hud.tscn" id="5_hud"]
 [ext_resource type="Script" path="res://scripts/systems/enemy_spatial_grid.gd" id="6_spatial_grid"]
 
+[ext_resource type="PackedScene" path="res://scenes/ui/upgrade_menu.tscn" id="7_menu"]
+[ext_resource type="Script" path="res://scripts/systems/upgrade_system.gd" id="8_upgrades"]
+[ext_resource type="Script" path="res://scripts/systems/upgrade_definition.gd" id="9_definition"]
+
+[ext_resource type="Script" path="res://scripts/systems/chapter_perk_manager.gd" id="10_chapters"]
+[ext_resource type="Resource" path="res://resources/chapters/ultramarines.tres" id="11_ultramarines"]
+[ext_resource type="Script" path="res://scripts/systems/chapter_perk_catalog.gd" id="12_catalog"]
+[ext_resource type="Script" path="res://scripts/systems/run_clock.gd" id="13_clock"]
+
+[ext_resource type="PackedScene" path="res://scenes/ui/character_info_panel.tscn" id="14_character_info"]
+
+[sub_resource type="Resource" id="Upgrade_bolter_damage"]
+script = ExtResource("9_definition")
+weapon_group = 0
+id = &"bolter_damage"
+display_name = "BOLTER DAMAGE"
+description = "Increase base direct and splash damage."
+stat = &"bolter_damage"
+amount = 0.1
+
+[sub_resource type="Resource" id="Upgrade_projectile_speed"]
+script = ExtResource("9_definition")
+weapon_group = 0
+id = &"projectile_speed"
+display_name = "BOLTER PROJECTILE SPEED"
+description = "Increase base Bolter projectile speed."
+stat = &"projectile_speed"
+amount = 0.1
+
+[sub_resource type="Resource" id="Upgrade_crit_chance"]
+script = ExtResource("9_definition")
+weapon_group = 2
+id = &"crit_chance"
+display_name = "CRIT CHANCE"
+description = "Add 1.5% points to Crit Chance."
+stat = &"crit_chance"
+amount = 0.015
+scales_with_mastery = false
+
+[sub_resource type="Resource" id="Upgrade_knife_damage"]
+script = ExtResource("9_definition")
+weapon_group = 1
+id = &"knife_damage"
+display_name = "KNIFE DAMAGE"
+description = "Increase base knife damage."
+stat = &"knife_damage"
+amount = 0.1
+
+[sub_resource type="Resource" id="Upgrade_knife_range"]
+script = ExtResource("9_definition")
+weapon_group = 1
+id = &"knife_range"
+display_name = "KNIFE RANGE"
+description = "Increase base knife reach and slash size."
+stat = &"knife_range"
+amount = 0.1
+
+[sub_resource type="Resource" id="Upgrade_armor"]
+script = ExtResource("9_definition")
+category = 1
+id = &"armor"
+display_name = "CERAMITE PLATING"
+description = "Reinforce your power armor with additional ceramite protection."
+stat = &"armor"
+amount = 1.0
+percentage = false
+scales_with_mastery = false
+
+[sub_resource type="Resource" id="Upgrade_multishot"]
+script = ExtResource("9_definition")
+weapon_group = 0
+id = &"multishot"
+display_name = "BOLTER PROJECTILE COUNT"
+description = "+1 Bolter projectile. Maximum total: 5."
+stat = &"projectile_count"
+amount = 1.0
+percentage = false
+max_level = 4
+stat_cap = 5.0
+
+[sub_resource type="Resource" id="Upgrade_fire_rate"]
+script = ExtResource("9_definition")
+weapon_group = 0
+id = &"fire_rate"
+display_name = "BOLTER FIRE RATE"
+description = "Fire the Bolter 10% faster."
+stat = &"fire_rate"
+amount = 0.1
+
+[sub_resource type="Resource" id="Upgrade_knife_attack_rate"]
+script = ExtResource("9_definition")
+weapon_group = 1
+id = &"knife_attack_rate"
+display_name = "KNIFE ATTACK RATE"
+description = "Attack with the knife 10% faster."
+stat = &"knife_attack_rate"
+amount = 0.1
+
+[sub_resource type="Resource" id="Upgrade_max_health"]
+script = ExtResource("9_definition")
+category = 1
+id = &"max_health"
+display_name = "ASTARTES PHYSIOLOGY"
+description = "Enhance your superhuman resilience and increase maximum Health by 5%."
+stat = &"max_health_bonus"
+amount = 0.05
+
+[sub_resource type="Resource" id="Upgrade_health_regen"]
+script = ExtResource("9_definition")
+category = 1
+id = &"health_regen"
+display_name = "GENE-SEED RESILIENCE"
+description = "Regenerate 0.2 Health per second."
+stat = &"health_regen"
+amount = 0.2
+percentage = false
+scales_with_mastery = false
+
+[sub_resource type="Resource" id="Upgrade_auto_senses"]
+script = ExtResource("9_definition")
+category = 1
+id = &"auto_senses"
+display_name = "AUTO-SENSES"
+description = "Increase XP pickup radius by 10%."
+stat = &"pickup_radius"
+amount = 0.1
+scales_with_mastery = false
+
+[sub_resource type="Resource" id="Upgrade_combat_stims"]
+script = ExtResource("9_definition")
+category = 1
+id = &"combat_stims"
+display_name = "COMBAT STIMS"
+description = "Increase movement speed by 5%."
+stat = &"movement_speed"
+amount = 0.05
+scales_with_mastery = false
+
+[sub_resource type="Resource" id="Upgrade_purity_seals"]
+script = ExtResource("9_definition")
+category = 1
+id = &"purity_seals"
+display_name = "PURITY SEALS"
+description = "Increase all XP gained by 10%."
+stat = &"xp_gain"
+amount = 0.1
+scales_with_mastery = false
+
+[sub_resource type="Resource" id="Upgrade_iron_halo"]
+script = ExtResource("9_definition")
+category = 1
+id = &"iron_halo"
+display_name = "IRON HALO"
+description = "Gain a 2% chance to completely avoid incoming damage."
+stat = &"dodge_chance"
+amount = 0.02
+scales_with_mastery = false
+
+[sub_resource type="Resource" id="Upgrade_battlefield_salvage"]
+script = ExtResource("9_definition")
+category = 1
+id = &"battlefield_salvage"
+display_name = "BATTLEFIELD SALVAGE"
+description = "Increase the chance for enemies to drop higher-tier XP skulls by 5%."
+stat = &"better_xp_drop_chance"
+amount = 0.05
+scales_with_mastery = false
+stat_cap = 0.4
+
 [node name="Main" type="Node2D"]
 script = ExtResource("4_main")
 
-[node name="WorldGrid" type="Node2D" parent="."]
-z_index = -10
-script = ExtResource("2_grid")
+[node name="RunClock" type="Node" parent="."]
+process_mode = 1
+process_priority = -10
+script = ExtResource("13_clock")
+
+[node name="ChunkManager" parent="." node_paths=PackedStringArray("player") instance=ExtResource("2_chunks")]
+player = NodePath("../Player")
 
 [node name="Player" parent="." instance=ExtResource("1_player")]
 
@@ -23,3 +196,18 @@ script = ExtResource("3_spawner")
 script = ExtResource("6_spatial_grid")
 
 [node name="HealthHUD" parent="." instance=ExtResource("5_hud")]
+
+[node name="UpgradeSystem" type="Node" parent="."]
+process_mode = 3
+script = ExtResource("8_upgrades")
+definitions = Array[ExtResource("9_definition")]([SubResource("Upgrade_bolter_damage"), SubResource("Upgrade_projectile_speed"), SubResource("Upgrade_crit_chance"), SubResource("Upgrade_knife_damage"), SubResource("Upgrade_knife_range"), SubResource("Upgrade_armor"), SubResource("Upgrade_fire_rate"), SubResource("Upgrade_knife_attack_rate"), SubResource("Upgrade_max_health"), SubResource("Upgrade_health_regen"), SubResource("Upgrade_auto_senses"), SubResource("Upgrade_combat_stims"), SubResource("Upgrade_purity_seals"), SubResource("Upgrade_iron_halo"), SubResource("Upgrade_battlefield_salvage"), SubResource("Upgrade_multishot")])
+
+[node name="UpgradeMenu" parent="." instance=ExtResource("7_menu")]
+
+[node name="ChapterPerkManager" type="Node" parent="."]
+script = ExtResource("10_chapters")
+catalogs = Array[ExtResource("12_catalog")]([ExtResource("11_ultramarines")])
+
+[node name="ChapterPerkMenu" parent="." instance=ExtResource("7_menu")]
+
+[node name="CharacterInfoPanel" parent="." instance=ExtResource("14_character_info")]

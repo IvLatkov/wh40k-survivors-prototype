@@ -1,3 +1,32 @@
 # Godot 4+ specific ignores
 .godot/
 /android/
+
+# Temporary files and logs
+*.tmp
+*.log
+*.temp
+*~
+
+# Local Godot editor data and generated exports
+/Godot/
+/build/
+/builds/
+/exports/
+.export/
+export_credentials.cfg
+
+# Operating system and editor caches
+.DS_Store
+Thumbs.db
+desktop.ini
+.idea/
+.vscode/
+__pycache__/
+*.pyc
+
+# Local environment files and credentials
+.env
+.env.*
+!.env.example
+!.env.sample

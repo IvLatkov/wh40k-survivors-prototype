@@ -1,0 +1,10 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/systems/chunk_manager.gd" id="1_manager"]
+
+[node name="ChunkManager" type="Node2D"]
+process_physics_priority = 1
+script = ExtResource("1_manager")
+
+[node name="TerrainChunks" type="Node2D" parent="."]
+z_index = -10

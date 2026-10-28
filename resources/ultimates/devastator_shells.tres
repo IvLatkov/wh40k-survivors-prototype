@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="UltimateDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/systems/ultimate_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"devastator_shells"
+display_name = "DEVASTATOR SHELLS"
+description = "Every third Bolter attack fires an empowered heavy shell with increased damage and blast radius."
+prerequisites = {
+&"bolter_damage": 5,
+&"fire_rate": 5
+}
+accept_functional_cap = Array[StringName]([])

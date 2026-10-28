@@ -1,0 +1,88 @@
+[gd_scene load_steps=16 format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/enemies/enemy.tscn" id="1_base"]
+[ext_resource type="Texture2D" path="res://assets/art/effects/enemy/orc/ChatGPT Image Oct 19, 2026, 08_30_45 PM-1.png" id="2_walk"]
+[ext_resource type="Resource" path="res://assets/art/effects/xp/low_level/xp_reward.tres" id="3_quantity"]
+[ext_resource type="Texture2D" path="res://assets/art/effects/enemy/orc/ChatGPT Image Oct 19, 2026, 08_30_46 PM-2.png" id="4_attack"]
+[ext_resource type="Script" path="res://scripts/enemies/ork_boy.gd" id="5_ork"]
+
+[sub_resource type="AtlasTexture" id="walk_0"]
+atlas = ExtResource("2_walk")
+region = Rect2(0, 0, 670, 650)
+margin = Rect2(202, 120, 354, 374)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="walk_1"]
+atlas = ExtResource("2_walk")
+region = Rect2(670, 0, 584, 650)
+margin = Rect2(287, 120, 440, 374)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="walk_2"]
+atlas = ExtResource("2_walk")
+region = Rect2(0, 650, 670, 604)
+margin = Rect2(220, 165, 354, 420)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="walk_3"]
+atlas = ExtResource("2_walk")
+region = Rect2(670, 650, 584, 604)
+margin = Rect2(300, 165, 440, 420)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="attack_0"]
+atlas = ExtResource("4_attack")
+region = Rect2(0, 0, 600, 650)
+margin = Rect2(227, 83, 424, 374)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="attack_1"]
+atlas = ExtResource("4_attack")
+region = Rect2(600, 0, 654, 650)
+margin = Rect2(283, 80, 370, 374)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="attack_2"]
+atlas = ExtResource("4_attack")
+region = Rect2(0, 650, 710, 604)
+margin = Rect2(236, 174, 314, 420)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="attack_3"]
+atlas = ExtResource("4_attack")
+region = Rect2(710, 650, 544, 604)
+margin = Rect2(351, 175, 480, 420)
+filter_clip = true
+
+[sub_resource type="SpriteFrames" id="OrkFrames"]
+animations = [
+{"frames": [{"duration": 1.0, "texture": SubResource("walk_0")}, {"duration": 1.0, "texture": SubResource("walk_1")}, {"duration": 1.0, "texture": SubResource("walk_2")}, {"duration": 1.0, "texture": SubResource("walk_3")}], "loop": true, "name": &"walk", "speed": 6.0},
+{"frames": [{"duration": 1.0, "texture": SubResource("attack_0")}, {"duration": 1.0, "texture": SubResource("attack_1")}, {"duration": 1.0, "texture": SubResource("attack_2")}, {"duration": 1.0, "texture": SubResource("attack_3")}], "loop": false, "name": &"attack", "speed": 7.0}
+ ]
+
+[sub_resource type="CircleShape2D" id="OrkBody"]
+radius = 18.0
+
+[node name="OrkBoy" instance=ExtResource("1_base")]
+script = ExtResource("5_ork")
+movement_animations = Array[StringName]([&"walk"])
+speed_variation_limit = 0.05
+movement_speed = 50.0
+max_health = 50.0
+stop_distance = 65.0
+separation_radius = 44.0
+separation_strength = 0.3
+contact_damage = 3.0
+contact_damage_enabled = false
+damage_tier = 4
+xp_tier = 1
+xp_quantity_reward = ExtResource("3_quantity")
+
+[node name="Visual" parent="." index="0"]
+position = Vector2(0, 0)
+scale = Vector2(0.09, 0.09)
+sprite_frames = SubResource("OrkFrames")
+animation = &"walk"
+
+[node name="CollisionShape2D" parent="." index="1"]
+shape = SubResource("OrkBody")

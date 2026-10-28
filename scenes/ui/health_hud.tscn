@@ -15,6 +15,23 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 
+[node name="RunTimerLabel" type="Label" parent="HUD"]
+layout_mode = 1
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -100.0
+offset_top = 12.0
+offset_right = 100.0
+offset_bottom = 50.0
+grow_horizontal = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 28
+text = "00:00"
+horizontal_alignment = 1
+
 [node name="PerformanceLabel" type="Label" parent="HUD"]
 layout_mode = 1
 offset_left = 12.0
@@ -50,7 +67,38 @@ horizontal_alignment = 1
 custom_minimum_size = Vector2(300, 22)
 layout_mode = 2
 max_value = 50.0
+step = 0.0
 value = 50.0
+show_percentage = false
+
+[node name="XPDisplay" type="VBoxContainer" parent="HUD"]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -150.0
+offset_top = -132.0
+offset_right = 150.0
+offset_bottom = -84.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 2
+theme_override_constants/separation = 4
+
+[node name="XPLabel" type="Label" parent="HUD/XPDisplay"]
+layout_mode = 2
+mouse_filter = 2
+text = "LEVEL 1    XP 0 / 10"
+horizontal_alignment = 1
+
+[node name="XPBar" type="ProgressBar" parent="HUD/XPDisplay"]
+custom_minimum_size = Vector2(300, 22)
+layout_mode = 2
+mouse_filter = 2
+max_value = 10.0
+step = 0.0
 show_percentage = false
 
 [node name="DeathLabel" type="Label" parent="HUD"]

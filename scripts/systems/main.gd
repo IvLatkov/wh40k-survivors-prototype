@@ -6,5 +6,21 @@ extends Node2D
 
 
 func _ready() -> void:
+	health_hud.bind_run_clock($RunClock)
+	enemy_spawner.bind_run_clock($RunClock)
 	health_hud.bind_player(player)
 	health_hud.bind_enemy_spawner(enemy_spawner)
+	$UpgradeSystem.choices_ready.connect($UpgradeMenu.show_choices)
+	$UpgradeSystem.selection_finished.connect($UpgradeMenu.hide)
+	$UpgradeMenu.upgrade_selected.connect($UpgradeSystem.select_upgrade)
+	$ChapterPerkManager.bind_player(player)
+	$UpgradeSystem.chapter_manager = $ChapterPerkManager
+	$UpgradeMenu.stats = player.combat_stats
+	$UpgradeSystem.chapter_choices_ready.connect($ChapterPerkMenu.show_chapter_choices)
+	$UpgradeSystem.selection_finished.connect($ChapterPerkMenu.hide)
+	$ChapterPerkMenu.upgrade_selected.connect($UpgradeSystem.select_chapter_perk)
+	$UpgradeSystem.ultimate_selected.connect(player.get_node("Bolter").activate_ultimate)
+	$UpgradeSystem.ultimate_selected.connect(player.get_node("KnifeAttack").activate_ultimate)
+	$UpgradeSystem.bind_player(player)
+	var reward_menus: Array[CanvasLayer] = [$UpgradeMenu, $ChapterPerkMenu]
+	$CharacterInfoPanel.bind_player(player, $UpgradeSystem, reward_menus)

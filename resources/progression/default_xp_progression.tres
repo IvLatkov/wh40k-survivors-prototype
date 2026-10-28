@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="XPProgression" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/systems/xp_progression.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+requirements = PackedInt32Array(8, 10, 12, 15, 18, 22, 26, 30, 35, 40, 50, 60, 72, 85, 100)
+subsequent_level_increase = 15

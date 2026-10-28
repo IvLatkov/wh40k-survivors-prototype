@@ -80,3 +80,17 @@ func _world_to_cell(world_position: Vector2) -> Vector2i:
 		floori(world_position.x / safe_cell_size),
 		floori(world_position.y / safe_cell_size)
 	)
+
+
+func append_candidates_in_radius(world_position: Vector2, radius: float, output: Array[Enemy]) -> void:
+	output.clear()
+	# Include one update interval of movement padding for the periodically rebuilt grid.
+	var padding := maxf(cell_size, 1.0)
+	var extent := Vector2.ONE * (radius + padding)
+	var first := _world_to_cell(world_position - extent)
+	var last := _world_to_cell(world_position + extent)
+	for y in range(first.y, last.y + 1):
+		for x in range(first.x, last.x + 1):
+			for candidate: Variant in _cells.get(Vector2i(x, y), []):
+				if is_instance_valid(candidate) and candidate is Enemy:
+					output.append(candidate)

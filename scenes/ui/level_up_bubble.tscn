@@ -1,0 +1,41 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/level_up_bubble.gd" id="1_script"]
+
+[sub_resource type="StyleBoxFlat" id="Style_bubble"]
+bg_color = Color(1, 1, 1, 1)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_left = 5
+corner_radius_bottom_right = 5
+
+[node name="LevelUpBubble" type="Control"]
+visible = false
+z_index = 10
+mouse_filter = 2
+script = ExtResource("1_script")
+
+[node name="Panel" type="Panel" parent="."]
+offset_left = -120.0
+offset_top = -28.0
+offset_right = 120.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("Style_bubble")
+
+[node name="Tail" type="Polygon2D" parent="."]
+polygon = PackedVector2Array(-5, -1, 5, -1, 0, 5)
+color = Color(1, 1, 1, 1)
+
+[node name="Message" type="Label" parent="Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.05, 0.05, 0.05, 1)
+theme_override_font_sizes/font_size = 14
+text = "FOR THE EMPEROR!"
+horizontal_alignment = 1
+vertical_alignment = 1

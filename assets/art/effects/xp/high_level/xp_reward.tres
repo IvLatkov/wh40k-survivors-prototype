@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="XPReward" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/pickups/xp_reward.gd" id="1_reward"]
+[ext_resource type="Texture2D" path="res://assets/art/effects/xp/high_level/Skull_head_with_little_wings_red.png" id="2_texture"]
+
+[resource]
+script = ExtResource("1_reward")
+xp_per_pickup = 15
+pickup_count = 1
+double_drop_chance = 0.15
+texture = ExtResource("2_texture")

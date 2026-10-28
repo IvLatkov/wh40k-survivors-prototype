@@ -1,6 +1,7 @@
-[gd_scene load_steps=18 format=3]
+[gd_scene load_steps=20 format=3]
 
 [ext_resource type="Script" path="res://scripts/player/player.gd" id="1_player"]
+[ext_resource type="PackedScene" path="res://scenes/ui/level_up_bubble.tscn" id="17_bubble"]
 [ext_resource type="PackedScene" path="res://scenes/weapons/bolter.tscn" id="2_bolter"]
 [ext_resource type="PackedScene" path="res://scenes/weapons/knife.tscn" id="4_knife"]
 [ext_resource type="Texture2D" path="res://assets/art/effects/player/ultramarine/Ultramarine_bolter_right.png_0001.png" id="5_right_1"]
@@ -79,6 +80,9 @@ animations = [{
 "speed": 9.0
 }]
 
+[sub_resource type="CircleShape2D" id="CircleShape2D_xp_collection"]
+radius = 60.0
+
 [node name="Player" type="CharacterBody2D"]
 texture_filter = 1
 collision_mask = 2
@@ -110,3 +114,18 @@ one_shot = true
 [node name="Bolter" parent="." instance=ExtResource("2_bolter")]
 
 [node name="KnifeAttack" parent="." instance=ExtResource("4_knife")]
+
+[node name="XPCollectionArea" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 8
+monitorable = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="XPCollectionArea"]
+shape = SubResource("CircleShape2D_xp_collection")
+
+[node name="LevelUpBubble" parent="." instance=ExtResource("17_bubble")]
+offset_top = -55.0
+offset_bottom = -55.0
+
+[connection signal="leveled_up" from="." to="LevelUpBubble" method="show_message"]
+[connection signal="area_entered" from="XPCollectionArea" to="." method="_on_xp_collection_area_entered"]

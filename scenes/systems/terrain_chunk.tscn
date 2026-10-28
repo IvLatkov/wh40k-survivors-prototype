@@ -1,0 +1,17 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/systems/terrain_chunk.gd" id="1_chunk"]
+
+[node name="TerrainChunk" type="Node2D"]
+texture_filter = 1
+script = ExtResource("1_chunk")
+
+[node name="Ground" type="TileMapLayer" parent="."]
+modulate = Color(0.65, 0.65, 0.65, 1)
+collision_enabled = false
+navigation_enabled = false
+
+[node name="Decorations" type="TileMapLayer" parent="."]
+z_index = 1
+collision_enabled = false
+navigation_enabled = false

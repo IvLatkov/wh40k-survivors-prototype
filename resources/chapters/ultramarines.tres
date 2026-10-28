@@ -1,0 +1,173 @@
+[gd_resource type="Resource" script_class="ChapterPerkCatalog" format=3 uid="uid://cxulgcq8m8n3l"]
+
+[ext_resource type="Script" uid="uid://dflcqxvinssum" path="res://scripts/systems/chapter_perk_catalog.gd" id="1"]
+[ext_resource type="Script" uid="uid://cr14raaxtx3tv" path="res://scripts/systems/chapter_perk_definition.gd" id="2"]
+
+[sub_resource type="Resource" id="tactical_precision"]
+script = ExtResource("2")
+id = &"tactical_precision"
+display_name = "TACTICAL PRECISION"
+description = "Permanent: +5% Bolter damage; +3 percentage points crit chance."
+modifiers = {
+&"bolter_damage": 0.05,
+&"crit_chance": 0.03
+}
+
+[sub_resource type="Resource" id="combat_drills"]
+script = ExtResource("2")
+id = &"combat_drills"
+display_name = "COMBAT DRILLS"
+description = "Permanent: +8% projectile speed; +8% knife damage."
+modifiers = {
+&"knife_damage": 0.08,
+&"projectile_speed": 0.08
+}
+
+[sub_resource type="Resource" id="codex_discipline"]
+script = ExtResource("2")
+id = &"codex_discipline"
+display_name = "CODEX DISCIPLINE"
+description = "Permanent: +5% movement speed; +5% Bolter fire rate."
+modifiers = {
+&"fire_rate": 0.05,
+&"movement_speed": 0.05
+}
+
+[sub_resource type="Resource" id="precision_drills"]
+script = ExtResource("2")
+id = &"precision_drills"
+display_name = "PRECISION DRILLS"
+description = "Permanent: +20 percentage points crit damage."
+milestone = 20
+modifiers = {
+&"crit_damage": 0.2
+}
+
+[sub_resource type="Resource" id="controlled_bursts"]
+script = ExtResource("2")
+id = &"controlled_bursts"
+display_name = "CONTROLLED BURSTS"
+description = "Permanent: +10% Bolter damage; +10% projectile speed."
+milestone = 20
+modifiers = {
+&"bolter_damage": 0.1,
+&"projectile_speed": 0.1
+}
+
+[sub_resource type="Resource" id="close_quarters_training"]
+script = ExtResource("2")
+id = &"close_quarters_training"
+display_name = "CLOSE QUARTERS TRAINING"
+description = "Permanent: +15% knife damage; +10% knife range."
+milestone = 20
+modifiers = {
+&"knife_damage": 0.15,
+&"knife_range": 0.1
+}
+
+[sub_resource type="Resource" id="combat_efficiency"]
+script = ExtResource("2")
+id = &"combat_efficiency"
+display_name = "COMBAT EFFICIENCY"
+description = "On kill: +3% fire rate and movement speed for 3s.
+Max 3 stacks (+9%); kills refresh all stacks."
+milestone = 30
+behavior = 1
+duration = 3.0
+bonus = 0.03
+max_stacks = 3
+
+[sub_resource type="Resource" id="targeting_protocols"]
+script = ExtResource("2")
+id = &"targeting_protocols"
+display_name = "TARGETING PROTOCOLS"
+description = "Permanent: +5 percentage points crit chance;
++15 percentage points crit damage."
+milestone = 30
+modifiers = {
+&"crit_chance": 0.05,
+&"crit_damage": 0.15
+}
+
+[sub_resource type="Resource" id="veteran_marksman"]
+script = ExtResource("2")
+id = &"veteran_marksman"
+display_name = "VETERAN MARKSMAN"
+description = "Permanent: Bolter projectiles penetrate 1 additional enemy."
+milestone = 30
+modifiers = {
+&"penetration": 1.0
+}
+
+[sub_resource type="Resource" id="adaptive_warfare"]
+script = ExtResource("2")
+id = &"adaptive_warfare"
+display_name = "ADAPTIVE WARFARE"
+description = "Every 20s: stronger weapon gains +15% damage for 20s.
+Based on effective damage; kills break ties."
+milestone = 40
+behavior = 2
+duration = 20.0
+bonus = 0.15
+
+[sub_resource type="Resource" id="explosive_doctrine"]
+script = ExtResource("2")
+id = &"explosive_doctrine"
+display_name = "EXPLOSIVE DOCTRINE"
+description = "Permanent: +20% splash damage; +15% splash radius."
+milestone = 40
+modifiers = {
+&"splash_damage": 0.2,
+&"splash_radius": 0.15
+}
+
+[sub_resource type="Resource" id="battle_hardened"]
+script = ExtResource("2")
+id = &"battle_hardened"
+display_name = "BATTLE HARDENED"
+description = "Permanent: +15% max HP (heal the increase);
+8% less damage taken."
+milestone = 40
+modifiers = {
+&"damage_reduction": 0.08,
+&"max_health": 0.15
+}
+
+[sub_resource type="Resource" id="codex_mastery"]
+script = ExtResource("2")
+id = &"codex_mastery"
+display_name = "CODEX MASTERY"
+description = "Permanent: future normal percentage upgrades are 20% stronger.
+Multishot stays +1, capped at 5. Existing upgrades unchanged."
+milestone = 50
+modifiers = {
+&"normal_upgrade_effectiveness": 0.2
+}
+
+[sub_resource type="Resource" id="master_of_war"]
+script = ExtResource("2")
+id = &"master_of_war"
+display_name = "MASTER OF WAR"
+description = "Permanent: +15% Bolter and knife damage;
++10 points crit damage; +5% movement speed."
+milestone = 50
+modifiers = {
+&"bolter_damage": 0.15,
+&"crit_damage": 0.1,
+&"knife_damage": 0.15,
+&"movement_speed": 0.05
+}
+
+[sub_resource type="Resource" id="perfect_discipline"]
+script = ExtResource("2")
+id = &"perfect_discipline"
+display_name = "PERFECT DISCIPLINE"
+description = "Permanent: every 5th Bolter projectile guarantees direct-hit crits.
+Counts each multishot projectile. Splash retains random crits."
+milestone = 50
+behavior = 3
+projectile_interval = 5
+
+[resource]
+script = ExtResource("1")
+perks = Array[ExtResource("2")]([SubResource("tactical_precision"), SubResource("combat_drills"), SubResource("codex_discipline"), SubResource("precision_drills"), SubResource("controlled_bursts"), SubResource("close_quarters_training"), SubResource("combat_efficiency"), SubResource("targeting_protocols"), SubResource("veteran_marksman"), SubResource("adaptive_warfare"), SubResource("explosive_doctrine"), SubResource("battle_hardened"), SubResource("codex_mastery"), SubResource("master_of_war"), SubResource("perfect_discipline")])
