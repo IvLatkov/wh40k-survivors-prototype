@@ -87,3 +87,82 @@ Godot_console.exe --path . --script tests/terrain_streaming_performance_test.gd
 Godot_console.exe --path . --script tests/terrain_streaming_performance_test.gd -- --stress
 Godot_console.exe --path . --script tests/terrain_streaming_performance_test.gd -- --stress --cold
 ```
+
+## Follow-up validation, 2026-10-28 (current results)
+
+The preceding sections record the earlier implementation. The current follow-up
+uses 48 crossings per rendered run, Godot 4.6.3, D3D12 Forward+, RX 5700 XT,
+60Hz presentation. All runs below enable gated subsystem profiling. The historical
+unprefetched original was 23.514ms average / 41.216ms worst on a different route;
+it is not a matched before/after comparison. On entry to this task, prefetch already
+worked: the current-code baseline measured 3.288 / 4.994ms CPU across 48 crossings.
+The small follow-up changes do **not** demonstrate a statistically significant speedup
+against that already-prefetched baseline; individual maxima vary between runs.
+
+| Mode (48 crossings) | Normal frame mean / FPS | Crossing CPU mean / worst | Crossing frame mean / worst / p95 | Crossing FPS |
+| --- | --- | --- | --- | --- |
+| Entry baseline, low enemies, prefetched | 16.251ms* / 61.53* | 3.288 / 4.994ms | 16.675 / 17.459 / 16.874ms | 59.97 |
+| Cold comparison, 200 enemies | 16.669ms / 59.99 | 23.449 / 33.631ms | 34.530 / 49.087 / 45.089ms | 28.96 |
+| Final, low enemies (zero) | 16.664ms / 60.01 | 3.184 / 7.293ms | 16.880 / 22.952 / 17.129ms | 59.24 |
+| Final, 200 enemies | 16.660ms / 60.03 | 2.990 / 6.328ms | 16.655 / 24.342 / 20.884ms | 60.04 |
+
+*The entry baseline normal-frame timer omitted the prefetch callback; this was
+corrected for final runs. Crossing CPU/frame timing was unchanged. Normal samples
+are the approach waiting frames, with unchanged enemy AI running in stress mode.
+These timings are frame intervals rather than isolated GPU render timings.
+
+| Stage, mean ms per crossing | Cold / 200 | Final / low | Final / 200 |
+| --- | ---: | ---: | ---: |
+| Player coordinate | .0030 | .0057 | .0031 |
+| Missing detection | .0037 | .0039 | .0035 |
+| Obsolete detection | .0057 | .0083 | .0054 |
+| Instantiation | .101 | .104 | .091 |
+| Generation including setup/cache access | 20.436 | .024 | .021 |
+| Ground choices (subset of generation) | 15.410 | 0 | 0 |
+| Decoration choices (subset of generation) | 3.397 | 0 | 0 |
+| Ground population | 1.482 | 1.521 | 1.497 |
+| Decoration population | .086 | .088 | .092 |
+| Scene insertion, inclusive of population | 1.737 | 1.737 | 1.708 |
+| Detach / queue_free scheduling | 1.093 | 1.235 | 1.100 |
+
+Instrumentation captures minimum/maximum as well as means in aggregate console
+output (`--profile`). Per-cell cold timers have overhead; generation includes patch
+setup and work outside the two choice counters. Scene insertion calls `_ready`, so
+population times are subsets, not additional costs. Deferred TileMap rendering and
+actual deletion occur outside the synchronous update and are reflected in complete
+frame intervals. No claim of GPU/engine-internal attribution is made.
+
+Both final runs consumed every incoming chunk from prepared data (192 hits per run;
+three per cardinal and five per diagonal). Peak completed cache: seven; peak
+prefetch callback: 1.860ms low / 1.727ms stress. The cache cap is now **nine**, plus
+one partial data-only generator. The threshold remains **256px**, with a **1.5ms**
+row-granular budget. Fresh chunks skip redundant empty-layer clears; reconfiguration
+still clears existing cells. Edge streaming and RNG/output logic remain intact.
+Cleanup is unchanged: immediate detachment and existing end-of-frame queue_free,
+with no extra deferred queue or multi-frame staggering. No threads are used.
+
+**Result:** streaming CPU stays below 10ms in these final runs. The strict worst
+complete crossing-frame target of 16.7ms is **not achieved**. Remaining synchronous
+cost is primarily Ground application, then cleanup; remaining whole-frame overruns
+include render/engine work, combat and presentation, which these CPU timers do not
+isolate. Moving already-complete pure data onto threads would not address that cost.
+Visible application was not staggered because no safe visibility margin has been
+proven, and synchronous terrain work already meets its CPU budget. Cold teleports
+remain an explicit exception to the CPU target.
+
+Final checks pass: 25 reference chunks match exact Ground and Decorations bytes
+(including orientation bits), incremental/synchronous equivalence, 901 streaming
+checks (negative coordinates, returns, seams, player movement, 100 long-distance
+transitions), prefetch consumption/reversals/partial tasks, and artwork checks.
+Only the eight allowed sprites remain; no landmarks or image processing were added.
+Terrain ownership is bounded: nine active chunks, at most nine completed data
+objects and one partial task. End-of-frame deletion prevents old chunks accumulating.
+This establishes bounded terrain allocations, not a claim that total process memory
+or unrelated combat objects never fluctuate. Spawner (3246), Ork (100147), XP (50),
+Knife (127), Bolter (41), and Tier 1 contact damage (100621) checks pass.
+
+Reproduce current profiling with the commands above, adding `--profile` after `--`.
+The route includes 24 cardinal and 24 diagonal crossings. Production profiling and
+logging are disabled by default.
+
+Final rendered editor scan and main-project smoke run completed without parser, import or runtime errors. An initial editor run exited before scanning completed; the longer rerun completed cleanly.

@@ -24,6 +24,10 @@ const DECORATION_CHANCES: Array[float] = [
 @export_range(32, 8192, 32) var chunk_size: int = 1024
 var chunk_coordinate: Vector2i = Vector2i.ZERO
 var chunk_seed: int = 0
+var profile_generation: bool = false
+var ground_population_usec: int = 0
+var decoration_population_usec: int = 0
+var _has_generated: bool = false
 var _prepared_data: ChunkData
 static var _ground_tiles: TileSet
 static var _decoration_tiles: TileSet
@@ -131,6 +135,9 @@ class Generation:
 	var data := ChunkData.new()
 	var rng := RandomNumberGenerator.new()
 	var patches: Dictionary[Vector2i, Vector3]
+	var profile_enabled: bool = false
+	var ground_usec: int = 0
+	var decoration_usec: int = 0
 
 	func _init(chunk_position: Vector2i, size: int) -> void:
 		coordinate = chunk_position
@@ -141,9 +148,13 @@ class Generation:
 	func generate_row() -> void:
 		var y := row
 		for x in cells:
+			var started := Time.get_ticks_usec() if profile_enabled else 0
 			var world_cell := coordinate * cells + Vector2i(x, y)
 			var variant := TerrainChunk._ground_variant(world_cell, patches)
 			data.ground_cells.append(Vector2i(variant * 4 + posmod(world_cell.x, 4), posmod(world_cell.y, 4)))
+			if profile_enabled:
+				ground_usec += Time.get_ticks_usec() - started
+				started = Time.get_ticks_usec()
 			var roll := rng.randf()
 			var threshold: float = 0.0
 			for index in DECORATION_FILES.size():
@@ -159,6 +170,8 @@ class Generation:
 					transform |= TileSetAtlasSource.TRANSFORM_TRANSPOSE
 				data.decoration_cells.append(Vector4i(x, y, index, transform))
 				break
+			if profile_enabled:
+				decoration_usec += Time.get_ticks_usec() - started
 		row += 1
 
 	func is_complete() -> bool:
@@ -179,12 +192,19 @@ func _generate() -> void:
 	if data == null:
 		data = generate_data(chunk_coordinate, chunk_size)
 	_prepared_data = null
-	ground.clear()
-	decorations.clear()
+	# Fresh chunk layers are empty; clear only when reconfiguring a live chunk.
+	if _has_generated:
+		ground.clear()
+		decorations.clear()
+	_has_generated = true
 	var cells := floori(float(chunk_size) / TILE_SIZE)
 	# set_cell queues internal TileMap updates; do not force rebuilds in this loop.
+	var started := Time.get_ticks_usec() if profile_generation else 0
 	for y in cells:
 		for x in cells:
 			ground.set_cell(Vector2i(x, y), 0, data.ground_cells[y * cells + x])
+	ground_population_usec = Time.get_ticks_usec() - started if profile_generation else 0
+	started = Time.get_ticks_usec() if profile_generation else 0
 	for cell in data.decoration_cells:
 		decorations.set_cell(Vector2i(cell.x, cell.y), cell.z, Vector2i.ZERO, cell.w)
+	decoration_population_usec = Time.get_ticks_usec() - started if profile_generation else 0

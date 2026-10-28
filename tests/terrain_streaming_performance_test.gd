@@ -3,7 +3,7 @@ extends SceneTree
 func _initialize() -> void:
 	run.call_deferred()
 
-func average(values: Array[float]) -> float:
+func average(values: Array) -> float:
 	return values.reduce(func(a: float, b: float) -> float: return a + b, 0.0) / max(1, values.size())
 
 func run() -> void:
@@ -18,6 +18,9 @@ func run() -> void:
 	player.set_physics_process(false)
 	spawner.set_process(false)
 	var stress := OS.get_cmdline_user_args().has("--stress")
+	manager.profile_transitions = OS.get_cmdline_user_args().has("--profile")
+	var profiles: Dictionary = {}
+	var normal_frames: Array[float] = []
 	var cold := OS.get_cmdline_user_args().has("--cold")
 	if stress:
 		for index in 200:
@@ -26,9 +29,10 @@ func run() -> void:
 		Vector2i(1, 1), Vector2i(-1, 1), Vector2i(-1, -1), Vector2i(1, -1)]
 	var transitions: Array[float] = []
 	var frame_intervals: Array[float] = []
+	var terrain_node_samples: Array[int] = []
 	var max_prefetch: float = 0.0
 	var cache_peak: int = 0
-	for step in 24:
+	for step in 48:
 		var direction := directions[step % directions.size()]
 		var center := manager.current_chunk_coordinate
 		var target := center + direction
@@ -52,7 +56,10 @@ func run() -> void:
 			cache_peak = maxi(cache_peak, manager.prepared_chunks.size())
 			assert(manager.prepared_chunks.size() <= manager.PREPARED_CACHE_LIMIT)
 			assert(manager.terrain_chunks.get_child_count() == 9)
+			var frame_start := start
 			await process_frame
+			if frame > 5:
+				normal_frames.append((Time.get_ticks_usec() - frame_start) / 1000.0)
 		if not cold:
 			for y in range(target.y - 1, target.y + 2):
 				for x in range(target.x - 1, target.x + 2):
@@ -65,6 +72,11 @@ func run() -> void:
 			maintain_enemies(player, spawner)
 		var start := Time.get_ticks_usec()
 		manager.update_chunks()
+		if manager.profile_transitions:
+			for key in manager.last_transition_profile:
+				if not profiles.has(key):
+					profiles[key] = []
+				profiles[key].append(float(manager.last_transition_profile[key]) / 1000.0)
 		transitions.append((Time.get_ticks_usec() - start) / 1000.0)
 		assert(manager.active_chunks.size() == 9 and manager.terrain_chunks.get_child_count() == 9)
 		var retained: int = 0
@@ -78,7 +90,17 @@ func run() -> void:
 				retained += 1
 		assert(retained == (6 if direction.x == 0 or direction.y == 0 else 4))
 		await process_frame
+		terrain_node_samples.append(manager.terrain_chunks.get_child_count())
 		frame_intervals.append((Time.get_ticks_usec() - start) / 1000.0)
+	assert(terrain_node_samples.min() == 9 and terrain_node_samples.max() == 9)
+	frame_intervals.sort()
+	print("NORMAL avg_ms=", average(normal_frames), " fps=", 1000.0 / average(normal_frames),
+		" crossing_fps=", 1000.0 / average(frame_intervals), " crossing_p95_ms=", frame_intervals[ceili(frame_intervals.size() * 0.95) - 1])
+	for key in profiles:
+		if key in ["cache_hits", "created", "removed"]:
+			print("COUNT ", key, " avg=", average(profiles[key]) * 1000, " max=", profiles[key].max() * 1000)
+			continue
+		print("STAGE ", key, " avg_ms=", average(profiles[key]), " min_ms=", profiles[key].min(), " max_ms=", profiles[key].max())
 	print("TERRAIN BENCH stress=", stress, " cold=", cold, " transitions=", transitions.size(),
 		" update_ms avg=", average(transitions), " worst=", transitions.max(),
 		" transition_frame_interval_ms avg=", average(frame_intervals), " worst=", frame_intervals.max(),

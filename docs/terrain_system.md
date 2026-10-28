@@ -32,11 +32,11 @@ One shared runtime ground TileSet uses 32 x 32 atlas regions (24 columns x 4 row
 
 ## Streaming and generation
 
-The existing `ChunkManager` and `chunk_manager.tscn` are reused without modification. Chunk size remains 1024 x 1024, with 32 x 32 ground cells. Active radius is 1: nine chunks in a 3 x 3 grid. Streaming occurs only when the player changes floor-based chunk coordinate. Distant chunks detach and free; gameplay objects retain their existing parents.
+The existing `ChunkManager` and `chunk_manager.tscn` retain their existing scene architecture. Chunk size remains 1024 x 1024, with 32 x 32 ground cells. Active radius is 1: nine chunks in a 3 x 3 grid. Streaming occurs only when the player changes floor-based chunk coordinate. Distant chunks detach and free; gameplay objects retain their existing parents.
 
 The placeholder grid drawing in `TerrainChunk` is replaced with Ground and Decorations TileMapLayers: two rendering nodes per chunk, eighteen for the full active grid. Ground inherits z=-10; decorations render at z=-9; XP at its existing -1 and combat at its existing order remain above scenery. Decorations retain native size with flips and transpose (the eight orthogonal orientations), with no arbitrary angles or fractional scaling. No scenery collisions or pathfinding obstacles exist.
 
-Chunk data is now prefetched within 256px of boundaries under a 1.5ms frame budget, with a twelve-entry data-only cache. See [terrain_streaming_performance.md](terrain_streaming_performance.md) for the current architecture, exact-output verification and measurements.
+Chunk data is now prefetched within 256px of boundaries under a 1.5ms frame budget, with a nine-entry data-only cache. See [terrain_streaming_performance.md](terrain_streaming_performance.md) for the current architecture, exact-output verification and measurements.
 
 Ground uses deterministic jittered regional patches approximately five cells across. Each world region seeds a private RNG with `hash(region_coordinate)`. A cell uses its nearest regional center, including neighbors across chunk boundaries. Region data is calculated once per chunk, rather than reseeding per tile. Ground category probabilities apply to patch centers; measured area proportions fluctuate locally:
 
@@ -100,3 +100,51 @@ Only Ground and Decorations are instantiated by TerrainChunk. The eight active d
 The historical ground reference hashes remain unchanged. Decoration reference hashes were regenerated for the intentional pool change; direct generation, incremental preparation and chunk reloads must reproduce the current output exactly. Normal and stress previews contain only the two terrain layers and current allowed sprites.
 
 Current-pool verification: all 901 streaming checks, original-ground/current-decoration hash checks, prefetch/cache tests, artwork tests and gameplay regressions pass. Both refreshed rendered previews run at approximately 60 FPS without debugger errors.
+
+## Chunk-transition validation (2026-10-28)
+
+Streaming retains six overlapping nodes on cardinal movement (three created/removed),
+and four on diagonal movement (five created/removed). The active grid is always 3x3,
+1024px chunks with 32px cells. Both TileSets remain shared static resources; imported
+textures are used directly, without image preparation during gameplay.
+
+Prefetch already existed and is effective: at 256px from a boundary it queues the
+incoming row/column, including the diagonal corner. The 1.5ms main-thread budget
+prepares pure data incrementally, preserving RNG order. Completed data is consumed
+on activation. The cache is now capped at **nine completed chunks**, plus one partial
+generator; observed corner peak is seven. Reversals prune stale work. Cold teleports
+finish missing data synchronously to prevent holes. No threading, early scene
+instantiation, visual staggering or deferred cleanup was introduced. Old chunks are
+detached immediately and queue_free schedules destruction at the end of the frame.
+Fresh empty TileMapLayers no longer receive redundant clear calls; regeneration of
+an existing chunk still clears both layers.
+
+`profile_transitions` (off by default) captures microsecond stage timings into
+`last_transition_profile`, with no printing unless `debug_chunk_changes` is enabled.
+Generation timers distinguish ground choices from decoration choices; overall
+generation includes patch setup and cache lookup. Insertion includes `_ready` and
+cell population, so those inclusive numbers must not be added together. Cleanup
+measures detach/queue_free calls; actual deferred destruction/render updates are
+included only in complete frame intervals. Per-cell instrumentation adds overhead
+on cold runs. The benchmark aggregates averages/minima/maxima rather than logging
+frames, and reports complete crossing intervals separately from streaming CPU time.
+
+The reproducible route now runs **48 crossings**, cycling east/south/west/north and
+all four diagonals. Each approach spends 40 frames in the actual prefetch band
+(less than the approximately one second available at normal 250px/s movement).
+Incoming prepared data, retained node identity, shared TileSets, full ground coverage,
+nine active nodes and bounded cache are asserted. Stress mode maintains 200 nearby
+enemies, including Orks, using existing gameplay code. This is a controlled streaming
+benchmark, not a natural combat playthrough; normal movement samples are stationary
+approach frames with combat simulation enabled. Frame intervals include presentation
+and benchmark coverage assertions. See the performance report for measured results.
+
+Final rendered 48-crossing results: low enemies **3.184ms average / 7.293ms worst**
+streaming CPU; 200 enemies **2.990 / 6.328ms**. Complete crossing frames average
+16.880ms (low) / 16.655ms (stress), worst 22.952 / 24.342ms, p95 17.129 / 20.884ms.
+Normal frames average 16.664 / 16.660ms, about 60 FPS. Thus the terrain CPU target
+is met, but the strict <16.7ms worst full-frame target is not. Cold stress crossings
+remain 23.449 / 33.631ms CPU. Ground population is the main remaining synchronous
+cost (~1.5ms mean), followed by detach/cleanup (~1.1?1.2ms). No visual tradeoff was
+made to reduce frame intervals. Full stage measurements and limitations are in the
+follow-up section of [the performance report](terrain_streaming_performance.md).
