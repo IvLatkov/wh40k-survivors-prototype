@@ -50,7 +50,7 @@ func run() -> void:
 			var chunk := scene.instantiate() as TerrainChunk
 			chunk.configure(coordinate, 1024)
 			root.add_child(chunk)
-			check(chunk.get_child_count() == 3 and chunk.large_props.z_index == 2, "Only lightweight large-prop layer added")
+			check(chunk.get_child_count() == 4 and chunk.large_props.z_index == 2, "Dedicated visual road layer and unchanged large-prop depth")
 			check(chunk.large_props.get_child_count() <= 5, "At most one tank and four independent buildings per chunk")
 			check(chunk.find_children("*", "CollisionObject2D", true, false).is_empty() and chunk.find_children("*", "CollisionShape2D", true, false).is_empty(), "No prop physics")
 			var before := TerrainChunk.get_tank_position(coordinate, 1024)

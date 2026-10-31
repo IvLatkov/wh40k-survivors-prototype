@@ -1,0 +1,28 @@
+{
+	"checks": 96638,
+	"chunk_frequency": 0.2725,
+	"chunks": 10000,
+	"directed_border_connections": 4840,
+	"instantiated_chunks": 256,
+	"mask_counts": [
+		0,
+		237,
+		429,
+		171,
+		241,
+		3291,
+		174,
+		173,
+		430,
+		171,
+		4540,
+		23,
+		172,
+		177,
+		24,
+		218
+	],
+	"occupied_cell_fraction": 0.06544375,
+	"participating_chunks": 2725,
+	"pieces": 10471
+}

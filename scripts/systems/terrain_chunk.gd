@@ -60,6 +60,7 @@ static var _decoration_tiles: TileSet
 
 @onready var ground: TileMapLayer = $Ground
 @onready var decorations: TileMapLayer = $Decorations
+@onready var roads: TerrainRoads = $Roads
 
 
 func configure(coordinate: Vector2i, size: int, data: ChunkData = null) -> void:
@@ -235,6 +236,7 @@ func _generate() -> void:
 		decorations.set_cell(Vector2i(cell.x, cell.y), cell.z, Vector2i.ZERO, cell.w)
 	decoration_population_usec = Time.get_ticks_usec() - started if profile_generation else 0
 
+	roads.populate(chunk_coordinate, chunk_size)
 	_populate_large_props()
 
 

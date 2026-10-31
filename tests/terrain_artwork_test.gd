@@ -44,7 +44,7 @@ func run() -> void:
 			var chunk := scene.instantiate() as TerrainChunk
 			chunk.configure(Vector2i(cx, cy), 1024)
 			root.add_child(chunk)
-			assert(chunk.get_child_count() == 3 and chunk.get_node("Ground") == chunk.ground and chunk.get_node("Decorations") == chunk.decorations)
+			assert(chunk.get_child_count() == 4 and chunk.get_node("Ground") == chunk.ground and chunk.get_node("Decorations") == chunk.decorations)
 			assert(chunk.ground.get_used_cells().size() == 1024)
 			assert(chunk.ground.tile_set.get_physics_layers_count() == 0)
 			assert(chunk.decorations.tile_set.get_physics_layers_count() == 0)

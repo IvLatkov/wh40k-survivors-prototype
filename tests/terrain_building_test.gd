@@ -148,7 +148,7 @@ func run() -> void:
 			var chunk := scene.instantiate() as TerrainChunk
 			chunk.configure(coordinate, 1024)
 			root.add_child(chunk)
-			check(chunk.get_child_count() == 3 and chunk.large_props.z_index == 2 and chunk.texture_filter == CanvasItem.TEXTURE_FILTER_NEAREST, "Same visual layer and filter")
+			check(chunk.get_child_count() == 4 and chunk.large_props.z_index == 2 and chunk.texture_filter == CanvasItem.TEXTURE_FILTER_NEAREST, "Same visual layer and filter")
 			check(chunk.find_children("*", "CollisionObject2D", true, false).is_empty() and chunk.find_children("*", "CollisionShape2D", true, false).is_empty() and chunk.find_children("*", "NavigationRegion2D", true, false).is_empty(), "No physics/navigation")
 			check(chunk.large_props.get_child_count() == placements.size() + int(chunk.large_props.has_node("TankWreck")), "Exactly the accepted ruins plus original tank")
 			generated_histogram[placements.size()] += 1
