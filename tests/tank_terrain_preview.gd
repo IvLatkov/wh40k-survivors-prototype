@@ -32,8 +32,8 @@ func run() -> void:
 			var chunk := scene.instantiate() as TerrainChunk
 			chunk.configure(coordinate, 1024)
 			terrain.add_child(chunk)
-			tanks += chunk.large_props.get_child_count()
-			if chunk.large_props.get_child_count() == 1:
+			tanks += int(chunk.large_props.has_node("TankWreck"))
+			if chunk.large_props.has_node("TankWreck"):
 				var tank_world := Vector2(coordinate) * 1024 + TerrainChunk.get_tank_position(coordinate, 1024)
 				var marker := Line2D.new()
 				marker.width = 16.0

@@ -41,10 +41,16 @@ func run() -> void:
 	var cache_peak: int = 0
 	var tank_peak: int = 0
 	var tank_windows: int = 0
+	var building_peak: int = 0
+	var building_windows: int = 0
 	for step in 48:
 		var active_tanks := 0
+		var active_buildings := 0
 		for chunk: TerrainChunk in manager.active_chunks.values():
-			active_tanks += chunk.large_props.get_child_count()
+			active_tanks += int(chunk.large_props.has_node("TankWreck"))
+			active_buildings += chunk.large_props.get_child_count() - int(chunk.large_props.has_node("TankWreck"))
+		building_peak = maxi(building_peak, active_buildings)
+		building_windows += int(active_buildings > 0)
 		tank_peak = maxi(tank_peak, active_tanks)
 		tank_windows += int(active_tanks > 0)
 		var direction := directions[step % directions.size()]
@@ -115,7 +121,7 @@ func run() -> void:
 			print("COUNT ", key, " avg=", average(profiles[key]) * 1000, " max=", profiles[key].max() * 1000)
 			continue
 		print("STAGE ", key, " avg_ms=", average(profiles[key]), " min_ms=", profiles[key].min(), " max_ms=", profiles[key].max())
-	print("TERRAIN BENCH stress=", stress, " cold=", cold, " tank_route=", tank_route, " tank_windows=", tank_windows, " peak_active_tanks=", tank_peak, " transitions=", transitions.size(),
+	print("TERRAIN BENCH stress=", stress, " cold=", cold, " tank_route=", tank_route, " tank_windows=", tank_windows, " peak_active_tanks=", tank_peak, " building_windows=", building_windows, " peak_active_buildings=", building_peak, " transitions=", transitions.size(),
 		" update_ms avg=", average(transitions), " worst=", transitions.max(),
 		" transition_frame_interval_ms avg=", average(frame_intervals), " worst=", frame_intervals.max(),
 		" prefetch_worst_ms=", max_prefetch, " cache_peak=", cache_peak,

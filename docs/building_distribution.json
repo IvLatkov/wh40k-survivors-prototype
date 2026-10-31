@@ -1,0 +1,77 @@
+{
+  "attempt_counts": [
+    2473,
+    2502,
+    2501,
+    2523
+  ],
+  "average_buildings_per_chunk": 0.5349,
+  "both_count": 835,
+  "buildings_per_chunk_histogram": [
+    4758,
+    5136,
+    105,
+    1,
+    0
+  ],
+  "chunks": 10000,
+  "generated_chunks": 512,
+  "generated_counts": [
+    68,
+    73,
+    73,
+    78
+  ],
+  "generated_histogram": [
+    225,
+    282,
+    5,
+    0,
+    0
+  ],
+  "placed": 5349,
+  "placed_counts": [
+    1300,
+    1336,
+    1361,
+    1352
+  ],
+  "roll_mask_counts": [
+    3167,
+    1037,
+    1051,
+    329,
+    1075,
+    367,
+    325,
+    126,
+    1051,
+    350,
+    402,
+    112,
+    334,
+    117,
+    122,
+    35
+  ],
+  "skip_reasons": {
+    "building_overlap": 2030,
+    "start_clearance": 1,
+    "tank_overlap": 2619
+  },
+  "skipped_counts": [
+    1173,
+    1166,
+    1140,
+    1171
+  ],
+  "successful_rolls_per_chunk_histogram": [
+    3167,
+    4214,
+    2107,
+    477,
+    35
+  ],
+  "tank_count": 3523,
+  "total_successful_rolls": 9999
+}

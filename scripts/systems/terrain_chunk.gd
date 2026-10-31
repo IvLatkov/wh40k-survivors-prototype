@@ -8,6 +8,23 @@ const TANK_SCALE: float = 2.0
 const TANK_EDGE_MARGIN: float = 192.0
 const TANK_START_CLEARANCE: float = 250.0
 const TANK_RNG_SALT: int = 0x54414E4B
+const BUILDING_TEXTURES: Array[Texture2D] = [
+	preload("res://assets/art/effects/terrain/buildings/imperial_ruin_1.1.png"),
+	preload("res://assets/art/effects/terrain/buildings/imperial_ruin_2.1.png"),
+	preload("res://assets/art/effects/terrain/buildings/imperial_ruin_3.1.png"),
+	preload("res://assets/art/effects/terrain/buildings/imperial_ruin_4.1.png"),
+]
+const BUILDING_CHANCE: float = 0.25
+const BUILDING_SCALE: float = 3.0
+# Common conservative footprint of the largest 128x132 source. Placement
+# bounds safely cover every variant. Each has its own independent spawn roll.
+const BUILDING_FOOTPRINT: Vector2 = Vector2(128, 132) * BUILDING_SCALE
+const BUILDING_EDGE_MARGIN: float = 256.0
+const BUILDING_START_CLEARANCE: float = 300.0
+const BUILDING_TANK_GAP: float = 32.0
+const BUILDING_GAP: float = 32.0
+const BUILDING_RNG_SALT: int = 0x5255494E
+const BUILDING_ORDER_SALT: int = 0x4F524452
 const GROUND_ATLAS: Texture2D = preload("res://assets/art/effects/terrain/battlefield_biome/prepared/battlefield_ground_atlas.png")
 const DECORATION_FOLDER: String = "res://assets/art/effects/terrain/decorations/"
 # Explicit visually inspected sprites: rubble, bone fragments, stains, rocks,
@@ -246,16 +263,88 @@ static func get_tank_position(coordinate: Vector2i, size: int) -> Vector2:
 	return local_position
 
 
+class BuildingPlacement:
+	extends RefCounted
+	var position: Vector2
+	var variant: int
+
+	func _init(at: Vector2, variant_index: int) -> void:
+		position = at
+		variant = variant_index
+
+
+static func get_building_attempts(coordinate: Vector2i, size: int) -> Array[BuildingPlacement]:
+	# Per-variant streams keep every 25% roll independent of the other rolls,
+	# placement outcomes and their conditional position draws.
+	var attempts: Array[BuildingPlacement] = []
+	var half_size := BUILDING_FOOTPRINT * 0.5
+	var margin := (half_size + Vector2.ONE * TILE_SIZE).max(Vector2.ONE * BUILDING_EDGE_MARGIN)
+	var last := Vector2.ONE * size - margin
+	if last.x < margin.x or last.y < margin.y:
+		return attempts
+	var rng := RandomNumberGenerator.new()
+	# Rotate collision priority by chunk so no fixed texture always wins.
+	var first_variant := posmod(hash(Vector3i(coordinate.x, coordinate.y, BUILDING_ORDER_SALT)), BUILDING_TEXTURES.size())
+	for offset in BUILDING_TEXTURES.size():
+		var variant := (first_variant + offset) % BUILDING_TEXTURES.size()
+		rng.seed = hash(Vector4i(coordinate.x, coordinate.y, BUILDING_RNG_SALT, variant))
+		if rng.randf() >= BUILDING_CHANCE:
+			continue
+		var at := Vector2(roundf(rng.randf_range(margin.x, last.x)), roundf(rng.randf_range(margin.y, last.y)))
+		attempts.append(BuildingPlacement.new(at, variant))
+	return attempts
+
+
+static func get_building_placements(coordinate: Vector2i, size: int) -> Array[BuildingPlacement]:
+	var placed: Array[BuildingPlacement] = []
+	var attempts := get_building_attempts(coordinate, size)
+	if attempts.is_empty():
+		return placed
+	var half_size := BUILDING_FOOTPRINT * 0.5
+	var tank_at := get_tank_position(coordinate, size)
+	var tank_half := TANK_TEXTURE.get_size() * TANK_SCALE * 0.5
+	var tank_bounds := Rect2(tank_at - tank_half, tank_half * 2.0).grow(BUILDING_TANK_GAP) if tank_at != Vector2.INF else Rect2()
+	for candidate in attempts:
+		if not _building_clears_start(coordinate, size, candidate.position):
+			continue
+		var bounds := Rect2(candidate.position - half_size, BUILDING_FOOTPRINT)
+		if tank_at != Vector2.INF and bounds.intersects(tank_bounds):
+			continue
+		var overlaps := false
+		for previous in placed:
+			var previous_bounds := Rect2(previous.position - half_size, BUILDING_FOOTPRINT).grow(BUILDING_GAP)
+			if bounds.intersects(previous_bounds):
+				overlaps = true
+				break
+		if not overlaps:
+			placed.append(candidate)
+	return placed
+
+
+static func _building_clears_start(coordinate: Vector2i, size: int, at: Vector2) -> bool:
+	var center := Vector2(coordinate) * size + at
+	var half_size := BUILDING_FOOTPRINT * 0.5
+	var nearest := Vector2.ZERO.clamp(center - half_size, center + half_size)
+	return nearest.length_squared() >= BUILDING_START_CLEARANCE * BUILDING_START_CLEARANCE
+
+
 func _populate_large_props() -> void:
-	# Reconfiguration must replace the old prop immediately, without duplicates.
+	# Reconfiguration replaces all prop visuals immediately, without duplicates.
 	for child in large_props.get_children():
 		child.free()
-	var at := get_tank_position(chunk_coordinate, chunk_size)
-	if at == Vector2.INF:
-		return
-	var tank := Sprite2D.new()
-	tank.name = "TankWreck"
-	tank.texture = TANK_TEXTURE
-	tank.position = at
-	tank.scale = Vector2.ONE * TANK_SCALE
-	large_props.add_child(tank)
+	var tank_at := get_tank_position(chunk_coordinate, chunk_size)
+	if tank_at != Vector2.INF:
+		var tank := Sprite2D.new()
+		tank.name = "TankWreck"
+		tank.texture = TANK_TEXTURE
+		tank.position = tank_at
+		tank.scale = Vector2.ONE * TANK_SCALE
+		large_props.add_child(tank)
+	var buildings := get_building_placements(chunk_coordinate, chunk_size)
+	for building in buildings:
+		var ruin := Sprite2D.new()
+		ruin.name = "BuildingRuin%d" % (building.variant + 1)
+		ruin.texture = BUILDING_TEXTURES[building.variant]
+		ruin.position = building.position
+		ruin.scale = Vector2.ONE * BUILDING_SCALE
+		large_props.add_child(ruin)

@@ -51,16 +51,16 @@ func run() -> void:
 			chunk.configure(coordinate, 1024)
 			root.add_child(chunk)
 			check(chunk.get_child_count() == 3 and chunk.large_props.z_index == 2, "Only lightweight large-prop layer added")
-			check(chunk.large_props.get_child_count() <= 1, "Maximum one tank per chunk")
+			check(chunk.large_props.get_child_count() <= 5, "At most one tank and four independent buildings per chunk")
 			check(chunk.find_children("*", "CollisionObject2D", true, false).is_empty() and chunk.find_children("*", "CollisionShape2D", true, false).is_empty(), "No prop physics")
 			var before := TerrainChunk.get_tank_position(coordinate, 1024)
 			if before != Vector2.INF:
 				tanks += 1
-				var sprite := chunk.large_props.get_child(0) as Sprite2D
+				var sprite := chunk.large_props.get_node("TankWreck") as Sprite2D
 				check(sprite.texture == texture and sprite.position == before and sprite.scale == Vector2(2, 2), "Shared native texture and scale")
 				check(not sprite.flip_h and not sprite.flip_v and sprite.rotation == 0.0, "Original orientation and lighting retained")
 			chunk.configure(coordinate, 1024)
-			check(chunk.large_props.get_child_count() == int(before != Vector2.INF), "Reconfiguration never duplicates prop")
+			check(chunk.large_props.has_node("TankWreck") == (before != Vector2.INF), "Reconfiguration never duplicates prop")
 			chunk.free()
 	# Explicit unload/reload of an eligible coordinate.
 	var original := TerrainChunk.get_tank_position(first_tank, 1024)
@@ -68,7 +68,7 @@ func run() -> void:
 		var chunk := scene.instantiate() as TerrainChunk
 		chunk.configure(first_tank, 1024)
 		root.add_child(chunk)
-		check((chunk.large_props.get_child(0) as Sprite2D).position == original, "Reload keeps identical tank")
+		check((chunk.large_props.get_node("TankWreck") as Sprite2D).position == original, "Reload keeps identical tank")
 		chunk.free()
 	var timing_chunk := scene.instantiate() as TerrainChunk
 	timing_chunk.configure(first_tank, 1024)
