@@ -1,0 +1,8 @@
+[gd_resource type="ShaderMaterial" load_steps=3 format=3]
+
+[ext_resource type="Shader" path="res://assets/shaders/road_edge_blend.gdshader" id="1_shader"]
+[ext_resource type="Texture2D" path="res://assets/art/effects/terrain/roads/prepared/road_edge_masks.png" id="2_masks"]
+
+[resource]
+shader = ExtResource("1_shader")
+shader_parameter/edge_masks = ExtResource("2_masks")

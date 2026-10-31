@@ -1,0 +1,177 @@
+[
+  {
+    "test": "tests/additive_ork_spawning_test.gd",
+    "passed": true,
+    "output": "Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org\n\n0.000s: factor=0.000000, Squigs=22542, additional Orks=0, ratio=0.0000\n149.999s: factor=0.000000, Squigs=22580, additional Orks=0, ratio=0.0000\n150.000s: factor=0.100000, Squigs=22391, additional Orks=2214, ratio=0.0989\n225.000s: factor=0.300000, Squigs=22515, additional Orks=6782, ratio=0.3012\n299.999s: factor=0.499997, Squigs=22429, additional Orks=11132, ratio=0.4963\n300.000s: factor=1.000000, Squigs=22443, additional Orks=22394, ratio=0.9978\n600.000s: factor=1.000000, Squigs=22519, additional Orks=22394, ratio=0.9944\n140000 additive spawn cycles without scene allocation: 702.34 ms\nPASS: 50 additive Ork spawning checks\n"
+  },
+  {
+    "test": "tests/armor_test.gd",
+    "passed": true,
+    "output": "Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org\n\nPASS: 183 Armor checks\n"
+  },
+  {
+    "test": "tests/chapter_perks_test.gd",
+    "passed": true,
+    "output": "Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org\n\nPASS: 307 Chapter perk checks\n"
+  },
+  {
+    "test": "tests/character_info_test.gd",
+    "passed": true,
+    "output": "Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org\n\nPASS: 47 Character Info checks\n"
+  },
+  {
+    "test": "tests/character_sheet_test.gd",
+    "passed": true,
+    "output": "Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org\n\nPASS: 48 character sheet checks\n"
+  },
+  {
+    "test": "tests/combat_optimization_test.gd",
+    "passed": true,
+    "output": "Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org\n\nPASS: 2406 combat optimization checks\n"
+  },
+  {
+    "test": "tests/damage_numbers_test.gd",
+    "passed": true,
+    "output": "Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org\n\nPASS: 384 damage-number checks\n"
+  },
+  {
+    "test": "tests/decoration_distribution_test.gd",
+    "passed": true,
+    "output": "Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org\n\nDISTRIBUTION baseline=false chunks=400 cells=409600 total_probability=0.04928155339806\ndark_dirt_ash_tile.png count=2297 percent_of_cells=0.560791015625\ndark_dirt_ash_tile_2.png count=2157 percent_of_cells=0.526611328125\ndark_dirt_ash_tile_3.png count=2786 percent_of_cells=0.68017578125\ndark_dirt_ash_tile_4.png count=3952 percent_of_cells=0.96484375\ndark_dirt_ash_tile_5.png count=1631 percent_of_cells=0.398193359375\ndark_dirt_ash_tile_6.png count=1689 percent_of_cells=0.412353515625\ndark_dirt_ash_tile_11.png count=2747 percent_of_cells=0.670654296875\ndark_dirt_ash_tile_12.png count=2746 percent_of_cells=0.67041015625\nOBSERVED target_ratio=0.35285714285714 reduction_percent=64.7142857142857\nPASS decoration distribution / probability intervals / ground / tanks / determinism\n"
+  },
+  {
+    "test": "tests/directional_knife_test.gd",
+    "passed": true,
+    "output": "Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org\n\nPASS: 127 directional knife checks\n"
+  },
+  {
+    "test": "tests/dynamic_bolter_splash_test.gd",
+    "passed": true,
+    "output": "Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org\n\nPASS: 41 dynamic Bolter splash checks\n"
+  },
+  {
+    "test": "tests/enemy_health_fractional_damage_test.gd",
+    "passed": true,
+    "output": "Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org\n\nPASS: 28 enemy health and fractional damage checks\n"
+  },
+  {
+    "test": "tests/enemy_spawner_test.gd",
+    "passed": true,
+    "output": "Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org\n\nViewport: (1152.0, 648.0); old origin distance 1385.7..1641.7 (mean 1513.7); new sampled 388.7..793.3 (mean 574.4)\nEstimated screen entry at unchanged 60px/s, before burst offsets: 1.07..2.81s\nPASS: 3246 enemy spawner checks\n"
+  },
+  {
+    "test": "tests/generic_upgrades_test.gd",
+    "passed": true,
+    "output": "Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org\n\nSalvage sample: MID=20142 doubles=7073; dodge sample=2047\nPASS: 1204 Generic upgrade checks\n"
+  },
+  {
+    "test": "tests/health_regeneration_test.gd",
+    "passed": true,
+    "output": "Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org\n\nPASS: 58 health regeneration checks\n"
+  },
+  {
+    "test": "tests/knife_range_upgrade_test.gd",
+    "passed": true,
+    "output": "Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org\n\nPASS: 210 knife range upgrade checks\n"
+  },
+  {
+    "test": "tests/normal_rate_health_upgrades_test.gd",
+    "passed": true,
+    "output": "Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org\n\nPASS: 70 normal rate and health checks\n"
+  },
+  {
+    "test": "tests/ork_boy_test.gd",
+    "passed": true,
+    "output": "Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org\n\nOrk raw melee damage distribution: [64719, 25141, 10140]\n200 mixed-enemy local separation queries: 2.95 ms\nPASS: 100147 Ork Boy checks\n"
+  },
+  {
+    "test": "tests/ork_melee_animation_test.gd",
+    "passed": true,
+    "output": "Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org\n\nPASS: 131 Ork melee animation checks\n"
+  },
+  {
+    "test": "tests/road_edge_blend_test.gd",
+    "passed": true,
+    "output": "Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org\n\nHEADLESS BLEND DATA PASS checks=32784 (run rendered for GPU comparison)\n"
+  },
+  {
+    "test": "tests/run_timer_test.gd",
+    "passed": true,
+    "output": "Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org\n\nPASS: 1051 run timer and scaling checks\n"
+  },
+  {
+    "test": "tests/terrain_artwork_test.gd",
+    "passed": true,
+    "output": "Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org\n\nPASS terrain artwork: variants=[10427, 5488, 914, 6119, 1779, 873]; decoration density=4.73828125%; matching right neighbors=80.2734375%\n"
+  },
+  {
+    "test": "tests/terrain_building_test.gd",
+    "passed": true,
+    "output": "Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org\n\nBUILDING_STATS {\"attempt_counts\":[2473,2502,2501,2523],\"average_buildings_per_chunk\":0.5349,\"both_count\":835,\"buildings_per_chunk_histogram\":[4758,5136,105,1,0],\"chunks\":10000,\"generated_chunks\":512,\"generated_counts\":[68,73,73,78],\"generated_histogram\":[225,282,5,0,0],\"placed\":5349,\"placed_counts\":[1300,1336,1361,1352],\"roll_mask_counts\":[3167,1037,1051,329,1075,367,325,126,1051,350,402,112,334,117,122,35],\"skip_reasons\":{\"building_overlap\":2030,\"start_clearance\":1,\"tank_overlap\":2619},\"skipped_counts\":[1173,1166,1140,1171],\"successful_rolls_per_chunk_histogram\":[3167,4214,2107,477,35],\"tank_count\":3523,\"total_successful_rolls\":9999}\nPASS: 99467 independent-building checks; PNGs and 400 terrain/tank references unchanged\n"
+  },
+  {
+    "test": "tests/terrain_chunk_streaming_test.gd",
+    "passed": true,
+    "output": "Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org\n\n100 streaming transitions: 3420.666 ms including frame waits; active terrain: 9\nMean chunk update CPU time: 26.58027 ms\nPASS: 901 terrain streaming checks\n"
+  },
+  {
+    "test": "tests/terrain_determinism_test.gd",
+    "passed": true,
+    "output": "Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org\n\nPASS: 25 chunks match original ground and reduced-weight decoration reference bytes, including incremental generation\n"
+  },
+  {
+    "test": "tests/terrain_prefetch_test.gd",
+    "passed": true,
+    "output": "Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org\n\nPASS terrain prefetch: threshold, idle reuse, corners, reversals, consumption, partial task, teleport, bounded cache\n"
+  },
+  {
+    "test": "tests/terrain_roads_test.gd",
+    "passed": true,
+    "output": "Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org\n\nROADS PASS { \"target\": 0.3, \"region_activation_chance\": 0.75939754461461, \"chunks\": 40000, \"participating_chunks\": 12087, \"chunk_frequency\": 0.302175, \"pieces\": 46345, \"piece_counts\": { \"straights\": 34880, \"curves\": 3090, \"t_junctions\": 1518, \"crossroads\": 951, \"end_caps\": 5906 }, \"occupied_cell_fraction\": 0.0724140625, \"mask_counts\": [0, 1038, 1915, 755, 1038, 14577, 791, 664, 1915, 784, 20303, 100, 760, 666, 88, 951], \"directed_border_connections\": 21244, \"instantiated_chunks\": 256, \"checks\": 305981 }\n"
+  },
+  {
+    "test": "tests/terrain_tank_test.gd",
+    "passed": true,
+    "output": "Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org\n\nTANK_PROP_CPU samples=500 mean_ms=0.025526 peak_ms=0.063\nTANK_STATS chunks=10000 tanks=3523 frequency_percent=35.23 generated_chunks=100 generated_tanks=33 generated_percent=33\nPASS: 21047 tank placement checks\n"
+  },
+  {
+    "test": "tests/tier_1_contact_damage_test.gd",
+    "passed": true,
+    "output": "Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org\n\nTier 1 distribution over 100000 rolls: [70217, 24851, 4932]\nPASS: 100621 Tier 1 contact damage checks\n"
+  },
+  {
+    "test": "tests/tier_1_timed_xp_drop_test.gd",
+    "passed": true,
+    "output": "Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org\n\n100000 rolls: MID=9961 LOW=90039 doubles=7073 MID doubles=715\nPASS: 103029 time-based Tier 1 XP checks\n"
+  },
+  {
+    "test": "tests/ultimate_upgrades_test.gd",
+    "passed": true,
+    "output": "Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org\n\n1000 local fork queries with 300 distant enemies: 31.71 ms\nPASS: 121 Ultimate checks\n"
+  },
+  {
+    "test": "tests/upgrade_level_caps_test.gd",
+    "passed": true,
+    "output": "Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org\n\nPASS: 658 upgrade level cap checks\n"
+  },
+  {
+    "test": "tests/upgrade_system_test.gd",
+    "passed": true,
+    "output": "Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org\n\nPASS: 88 upgrade checks\n"
+  },
+  {
+    "test": "tests/weapon_upgrade_groups_test.gd",
+    "passed": true,
+    "output": "Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org\n\nPASS: 71 Weapon group checks\n"
+  },
+  {
+    "test": "tests/xp_pickup_visual_test.gd",
+    "passed": true,
+    "output": "Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org\n\nPASS: 104 XP visual/isolation checks\n"
+  },
+  {
+    "test": "tests/xp_progression_test.gd",
+    "passed": true,
+    "output": "Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org\n\nPASS: 50 XP progression checks\n"
+  }
+]

@@ -1,6 +1,9 @@
 extends SceneTree
 
 var checks: int = 0
+const SAMPLE_MIN: int = -100
+const SAMPLE_MAX: int = 100
+const SAMPLE_CHUNKS: int = (SAMPLE_MAX - SAMPLE_MIN) * (SAMPLE_MAX - SAMPLE_MIN)
 
 func check(ok: bool, message: String) -> void:
 	checks += 1
@@ -13,6 +16,8 @@ func _initialize() -> void:
 	run.call_deferred()
 
 func run() -> void:
+	check(TerrainRoads.PARTICIPATION_TARGET == 0.30, "Explicit 30% network participation target")
+	check(is_equal_approx(TerrainRoads.REGION_CHANCE * TerrainRoads.ACTIVE_REGION_CHUNK_FRACTION, 0.30), "Region activation accounts for partial network coverage")
 	var sha := HashingContext.new()
 	sha.start(HashingContext.HASH_SHA256)
 	sha.update(FileAccess.get_file_as_bytes("res://assets/art/effects/terrain/roads/road.png"))
@@ -41,8 +46,8 @@ func run() -> void:
 	seed(9381)
 	var expected_random := randf()
 	seed(9381)
-	for y in range(-50, 50):
-		for x in range(-50, 50):
+	for y in range(SAMPLE_MIN, SAMPLE_MAX):
+		for x in range(SAMPLE_MIN, SAMPLE_MAX):
 			var coordinate := Vector2i(x, y)
 			var layout := TerrainRoads.get_layout(coordinate, 1024)
 			check(layout == TerrainRoads.get_layout(coordinate, 1024), "Repeat/load-order independent layout")
@@ -75,7 +80,10 @@ func run() -> void:
 				border_connections += int(crossed and connected)
 	for mask in range(1, 16):
 		check(counts[mask] > 0, "Every piece including all ends/corners/junctions occurs naturally")
-	check(participating > 2000 and participating < 3500, "Moderate 20-35% road chunk participation")
+	var observed := float(participating) / SAMPLE_CHUNKS
+	# The independent unit is a whole route region, not each chunk. Allow
+	# sampling variation across the 2,500 complete regions in this fixture.
+	check(absf(observed - TerrainRoads.PARTICIPATION_TARGET) < 0.02, "Participation stays near the 30% target")
 	check(TerrainRoads.get_layout(Vector2i.ZERO, 128).is_empty(), "Undersized preview fixture is safe")
 	var generated := 0
 	var scene := preload("res://scenes/systems/terrain_chunk.tscn")
@@ -90,13 +98,17 @@ func run() -> void:
 		chunk.configure(coordinate, 1024)
 		check(chunk.roads.get_child_count() == expected, "Reconfigure replaces instead of accumulating")
 		for sprite: Sprite2D in chunk.roads.get_children():
-			check(sprite.get_child_count() == 0 and sprite.material == null and not sprite.is_processing() and not sprite.is_physics_processing(), "Visual-only shared sprite without processing/physics/material")
+			check(sprite.get_child_count() == 0 and sprite.material == TerrainRoads.EDGE_MATERIAL and not sprite.is_processing() and not sprite.is_physics_processing(), "Visual-only shared material without processing/physics")
 		chunk.free()
 		generated += 1
 		if generated >= 256:
 			break
-	var report := {"chunks": 10000, "participating_chunks": participating, "chunk_frequency": participating / 10000.0,
-		"pieces": total, "occupied_cell_fraction": total / 160000.0, "mask_counts": counts,
+	var piece_counts := {"straights": counts[5] + counts[10], "curves": counts[3] + counts[6] + counts[9] + counts[12],
+		"t_junctions": counts[7] + counts[11] + counts[13] + counts[14], "crossroads": counts[15],
+		"end_caps": counts[1] + counts[2] + counts[4] + counts[8]}
+	var report := {"target": TerrainRoads.PARTICIPATION_TARGET, "region_activation_chance": TerrainRoads.REGION_CHANCE,
+		"chunks": SAMPLE_CHUNKS, "participating_chunks": participating, "chunk_frequency": observed,
+		"pieces": total, "piece_counts": piece_counts, "occupied_cell_fraction": float(total) / (SAMPLE_CHUNKS * 16), "mask_counts": counts,
 		"directed_border_connections": border_connections, "instantiated_chunks": generated, "checks": checks}
 	var output := FileAccess.open("res://docs/roads_distribution.json", FileAccess.WRITE)
 	output.store_string(JSON.stringify(report, "\t") + "\n")

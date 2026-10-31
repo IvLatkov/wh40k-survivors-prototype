@@ -1,5 +1,7 @@
 # Connected battlefield roads
 
+Visual edge blending is documented in [road_edge_blending.md](road_edge_blending.md); the 30% network generation described below is unchanged.
+
 ## Source and preparation
 
 Found `assets/art/effects/terrain/roads/road.png`, **1536x1024 RGBA**. It is an irregularly arranged presentation sheet with genuine transparency (including faint background haze), three vertical straights, large bends, T/cross/Y junctions and broken fragments. It is not a ready-to-use tile atlas. The angled Y and small decorative round fragment are not used in the orthogonal network.
@@ -25,51 +27,54 @@ All have `.png` extensions and shared lossless, non-mipmapped imports. The origi
 
 ## Generation and continuity
 
-`TerrainRoads` uses 256px world cells and independent salted region RNG. A 16x16-cell (4096px) region has a 65% chance of a compact lane cluster: a left-to-right lane with a variable vertical bend and a 55% chance of a crossing vertical branch. Branches always connect to the main lane. All endpoints lie inside their region. These are occasional broken battlefield networks, not an infinite city grid.
+`TerrainRoads` uses 256px world cells and independent salted region RNG. The explicit chunk-network participation target is **30%**. A 16x16-cell (4096px) region has a derived **75.93975446%** chance of a compact lane cluster: a left-to-right lane with a variable vertical bend and a 55% chance of a crossing vertical branch. Branches always connect to the main lane. All endpoints lie inside their region. These are occasional broken battlefield networks, not an infinite city grid.
 
-At the default 1024px chunk size, a region spans 4x4 chunks. Every chunk reconstructs the same small region path from its world coordinates, then selects its own cells. A cell's mask is calculated from its actual four neighbors, including cells beyond the chunk. Thus reciprocal chunk-edge connections are guaranteed regardless of load order or eviction. Region boundaries have no exits on either side, so they agree too. Negative coordinates use floor division, not truncation.
+At the default 1024px chunk size, a region spans 4x4 chunks. Exact enumeration of the current route choices gives 4.86 participating chunks without a branch and 7.516 with one; weighting by the unchanged 55% branch chance gives 6.3208 of 16 chunks per active region. Therefore `PARTICIPATION_TARGET = 0.30`, `ACTIVE_REGION_CHUNK_FRACTION = 6.3208 / 16`, and `REGION_CHANCE = 0.30 / ACTIVE_REGION_CHUNK_FRACTION`. This targets 30% chunk participation across connected networks, rather than rolling for isolated roads in each chunk. Route shapes and all RNG draws/order are unchanged; increasing the region threshold only activates additional complete deterministic networks. Every chunk reconstructs the same small region path from its world coordinates, then selects its own cells. A cell's mask is calculated from its actual four neighbors, including cells beyond the chunk. Thus reciprocal chunk-edge connections are guaranteed regardless of load order or eviction. Region boundaries have no exits on either side, so they agree too. Negative coordinates use floor division, not truncation.
 
 Layouts are local bounded dictionaries, discarded after generation; no growing world cache exists. No chunk-manager/prefetch/cache architecture was changed. Chunk sizes below 256px or not divisible by 256 omit roads safely.
 
-`TerrainChunk` now contains Ground, Decorations, Roads, LargeProps. Roads are lightweight shared-texture sprites, at most 16 per 1024px chunk. Roads draw above ground and decorations, below large props and all combat. Large-prop z-order is unchanged. There are no collision/navigation nodes, speed/pathing/spawning effects, shaders or per-frame road callbacks.
+`TerrainChunk` now contains Ground, Decorations, Roads, LargeProps. Roads are lightweight shared-texture sprites, at most 16 per 1024px chunk. Roads draw above ground and decorations, below large props and all combat. Large-prop z-order is unchanged. There are no collision/navigation nodes, speed/pathing/spawning effects or per-frame road callbacks. Roads now share an alpha-only edge-blend shader with offline-prepared data; see the blending report.
 
 Ground/decor generation code, decoration exclusions and weights, tank rolls/positions and independent building rolls/positions are unchanged. No decoration RNG draw is removed and no decoration cell is suppressed. Opaque road artwork visually covers decorations underneath; surrounding decorations remain visible. Wrecks and ruins retain their placement and can overlap a road, rendering above it as abandoned obstacles; roads are not rerouted around them, and do not cut out entire cells around them, which would break continuity.
 
 ## Distribution and validation
 
-`tests/terrain_roads_test.gd`: **10,000 coordinates**, x/y -50 through 49.
+`tests/terrain_roads_test.gd`: **40,000 coordinates**, x/y -100 through 99, covering 2,500 complete route regions.
 
-- **2,725 chunks (27.25%)** contain roads.
-- **10,471 road pieces**, occupying **6.544375% of terrain cells**. The opaque road footprint covers less than the full tile area.
-- All 15 masks occur naturally. Counts by mask 1..15: `237, 429, 171, 241, 3291, 174, 173, 430, 171, 4540, 23, 172, 177, 24, 218`.
-- **4,840 directed chunk-edge connections** checked (both directions count).
+- **12,087 chunks (30.2175%)** contain roads, against the explicit **30% target**.
+- **46,345 road pieces**, occupying **7.24140625% of terrain cells**. The opaque road footprint covers less than the full tile area.
+- **34,880 straight segments**, **3,090 curves**, **1,518 T-junctions**, **951 crossroads**, **5,906 end caps**.
+- All 15 masks occur naturally. Counts by mask 1..15: `1038, 1915, 755, 1038, 14577, 791, 664, 1915, 784, 20303, 100, 760, 666, 88, 951`.
+- **21,244 directed chunk-edge connections** checked (both directions count).
 - Pixel-for-pixel matching seam checks for every compatible pair of prepared masks.
 - Repeated layout equality, unaffected global RNG, valid cell bounds, all directions, negative coordinates, and whole-neighbor reciprocal ports pass.
-- **256 actual chunk scenes** instantiated/reconfigured; no duplicate accumulation, shared sprite resources, no material or processing/physics callbacks.
-- **96,638 road checks** pass. All **34 functional regression scripts** pass, including ground/decor determinism, excluded decorations, 35% tanks and 25%-per-variant buildings. Existing 400-coordinate terrain baseline still matches.
+- **256 actual chunk scenes** instantiated/reconfigured; no duplicate accumulation, shared sprite resources, one shared edge material and no processing/physics callbacks.
+- **305,981 road checks** pass. The focused terrain regression suite is recorded in `docs/roads_target_regressions.json`, including ground/decor determinism, excluded decorations, unchanged 35% tanks and 25%-per-variant buildings. Existing 400-coordinate terrain baseline still matches. The original integration's 34-script functional regression evidence remains in `docs/roads_regressions.json`.
 
-Machine-readable distribution and regression outputs: `docs/roads_distribution.json`, `docs/roads_regressions.json`.
+Machine-readable current distribution: `docs/roads_distribution.json`. The preceding 10,000-chunk sample measured 27.25% under the old 65% region activation rule; the current sample is larger and region-aligned, so those two observed percentages are not a paired sample comparison.
 
 ## Preview and performance
 
-Rendered and inspected `docs/roads_overview.png` (49 natural chunks, 50 road pieces), `docs/roads_closeup.png` (nine natural chunks, 26 pieces), `docs/roads_junction.png` (native-scale natural crossroad) and `docs/roads_pieces.png` (all 15 extracted variants). Blue lines are preview-only chunk boundaries. Routes cross chunk borders cleanly; bends, T/cross junctions and broken ends are visible with tanks, ruins and normal decorations. Large open terrain areas remain. The original art's recurring imperial markings are intentionally retained.
+Rendered and inspected `docs/roads_overview.png` (49 natural chunks), `docs/roads_closeup.png` (nine natural chunks), `docs/roads_junction.png` (native-scale natural crossroad) and `docs/roads_pieces.png` (all 15 extracted variants). Blue lines are preview-only chunk boundaries. Routes cross chunk borders cleanly; bends, T/cross junctions and broken ends are visible with tanks, ruins and normal decorations. Large open terrain areas remain. The original art's recurring imperial markings are intentionally retained.
 
-Same rendered 48-transition route, 200 simulated enemies, Godot 4.6.3 Forward+ D3D12 / RX 5700 XT:
+The current 30% target is benchmarked on the same rendered 48-transition route, 200 simulated enemies, Godot 4.6.3 Forward+ D3D12 / RX 5700 XT. The prior rule was measured immediately before the change; this is separate from the initial integration benchmark.
 
-| Metric | Before roads | With roads |
+| Metric | Previous rule | Explicit 30% target |
 |---|---:|---:|
-| Normal frame mean | 16.657667ms | 16.661694ms |
-| Normal measured FPS | 60.0324 | 60.0179 |
-| Chunk update mean | 3.371979ms | 3.398250ms |
-| Chunk update worst | 6.620ms | 5.408ms |
-| Crossing p95 frame | 19.366ms | 19.909ms |
-| Crossing worst frame | 31.468ms | 21.674ms |
+| Normal frame mean | 16.662501ms | 16.662297ms |
+| Normal measured FPS | 60.0150 | 60.0157 |
+| Chunk update mean | 3.329021ms | 3.476479ms |
+| Chunk update worst | 5.448ms | 4.463ms |
+| Crossing p95 frame | 19.767ms | 19.041ms |
+| Crossing worst frame | 21.202ms | 19.576ms |
 | Prepared cache peak | 7 | 7 |
-| Prefetch worst | 1.836ms | 1.740ms |
+| Prefetch worst | 2.680ms | 1.823ms |
+| Windows with road pieces | 18/48 | 48/48 |
+| Peak active road pieces | 15 | 15 |
 
-Roads were present in **18/48** measured active windows, peaking at **15 pieces across the nine loaded chunks**. Tanks/buildings remained active in 48/48 windows, peaks 3/6. Mean chunk-update difference is **+0.026271ms**, within run-to-run timing variation. This sample shows no material streaming regression; it does not claim zero cost or guarantee every frame on other hardware. Logs are locally retained as ignored `docs/roads_performance_before.log` and `docs/roads_performance_after.log`.
+Mean chunk-update CPU increased by **0.147458ms (about 4.4%)**, with roads now present in all measured windows. Normal frame rate remained about 60 FPS, crossing frame timings stayed acceptable, and cache bounds were unchanged. This run shows no material streaming regression; timing fluctuations do not imply zero cost or guarantee other hardware. Both runs ended with 200 enemies and retained tanks/buildings throughout. Local ignored logs: `docs/roads_target_before.log`, `docs/roads_target_after.log`.
 
-Final rendered editor import/parser validation (120 frames) and main-project smoke run (300 frames) completed successfully, without debugger/import errors or shutdown warnings.
+All **eight focused terrain regression scripts passed**. The existing preview was rendered and visually inspected: 49 natural chunks / 53 pieces in the overview, matching joins and open terrain preserved. Curve/junction/piece images were regenerated but remain byte-identical; only the overview image changed. The main-project 300-frame smoke run completed without runtime/import errors or warnings (`docs/roads_target_smoke.log`). No scene/structural changes required another editor validation in this follow-up.
 
 ## Files
 
@@ -82,3 +87,14 @@ Final rendered editor import/parser validation (120 frames) and main-project smo
 - Added documentation/evidence: this report, distribution/regression JSONs, four preview PNGs and their Godot import metadata.
 
 No commit or push performed.
+
+### Files changed for the 30% target follow-up
+
+- `scripts/systems/terrain_roads.gd`: explicit target and derived region activation constant only.
+- `tests/terrain_roads_test.gd`: 40,000-chunk region-aligned sample, target verification and grouped piece counters.
+- `docs/roads_distribution.json`: refreshed distribution.
+- `docs/roads_target_regressions.json`: focused terrain regression evidence.
+- `docs/terrain_roads.md`: current target, calibration, counts and benchmark.
+- `docs/roads_overview.png`: refreshed 49-chunk preview; other regenerated previews are unchanged.
+
+No source/prepared road PNG, terrain generation, decoration, tank/building, scene, chunk manager, collision or gameplay code changed in this follow-up. No commit/push.

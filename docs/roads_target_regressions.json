@@ -1,0 +1,42 @@
+[
+  {
+    "test": "terrain_artwork_test.gd",
+    "passed": true,
+    "output": "Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org\n\nPASS terrain artwork: variants=[10427, 5488, 914, 6119, 1779, 873]; decoration density=4.73828125%; matching right neighbors=80.2734375%\n"
+  },
+  {
+    "test": "terrain_building_test.gd",
+    "passed": true,
+    "output": "Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org\n\nBUILDING_STATS {\"attempt_counts\":[2473,2502,2501,2523],\"average_buildings_per_chunk\":0.5349,\"both_count\":835,\"buildings_per_chunk_histogram\":[4758,5136,105,1,0],\"chunks\":10000,\"generated_chunks\":512,\"generated_counts\":[68,73,73,78],\"generated_histogram\":[225,282,5,0,0],\"placed\":5349,\"placed_counts\":[1300,1336,1361,1352],\"roll_mask_counts\":[3167,1037,1051,329,1075,367,325,126,1051,350,402,112,334,117,122,35],\"skip_reasons\":{\"building_overlap\":2030,\"start_clearance\":1,\"tank_overlap\":2619},\"skipped_counts\":[1173,1166,1140,1171],\"successful_rolls_per_chunk_histogram\":[3167,4214,2107,477,35],\"tank_count\":3523,\"total_successful_rolls\":9999}\nPASS: 99467 independent-building checks; PNGs and 400 terrain/tank references unchanged\n"
+  },
+  {
+    "test": "terrain_chunk_streaming_test.gd",
+    "passed": true,
+    "output": "Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org\n\n100 streaming transitions: 3420.166 ms including frame waits; active terrain: 9\nMean chunk update CPU time: 26.59955 ms\nPASS: 901 terrain streaming checks\n"
+  },
+  {
+    "test": "terrain_determinism_test.gd",
+    "passed": true,
+    "output": "Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org\n\nPASS: 25 chunks match original ground and reduced-weight decoration reference bytes, including incremental generation\n"
+  },
+  {
+    "test": "terrain_prefetch_test.gd",
+    "passed": true,
+    "output": "Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org\n\nPASS terrain prefetch: threshold, idle reuse, corners, reversals, consumption, partial task, teleport, bounded cache\n"
+  },
+  {
+    "test": "terrain_tank_test.gd",
+    "passed": true,
+    "output": "Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org\n\nTANK_PROP_CPU samples=500 mean_ms=0.023588 peak_ms=0.035\nTANK_STATS chunks=10000 tanks=3523 frequency_percent=35.23 generated_chunks=100 generated_tanks=33 generated_percent=33\nPASS: 21047 tank placement checks\n"
+  },
+  {
+    "test": "decoration_distribution_test.gd",
+    "passed": true,
+    "output": "Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org\n\nDISTRIBUTION baseline=false chunks=400 cells=409600 total_probability=0.04928155339806\ndark_dirt_ash_tile.png count=2297 percent_of_cells=0.560791015625\ndark_dirt_ash_tile_2.png count=2157 percent_of_cells=0.526611328125\ndark_dirt_ash_tile_3.png count=2786 percent_of_cells=0.68017578125\ndark_dirt_ash_tile_4.png count=3952 percent_of_cells=0.96484375\ndark_dirt_ash_tile_5.png count=1631 percent_of_cells=0.398193359375\ndark_dirt_ash_tile_6.png count=1689 percent_of_cells=0.412353515625\ndark_dirt_ash_tile_11.png count=2747 percent_of_cells=0.670654296875\ndark_dirt_ash_tile_12.png count=2746 percent_of_cells=0.67041015625\nOBSERVED target_ratio=0.35285714285714 reduction_percent=64.7142857142857\nPASS decoration distribution / probability intervals / ground / tanks / determinism\n"
+  },
+  {
+    "test": "terrain_roads_test.gd",
+    "passed": true,
+    "output": "Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org\n\nROADS PASS { \"target\": 0.3, \"region_activation_chance\": 0.75939754461461, \"chunks\": 40000, \"participating_chunks\": 12087, \"chunk_frequency\": 0.302175, \"pieces\": 46345, \"piece_counts\": { \"straights\": 34880, \"curves\": 3090, \"t_junctions\": 1518, \"crossroads\": 951, \"end_caps\": 5906 }, \"occupied_cell_fraction\": 0.0724140625, \"mask_counts\": [0, 1038, 1915, 755, 1038, 14577, 791, 664, 1915, 784, 20303, 100, 760, 666, 88, 951], \"directed_border_connections\": 21244, \"instantiated_chunks\": 256, \"checks\": 305981 }\n"
+  }
+]

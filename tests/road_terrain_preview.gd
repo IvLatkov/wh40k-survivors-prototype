@@ -4,6 +4,8 @@ func _initialize() -> void:
 	run.call_deferred()
 
 func capture(path: String) -> void:
+	if OS.get_cmdline_user_args().has("--unblended"):
+		path = path.replace(".png", "_blend_before.png")
 	await process_frame
 	await process_frame
 	await RenderingServer.frame_post_draw
@@ -36,6 +38,9 @@ func show_world(center: Vector2i, radius: int, zoom: float, filename: String, fo
 			var chunk := preload("res://scenes/systems/terrain_chunk.tscn").instantiate() as TerrainChunk
 			chunk.configure(Vector2i(x, y), 1024)
 			world.add_child(chunk)
+			if OS.get_cmdline_user_args().has("--unblended"):
+				for sprite: Sprite2D in chunk.roads.get_children():
+					sprite.material = null
 			pieces += chunk.roads.get_child_count()
 			var border := Line2D.new()
 			border.default_color = Color(0.5, 0.8, 1.0, 0.35)
@@ -59,6 +64,7 @@ func run() -> void:
 				example = Vector2i(x, y) * 4 + Vector2i(1, 1)
 	await show_world(example, 3, 0.20, "res://docs/roads_overview.png")
 	await show_world(example, 1, 0.6, "res://docs/roads_closeup.png")
+	await show_t_junction()
 	var junction_found := false
 	for y in range(example.y - 3, example.y + 4):
 		for x in range(example.x - 3, example.x + 4):
@@ -79,6 +85,10 @@ func run() -> void:
 		var sprite := Sprite2D.new()
 		sprite.centered = false
 		sprite.texture = TerrainRoads.TEXTURES[mask]
+		sprite.material = TerrainRoads.EDGE_MATERIAL
+		sprite.set_instance_shader_parameter(&"edge_index", float(mask - 1))
+		if OS.get_cmdline_user_args().has("--unblended"):
+			sprite.material = null
 		sprite.position = Vector2((mask - 1) % 5 * 270 + 40, (mask - 1) / 5 * 280 + 70)
 		gallery.add_child(sprite)
 	add_label(gallery, "EXTRACTED ROAD PIECES | N=1 E=2 S=4 W=8 | masks 1..15")
@@ -86,3 +96,15 @@ func run() -> void:
 	gallery.free()
 	await process_frame
 	quit()
+
+
+func show_t_junction() -> void:
+	for y in range(-20, 20):
+		for x in range(-20, 20):
+			var coordinate := Vector2i(x, y)
+			for cell in TerrainRoads.get_layout(coordinate, 1024):
+				if cell.z in [7, 11, 13, 14]:
+					var focus := Vector2(coordinate) * 1024 + Vector2(cell.x, cell.y) * 256 + Vector2(128, 128)
+					await show_world(coordinate, 1, 1.0, "res://docs/roads_tjunction.png", focus)
+					return
+	assert(false, "Natural T-junction example found")

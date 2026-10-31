@@ -6,9 +6,15 @@ extends Node2D
 # No global RNG, persistent layout cache, physics or per-frame processing.
 const CELL_SIZE: int = 256
 const REGION_CELLS: int = 16
-const REGION_CHANCE: float = 0.65
+const PARTICIPATION_TARGET: float = 0.30
 const BRANCH_CHANCE: float = 0.55
+# For the current route shapes, exact enumeration of the 10x10x4 bends
+# and 10 optional branch columns covers 6.3208 of a region's sixteen 1024px
+# chunks on average. Target chunk participation, not per-chunk road rolls.
+const ACTIVE_REGION_CHUNK_FRACTION: float = 6.3208 / 16.0
+const REGION_CHANCE: float = PARTICIPATION_TARGET / ACTIVE_REGION_CHUNK_FRACTION
 const RNG_SALT: int = 0x524F4144
+const EDGE_MATERIAL: ShaderMaterial = preload("res://assets/shaders/road_edge_blend.tres")
 const DIRECTIONS: Array[Vector2i] = [Vector2i.UP, Vector2i.RIGHT, Vector2i.DOWN, Vector2i.LEFT]
 const TEXTURES: Array[Texture2D] = [
 	null,
@@ -84,6 +90,8 @@ func populate(coordinate: Vector2i, size: int) -> void:
 	for cell in get_layout(coordinate, size):
 		var piece := Sprite2D.new()
 		piece.texture = TEXTURES[cell.z]
+		piece.material = EDGE_MATERIAL
+		piece.set_instance_shader_parameter(&"edge_index", float(cell.z - 1))
 		piece.centered = false
 		piece.position = Vector2(cell.x, cell.y) * CELL_SIZE
 		add_child(piece)
