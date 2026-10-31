@@ -26,7 +26,7 @@ func verify_grid(center: Vector2i) -> void:
 			var chunk := manager.active_chunks[coordinate]
 			instance_ids[chunk.get_instance_id()] = true
 			check(chunk.chunk_coordinate == coordinate and chunk.position == Vector2(coordinate) * 1024.0 and chunk.chunk_size == 1024, "Exact coordinate, size, and aligned position")
-			check(chunk.get_parent() == manager.terrain_chunks and chunk.get_child_count() == 2 and chunk.ground is TileMapLayer and chunk.decorations is TileMapLayer, "Chunk owns only terrain")
+			check(chunk.get_parent() == manager.terrain_chunks and chunk.get_child_count() == 3 and chunk.ground is TileMapLayer and chunk.decorations is TileMapLayer, "Chunk owns ground, decorations and visual large props")
 			check(chunk.chunk_seed == hash(coordinate), "Stable coordinate-derived seed")
 			var rect := Rect2(chunk.position, Vector2.ONE * chunk.chunk_size)
 			if x < center.x + 1:

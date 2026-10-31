@@ -32,7 +32,7 @@ func run() -> void:
 	for chance in TerrainChunk.DECORATION_CHANCES:
 		assert(chance > 0.0)
 		probability += chance
-	assert(is_equal_approx(probability, 0.049 * 0.0705 / 0.0515))
+	assert(is_equal_approx(probability, 0.036 * 0.0705 / 0.0515))
 	var seen_sources: Dictionary[int, bool] = {}
 	var scene := preload("res://scenes/systems/terrain_chunk.tscn")
 	var counts: Array[int] = [0, 0, 0, 0, 0, 0]
@@ -44,7 +44,7 @@ func run() -> void:
 			var chunk := scene.instantiate() as TerrainChunk
 			chunk.configure(Vector2i(cx, cy), 1024)
 			root.add_child(chunk)
-			assert(chunk.get_child_count() == 2 and chunk.get_node("Ground") == chunk.ground and chunk.get_node("Decorations") == chunk.decorations)
+			assert(chunk.get_child_count() == 3 and chunk.get_node("Ground") == chunk.ground and chunk.get_node("Decorations") == chunk.decorations)
 			assert(chunk.ground.get_used_cells().size() == 1024)
 			assert(chunk.ground.tile_set.get_physics_layers_count() == 0)
 			assert(chunk.decorations.tile_set.get_physics_layers_count() == 0)
@@ -69,7 +69,7 @@ func run() -> void:
 	assert(seen_sources.size() == expected_files.size(), "Every remaining decoration generates")
 	assert(counts.all(func(count: int) -> bool: return count > 0))
 	assert(float(adjacent_matches) / total > 0.70, "Ground forms coherent patches")
-	assert(float(decoration_count) / total > 0.05 and float(decoration_count) / total < 0.085)
+	assert(absf(float(decoration_count) / total - probability) < 0.01)
 	print("PASS terrain artwork: variants=", counts, "; decoration density=", 100.0 * decoration_count / total, "%; matching right neighbors=", 100.0 * adjacent_matches / total, "%")
 	quit()
 

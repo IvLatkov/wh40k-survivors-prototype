@@ -18,6 +18,13 @@ func run() -> void:
 	player.set_physics_process(false)
 	spawner.set_process(false)
 	var stress := OS.get_cmdline_user_args().has("--stress")
+	var tank_route := OS.get_cmdline_user_args().has("--tank-route")
+	if tank_route:
+		# Naturally eligible coordinate, not a forced prop/probability override.
+		var tank_coordinate := Vector2i(1, -2)
+		assert(TerrainChunk.get_tank_position(tank_coordinate, manager.chunk_size) != Vector2.INF)
+		player.position = Vector2(tank_coordinate) * manager.chunk_size + Vector2(512, 512)
+		manager.update_chunks()
 	manager.profile_transitions = OS.get_cmdline_user_args().has("--profile")
 	var profiles: Dictionary = {}
 	var normal_frames: Array[float] = []
@@ -32,7 +39,14 @@ func run() -> void:
 	var terrain_node_samples: Array[int] = []
 	var max_prefetch: float = 0.0
 	var cache_peak: int = 0
+	var tank_peak: int = 0
+	var tank_windows: int = 0
 	for step in 48:
+		var active_tanks := 0
+		for chunk: TerrainChunk in manager.active_chunks.values():
+			active_tanks += chunk.large_props.get_child_count()
+		tank_peak = maxi(tank_peak, active_tanks)
+		tank_windows += int(active_tanks > 0)
 		var direction := directions[step % directions.size()]
 		var center := manager.current_chunk_coordinate
 		var target := center + direction
@@ -101,13 +115,24 @@ func run() -> void:
 			print("COUNT ", key, " avg=", average(profiles[key]) * 1000, " max=", profiles[key].max() * 1000)
 			continue
 		print("STAGE ", key, " avg_ms=", average(profiles[key]), " min_ms=", profiles[key].min(), " max_ms=", profiles[key].max())
-	print("TERRAIN BENCH stress=", stress, " cold=", cold, " transitions=", transitions.size(),
+	print("TERRAIN BENCH stress=", stress, " cold=", cold, " tank_route=", tank_route, " tank_windows=", tank_windows, " peak_active_tanks=", tank_peak, " transitions=", transitions.size(),
 		" update_ms avg=", average(transitions), " worst=", transitions.max(),
 		" transition_frame_interval_ms avg=", average(frame_intervals), " worst=", frame_intervals.max(),
 		" prefetch_worst_ms=", max_prefetch, " cache_peak=", cache_peak,
 		" FPS=", Engine.get_frames_per_second(), " enemies=", spawner.get_active_enemy_count(),
 		" objects=", Performance.get_monitor(Performance.OBJECT_NODE_COUNT))
+	# Stop the fixture and drain existing explosion coroutines before removing
+	# their scene. This is outside every measured interval.
+	main.process_mode = Node.PROCESS_MODE_DISABLED
+	paused = false
+	for pass_index in 2:
+		for child in main.get_children():
+			if child is BoltProjectile:
+				child.queue_free()
+		await process_frame
+	await create_timer(0.5).timeout
 	main.queue_free()
+	await process_frame
 	await process_frame
 	quit()
 

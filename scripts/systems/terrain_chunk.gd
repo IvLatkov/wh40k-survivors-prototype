@@ -2,6 +2,12 @@ class_name TerrainChunk
 extends Node2D
 
 const TILE_SIZE: int = 32
+const TANK_TEXTURE: Texture2D = preload("res://assets/art/effects/terrain/tanks/tank1.png")
+const TANK_CHANCE: float = 0.35
+const TANK_SCALE: float = 2.0
+const TANK_EDGE_MARGIN: float = 192.0
+const TANK_START_CLEARANCE: float = 250.0
+const TANK_RNG_SALT: int = 0x54414E4B
 const GROUND_ATLAS: Texture2D = preload("res://assets/art/effects/terrain/battlefield_biome/prepared/battlefield_ground_atlas.png")
 const DECORATION_FOLDER: String = "res://assets/art/effects/terrain/decorations/"
 # Explicit visually inspected sprites: rubble, bone fragments, stains, rocks,
@@ -12,11 +18,12 @@ const DECORATION_FILES: Array[String] = [
 	"dark_dirt_ash_tile_5.png", "dark_dirt_ash_tile_6.png",
 	"dark_dirt_ash_tile_11.png", "dark_dirt_ash_tile_12.png",
 ]
-# Keep each remaining per-cell probability unchanged; total 6.70776699%.
+# Keep the historical scale and all other per-cell chances unchanged.
+# Tile 4 is reduced 65%; total decoration probability is now 4.92815534%.
 const DECORATION_NORMALIZATION: float = 0.0705 / 0.0515
 const DECORATION_CHANCES: Array[float] = [
 	0.004 * DECORATION_NORMALIZATION, 0.004 * DECORATION_NORMALIZATION,
-	0.005 * DECORATION_NORMALIZATION, 0.020 * DECORATION_NORMALIZATION,
+	0.005 * DECORATION_NORMALIZATION, 0.007 * DECORATION_NORMALIZATION,
 	0.003 * DECORATION_NORMALIZATION, 0.003 * DECORATION_NORMALIZATION,
 	0.005 * DECORATION_NORMALIZATION, 0.005 * DECORATION_NORMALIZATION,
 ]
@@ -31,6 +38,8 @@ var _has_generated: bool = false
 var _prepared_data: ChunkData
 static var _ground_tiles: TileSet
 static var _decoration_tiles: TileSet
+
+@onready var large_props: Node2D = $LargeProps
 
 @onready var ground: TileMapLayer = $Ground
 @onready var decorations: TileMapLayer = $Decorations
@@ -208,3 +217,45 @@ func _generate() -> void:
 	for cell in data.decoration_cells:
 		decorations.set_cell(Vector2i(cell.x, cell.y), cell.z, Vector2i.ZERO, cell.w)
 	decoration_population_usec = Time.get_ticks_usec() - started if profile_generation else 0
+
+	_populate_large_props()
+
+
+static func get_tank_position(coordinate: Vector2i, size: int) -> Vector2:
+	# Own stream: no ground, decoration or gameplay RNG is consumed.
+	var rng := RandomNumberGenerator.new()
+	rng.seed = hash(Vector3i(coordinate.x, coordinate.y, TANK_RNG_SALT))
+	if rng.randf() >= TANK_CHANCE:
+		return Vector2.INF
+	# Native texture shared by every sprite; scale is an integer pixel-art zoom.
+	var half_size := TANK_TEXTURE.get_size() * TANK_SCALE * 0.5
+	var margin := half_size + Vector2.ONE * TILE_SIZE
+	margin = margin.max(Vector2.ONE * TANK_EDGE_MARGIN)
+	if margin.x * 2.0 > size or margin.y * 2.0 > size:
+		return Vector2.INF
+	var local_position := Vector2(
+		roundf(rng.randf_range(margin.x, size - margin.x)),
+		roundf(rng.randf_range(margin.y, size - margin.y))
+	)
+	# The real run starts at terrain origin. Keep the entire prop footprint
+	# clear of its 250px disk, including neighboring chunks; never reroll.
+	var world_position := Vector2(coordinate) * size + local_position
+	var nearest_to_start := Vector2.ZERO.clamp(world_position - half_size, world_position + half_size)
+	if nearest_to_start.length_squared() < TANK_START_CLEARANCE * TANK_START_CLEARANCE:
+		return Vector2.INF
+	return local_position
+
+
+func _populate_large_props() -> void:
+	# Reconfiguration must replace the old prop immediately, without duplicates.
+	for child in large_props.get_children():
+		child.free()
+	var at := get_tank_position(chunk_coordinate, chunk_size)
+	if at == Vector2.INF:
+		return
+	var tank := Sprite2D.new()
+	tank.name = "TankWreck"
+	tank.texture = TANK_TEXTURE
+	tank.position = at
+	tank.scale = Vector2.ONE * TANK_SCALE
+	large_props.add_child(tank)
