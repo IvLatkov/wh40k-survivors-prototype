@@ -1,0 +1,49 @@
+name: Godot CI
+
+on:
+  push:
+    branches:
+      - main
+
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Godot
+        uses: chickensoft-games/setup-godot@v2
+        with:
+          version: 4.6.3
+          use-dotnet: false
+          include-templates: false
+
+      - name: Verify Godot
+        run: godot --version
+
+      - name: Import project
+        run: godot --headless --path . --editor --quit
+
+      - name: Test XP progression
+        run: godot --headless --path . --script tests/xp_progression_test.gd
+
+      - name: Test armor
+        run: godot --headless --path . --script tests/armor_test.gd
+
+      - name: Test Ork spawning
+        run: godot --headless --path . --script tests/additive_ork_spawning_test.gd
+
+      - name: Test combat optimizations
+        run: godot --headless --path . --script tests/combat_optimization_test.gd
+
+      - name: Test ultimate upgrades
+        run: godot --headless --path . --script tests/ultimate_upgrades_test.gd
+
+      - name: Test XP pickup visuals
+        run: godot --headless --path . --script tests/xp_pickup_visual_test.gd
