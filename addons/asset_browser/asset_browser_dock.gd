@@ -16,6 +16,8 @@ var category_label: Label
 var path_label: Label
 var dimensions_label: Label
 var tags_label: Label
+var refresh_button: Button
+
 
 
 func _ready() -> void:
@@ -33,6 +35,11 @@ func build_ui() -> void:
 	title.add_theme_font_size_override("font_size", 18)
 	add_child(title)
 
+	refresh_button = Button.new()
+	refresh_button.text = "Refresh Catalog"
+	refresh_button.pressed.connect(_on_refresh_pressed)
+	add_child(refresh_button)
+
 	search_box = LineEdit.new()
 	search_box.placeholder_text = "Search assets..."
 	search_box.text_changed.connect(_on_search_changed)
@@ -46,6 +53,7 @@ func build_ui() -> void:
 	result_list.custom_minimum_size = Vector2(0, 220)
 	result_list.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	result_list.item_selected.connect(_on_asset_selected)
+	result_list.item_activated.connect(_on_asset_activated)
 	add_child(result_list)
 
 	var separator := HSeparator.new()
@@ -212,3 +220,70 @@ func show_asset(asset: Dictionary) -> void:
 
 		if resource is Texture2D:
 			preview.texture = resource
+
+func _on_asset_activated(index: int) -> void:
+	if index < 0 or index >= filtered_assets.size():
+		return
+
+	var asset: Dictionary = filtered_assets[index]
+	var path := str(asset.get("path", ""))
+
+	if path == "":
+		return
+
+	var filesystem_dock := EditorInterface.get_file_system_dock()
+	filesystem_dock.navigate_to_path(path)
+
+
+func _on_refresh_pressed() -> void:
+	refresh_button.disabled = true
+	refresh_button.text = "Refreshing..."
+
+	var godot_executable := OS.get_executable_path()
+	var project_path := ProjectSettings.globalize_path("res://")
+	var script_path := ProjectSettings.globalize_path(
+		"res://tools/build_asset_catalog.gd"
+	)
+
+	var output: Array = []
+
+	var exit_code := OS.execute(
+		godot_executable,
+		[
+			"--headless",
+			"--path",
+			project_path,
+			"--script",
+			script_path,
+		],
+		output,
+		true
+	)
+
+	for line in output:
+		print(line)
+
+	if exit_code != 0:
+		push_error("Asset catalog regeneration failed.")
+		refresh_button.text = "Refresh Failed"
+		refresh_button.disabled = false
+		return
+
+	assets.clear()
+	filtered_assets.clear()
+
+	load_catalog()
+	populate_categories()
+	refresh_results()
+
+	preview.texture = null
+	name_label.text = "Name:"
+	category_label.text = "Category:"
+	dimensions_label.text = "Dimensions:"
+	path_label.text = "Path:"
+	tags_label.text = "Tags:"
+
+	refresh_button.text = "Refresh Catalog"
+	refresh_button.disabled = false
+
+	print("Asset Browser catalog refreshed.")
