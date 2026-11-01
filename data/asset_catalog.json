@@ -1,0 +1,1174 @@
+{
+	"asset_count": 68,
+	"assets": [
+		{
+			"category": "enemy",
+			"extension": "png",
+			"height": 1254,
+			"id": "art_effects_enemy_orc_chatgpt_image_oct_19,_2026,_08_30_45_pm-1",
+			"name": "ChatGPT Image Oct 19, 2026, 08_30_45 PM-1",
+			"path": "res://assets/art/effects/enemy/orc/ChatGPT Image Oct 19, 2026, 08_30_45 PM-1.png",
+			"tags": [
+				"art",
+				"effects",
+				"enemy",
+				"orc",
+				"chatgpt image oct 19, 2026, 08_30_45 pm-1"
+			],
+			"type": "image",
+			"width": 1254
+		},
+		{
+			"category": "enemy",
+			"extension": "png",
+			"height": 1254,
+			"id": "art_effects_enemy_orc_chatgpt_image_oct_19,_2026,_08_30_46_pm-2",
+			"name": "ChatGPT Image Oct 19, 2026, 08_30_46 PM-2",
+			"path": "res://assets/art/effects/enemy/orc/ChatGPT Image Oct 19, 2026, 08_30_46 PM-2.png",
+			"tags": [
+				"art",
+				"effects",
+				"enemy",
+				"orc",
+				"chatgpt image oct 19, 2026, 08_30_46 pm-2"
+			],
+			"type": "image",
+			"width": 1254
+		},
+		{
+			"category": "enemy",
+			"extension": "png",
+			"height": 64,
+			"id": "art_effects_enemy_orc_pixel_orc_warboss_with_chainsaw_cleaver.png",
+			"name": "Pixel Orc Warboss with Chainsaw Cleaver.png",
+			"path": "res://assets/art/effects/enemy/orc/Pixel Orc Warboss with Chainsaw Cleaver.png.png",
+			"tags": [
+				"art",
+				"effects",
+				"enemy",
+				"orc",
+				"pixel orc warboss with chainsaw cleaver.png"
+			],
+			"type": "image",
+			"width": 64
+		},
+		{
+			"category": "enemy",
+			"extension": "png",
+			"height": 370,
+			"id": "art_effects_enemy_squig_squig_green_walking_0001",
+			"name": "squig_green_walking_0001",
+			"path": "res://assets/art/effects/enemy/squig/squig_green_walking_0001.png",
+			"tags": [
+				"art",
+				"effects",
+				"enemy",
+				"squig",
+				"squig_green_walking_0001"
+			],
+			"type": "image",
+			"width": 342
+		},
+		{
+			"category": "enemy",
+			"extension": "png",
+			"height": 370,
+			"id": "art_effects_enemy_squig_squig_green_walking_0002",
+			"name": "squig_green_walking_0002",
+			"path": "res://assets/art/effects/enemy/squig/squig_green_walking_0002.png",
+			"tags": [
+				"art",
+				"effects",
+				"enemy",
+				"squig",
+				"squig_green_walking_0002"
+			],
+			"type": "image",
+			"width": 342
+		},
+		{
+			"category": "enemy",
+			"extension": "png",
+			"height": 370,
+			"id": "art_effects_enemy_squig_squig_purple_walking_0001",
+			"name": "squig_purple_walking_0001",
+			"path": "res://assets/art/effects/enemy/squig/squig_purple_walking_0001.png",
+			"tags": [
+				"art",
+				"effects",
+				"enemy",
+				"squig",
+				"squig_purple_walking_0001"
+			],
+			"type": "image",
+			"width": 342
+		},
+		{
+			"category": "enemy",
+			"extension": "png",
+			"height": 370,
+			"id": "art_effects_enemy_squig_squig_purple_walking_0002",
+			"name": "squig_purple_walking_0002",
+			"path": "res://assets/art/effects/enemy/squig/squig_purple_walking_0002.png",
+			"tags": [
+				"art",
+				"effects",
+				"enemy",
+				"squig",
+				"squig_purple_walking_0002"
+			],
+			"type": "image",
+			"width": 342
+		},
+		{
+			"category": "enemy",
+			"extension": "png",
+			"height": 370,
+			"id": "art_effects_enemy_squig_squig_red_walking_0001",
+			"name": "squig_red_walking_0001",
+			"path": "res://assets/art/effects/enemy/squig/squig_red_walking_0001.png",
+			"tags": [
+				"art",
+				"effects",
+				"enemy",
+				"squig",
+				"squig_red_walking_0001"
+			],
+			"type": "image",
+			"width": 342
+		},
+		{
+			"category": "enemy",
+			"extension": "png",
+			"height": 370,
+			"id": "art_effects_enemy_squig_squig_red_walking_0002",
+			"name": "squig_red_walking_0002",
+			"path": "res://assets/art/effects/enemy/squig/squig_red_walking_0002.png",
+			"tags": [
+				"art",
+				"effects",
+				"enemy",
+				"squig",
+				"squig_red_walking_0002"
+			],
+			"type": "image",
+			"width": 342
+		},
+		{
+			"category": "effect",
+			"extension": "png",
+			"height": 48,
+			"id": "art_effects_explosions_bolter_explosion",
+			"name": "bolter_explosion",
+			"path": "res://assets/art/effects/explosions/bolter_explosion.png",
+			"tags": [
+				"art",
+				"effects",
+				"explosions",
+				"bolter_explosion"
+			],
+			"type": "image",
+			"width": 48
+		},
+		{
+			"category": "effect",
+			"extension": "png",
+			"height": 48,
+			"id": "art_effects_explosions_bolter_explosion_after",
+			"name": "bolter_explosion_after",
+			"path": "res://assets/art/effects/explosions/bolter_explosion_after.png",
+			"tags": [
+				"art",
+				"effects",
+				"explosions",
+				"bolter_explosion_after"
+			],
+			"type": "image",
+			"width": 48
+		},
+		{
+			"category": "player",
+			"extension": "png",
+			"height": 623,
+			"id": "art_effects_player_ultramarine_ultramarine_bolter_left.png_0001",
+			"name": "Ultramarine_bolter_left.png_0001",
+			"path": "res://assets/art/effects/player/ultramarine/Ultramarine_bolter_left.png_0001.png",
+			"tags": [
+				"art",
+				"effects",
+				"player",
+				"ultramarine",
+				"ultramarine_bolter_left.png_0001"
+			],
+			"type": "image",
+			"width": 420
+		},
+		{
+			"category": "player",
+			"extension": "png",
+			"height": 623,
+			"id": "art_effects_player_ultramarine_ultramarine_bolter_left.png_0002",
+			"name": "Ultramarine_bolter_left.png_0002",
+			"path": "res://assets/art/effects/player/ultramarine/Ultramarine_bolter_left.png_0002.png",
+			"tags": [
+				"art",
+				"effects",
+				"player",
+				"ultramarine",
+				"ultramarine_bolter_left.png_0002"
+			],
+			"type": "image",
+			"width": 420
+		},
+		{
+			"category": "player",
+			"extension": "png",
+			"height": 623,
+			"id": "art_effects_player_ultramarine_ultramarine_bolter_left.png_0003",
+			"name": "Ultramarine_bolter_left.png_0003",
+			"path": "res://assets/art/effects/player/ultramarine/Ultramarine_bolter_left.png_0003.png",
+			"tags": [
+				"art",
+				"effects",
+				"player",
+				"ultramarine",
+				"ultramarine_bolter_left.png_0003"
+			],
+			"type": "image",
+			"width": 420
+		},
+		{
+			"category": "player",
+			"extension": "png",
+			"height": 623,
+			"id": "art_effects_player_ultramarine_ultramarine_bolter_left.png_0004",
+			"name": "Ultramarine_bolter_left.png_0004",
+			"path": "res://assets/art/effects/player/ultramarine/Ultramarine_bolter_left.png_0004.png",
+			"tags": [
+				"art",
+				"effects",
+				"player",
+				"ultramarine",
+				"ultramarine_bolter_left.png_0004"
+			],
+			"type": "image",
+			"width": 420
+		},
+		{
+			"category": "player",
+			"extension": "png",
+			"height": 623,
+			"id": "art_effects_player_ultramarine_ultramarine_bolter_left_still.png_0001",
+			"name": "Ultramarine_bolter_left_still.png_0001",
+			"path": "res://assets/art/effects/player/ultramarine/Ultramarine_bolter_left_still.png_0001.png",
+			"tags": [
+				"art",
+				"effects",
+				"player",
+				"ultramarine",
+				"ultramarine_bolter_left_still.png_0001"
+			],
+			"type": "image",
+			"width": 420
+		},
+		{
+			"category": "player",
+			"extension": "png",
+			"height": 623,
+			"id": "art_effects_player_ultramarine_ultramarine_bolter_left_still.png_0002",
+			"name": "Ultramarine_bolter_left_still.png_0002",
+			"path": "res://assets/art/effects/player/ultramarine/Ultramarine_bolter_left_still.png_0002.png",
+			"tags": [
+				"art",
+				"effects",
+				"player",
+				"ultramarine",
+				"ultramarine_bolter_left_still.png_0002"
+			],
+			"type": "image",
+			"width": 420
+		},
+		{
+			"category": "player",
+			"extension": "png",
+			"height": 623,
+			"id": "art_effects_player_ultramarine_ultramarine_bolter_right.png_0001",
+			"name": "Ultramarine_bolter_right.png_0001",
+			"path": "res://assets/art/effects/player/ultramarine/Ultramarine_bolter_right.png_0001.png",
+			"tags": [
+				"art",
+				"effects",
+				"player",
+				"ultramarine",
+				"ultramarine_bolter_right.png_0001"
+			],
+			"type": "image",
+			"width": 420
+		},
+		{
+			"category": "player",
+			"extension": "png",
+			"height": 623,
+			"id": "art_effects_player_ultramarine_ultramarine_bolter_right.png_0002",
+			"name": "Ultramarine_bolter_right.png_0002",
+			"path": "res://assets/art/effects/player/ultramarine/Ultramarine_bolter_right.png_0002.png",
+			"tags": [
+				"art",
+				"effects",
+				"player",
+				"ultramarine",
+				"ultramarine_bolter_right.png_0002"
+			],
+			"type": "image",
+			"width": 420
+		},
+		{
+			"category": "player",
+			"extension": "png",
+			"height": 623,
+			"id": "art_effects_player_ultramarine_ultramarine_bolter_right.png_0003",
+			"name": "Ultramarine_bolter_right.png_0003",
+			"path": "res://assets/art/effects/player/ultramarine/Ultramarine_bolter_right.png_0003.png",
+			"tags": [
+				"art",
+				"effects",
+				"player",
+				"ultramarine",
+				"ultramarine_bolter_right.png_0003"
+			],
+			"type": "image",
+			"width": 420
+		},
+		{
+			"category": "player",
+			"extension": "png",
+			"height": 623,
+			"id": "art_effects_player_ultramarine_ultramarine_bolter_right.png_0004",
+			"name": "Ultramarine_bolter_right.png_0004",
+			"path": "res://assets/art/effects/player/ultramarine/Ultramarine_bolter_right.png_0004.png",
+			"tags": [
+				"art",
+				"effects",
+				"player",
+				"ultramarine",
+				"ultramarine_bolter_right.png_0004"
+			],
+			"type": "image",
+			"width": 420
+		},
+		{
+			"category": "player",
+			"extension": "png",
+			"height": 623,
+			"id": "art_effects_player_ultramarine_ultramarine_bolter_right_still.png_0001",
+			"name": "Ultramarine_bolter_right_still.png_0001",
+			"path": "res://assets/art/effects/player/ultramarine/Ultramarine_bolter_right_still.png_0001.png",
+			"tags": [
+				"art",
+				"effects",
+				"player",
+				"ultramarine",
+				"ultramarine_bolter_right_still.png_0001"
+			],
+			"type": "image",
+			"width": 420
+		},
+		{
+			"category": "player",
+			"extension": "png",
+			"height": 623,
+			"id": "art_effects_player_ultramarine_ultramarine_bolter_right_still.png_0002",
+			"name": "Ultramarine_bolter_right_still.png_0002",
+			"path": "res://assets/art/effects/player/ultramarine/Ultramarine_bolter_right_still.png_0002.png",
+			"tags": [
+				"art",
+				"effects",
+				"player",
+				"ultramarine",
+				"ultramarine_bolter_right_still.png_0002"
+			],
+			"type": "image",
+			"width": 420
+		},
+		{
+			"category": "effect",
+			"extension": "png",
+			"height": 13,
+			"id": "art_effects_projectiles_bolter_projectile",
+			"name": "bolter_projectile",
+			"path": "res://assets/art/effects/projectiles/bolter_projectile.png",
+			"tags": [
+				"art",
+				"effects",
+				"projectiles",
+				"bolter_projectile"
+			],
+			"type": "image",
+			"width": 32
+		},
+		{
+			"category": "effect",
+			"extension": "png",
+			"height": 141,
+			"id": "art_effects_sword_slash_sword_slash",
+			"name": "sword_slash",
+			"path": "res://assets/art/effects/sword_slash/sword_slash.png",
+			"tags": [
+				"art",
+				"effects",
+				"sword_slash"
+			],
+			"type": "image",
+			"width": 192
+		},
+		{
+			"category": "terrain",
+			"extension": "png",
+			"height": 1024,
+			"id": "art_effects_terrain_battlefield_biome_chatgpt_image_oct_21,_2026,_07_17_37_pm-1",
+			"name": "ChatGPT Image Oct 21, 2026, 07_17_37 PM-1",
+			"path": "res://assets/art/effects/terrain/battlefield_biome/ChatGPT Image Oct 21, 2026, 07_17_37 PM-1.png",
+			"tags": [
+				"art",
+				"effects",
+				"terrain",
+				"battlefield_biome",
+				"chatgpt image oct 21, 2026, 07_17_37 pm-1"
+			],
+			"type": "image",
+			"width": 1536
+		},
+		{
+			"category": "terrain",
+			"extension": "png",
+			"height": 128,
+			"id": "art_effects_terrain_battlefield_biome_prepared_battlefield_ground_atlas",
+			"name": "battlefield_ground_atlas",
+			"path": "res://assets/art/effects/terrain/battlefield_biome/prepared/battlefield_ground_atlas.png",
+			"tags": [
+				"art",
+				"effects",
+				"terrain",
+				"battlefield_biome",
+				"prepared",
+				"battlefield_ground_atlas"
+			],
+			"type": "image",
+			"width": 768
+		},
+		{
+			"category": "terrain",
+			"extension": "png",
+			"height": 132,
+			"id": "art_effects_terrain_buildings_imperial_ruin_1.1",
+			"name": "imperial_ruin_1.1",
+			"path": "res://assets/art/effects/terrain/buildings/imperial_ruin_1.1.png",
+			"tags": [
+				"art",
+				"effects",
+				"terrain",
+				"buildings",
+				"imperial_ruin_1.1"
+			],
+			"type": "image",
+			"width": 128
+		},
+		{
+			"category": "terrain",
+			"extension": "png",
+			"height": 128,
+			"id": "art_effects_terrain_buildings_imperial_ruin_2.1",
+			"name": "imperial_ruin_2.1",
+			"path": "res://assets/art/effects/terrain/buildings/imperial_ruin_2.1.png",
+			"tags": [
+				"art",
+				"effects",
+				"terrain",
+				"buildings",
+				"imperial_ruin_2.1"
+			],
+			"type": "image",
+			"width": 128
+		},
+		{
+			"category": "terrain",
+			"extension": "png",
+			"height": 128,
+			"id": "art_effects_terrain_buildings_imperial_ruin_3.1",
+			"name": "imperial_ruin_3.1",
+			"path": "res://assets/art/effects/terrain/buildings/imperial_ruin_3.1.png",
+			"tags": [
+				"art",
+				"effects",
+				"terrain",
+				"buildings",
+				"imperial_ruin_3.1"
+			],
+			"type": "image",
+			"width": 128
+		},
+		{
+			"category": "terrain",
+			"extension": "png",
+			"height": 130,
+			"id": "art_effects_terrain_buildings_imperial_ruin_4.1",
+			"name": "imperial_ruin_4.1",
+			"path": "res://assets/art/effects/terrain/buildings/imperial_ruin_4.1.png",
+			"tags": [
+				"art",
+				"effects",
+				"terrain",
+				"buildings",
+				"imperial_ruin_4.1"
+			],
+			"type": "image",
+			"width": 128
+		},
+		{
+			"category": "terrain",
+			"extension": "png",
+			"height": 1024,
+			"id": "art_effects_terrain_decorations_chatgpt_image_oct_21,_2026,_07_17_38_pm-2",
+			"name": "ChatGPT Image Oct 21, 2026, 07_17_38 PM-2",
+			"path": "res://assets/art/effects/terrain/decorations/ChatGPT Image Oct 21, 2026, 07_17_38 PM-2.png",
+			"tags": [
+				"art",
+				"effects",
+				"terrain",
+				"decorations",
+				"chatgpt image oct 21, 2026, 07_17_38 pm-2"
+			],
+			"type": "image",
+			"width": 1536
+		},
+		{
+			"category": "terrain",
+			"extension": "png",
+			"height": 48,
+			"id": "art_effects_terrain_decorations_dark_dirt_ash_tile",
+			"name": "dark_dirt_ash_tile",
+			"path": "res://assets/art/effects/terrain/decorations/dark_dirt_ash_tile.png",
+			"tags": [
+				"art",
+				"effects",
+				"terrain",
+				"decorations",
+				"dark_dirt_ash_tile"
+			],
+			"type": "image",
+			"width": 48
+		},
+		{
+			"category": "terrain",
+			"extension": "png",
+			"height": 48,
+			"id": "art_effects_terrain_decorations_dark_dirt_ash_tile_10",
+			"name": "dark_dirt_ash_tile_10",
+			"path": "res://assets/art/effects/terrain/decorations/dark_dirt_ash_tile_10.png",
+			"tags": [
+				"art",
+				"effects",
+				"terrain",
+				"decorations",
+				"dark_dirt_ash_tile_10"
+			],
+			"type": "image",
+			"width": 48
+		},
+		{
+			"category": "terrain",
+			"extension": "png",
+			"height": 48,
+			"id": "art_effects_terrain_decorations_dark_dirt_ash_tile_11",
+			"name": "dark_dirt_ash_tile_11",
+			"path": "res://assets/art/effects/terrain/decorations/dark_dirt_ash_tile_11.png",
+			"tags": [
+				"art",
+				"effects",
+				"terrain",
+				"decorations",
+				"dark_dirt_ash_tile_11"
+			],
+			"type": "image",
+			"width": 48
+		},
+		{
+			"category": "terrain",
+			"extension": "png",
+			"height": 48,
+			"id": "art_effects_terrain_decorations_dark_dirt_ash_tile_12",
+			"name": "dark_dirt_ash_tile_12",
+			"path": "res://assets/art/effects/terrain/decorations/dark_dirt_ash_tile_12.png",
+			"tags": [
+				"art",
+				"effects",
+				"terrain",
+				"decorations",
+				"dark_dirt_ash_tile_12"
+			],
+			"type": "image",
+			"width": 48
+		},
+		{
+			"category": "terrain",
+			"extension": "png",
+			"height": 48,
+			"id": "art_effects_terrain_decorations_dark_dirt_ash_tile_13",
+			"name": "dark_dirt_ash_tile_13",
+			"path": "res://assets/art/effects/terrain/decorations/dark_dirt_ash_tile_13.png",
+			"tags": [
+				"art",
+				"effects",
+				"terrain",
+				"decorations",
+				"dark_dirt_ash_tile_13"
+			],
+			"type": "image",
+			"width": 48
+		},
+		{
+			"category": "terrain",
+			"extension": "png",
+			"height": 48,
+			"id": "art_effects_terrain_decorations_dark_dirt_ash_tile_2",
+			"name": "dark_dirt_ash_tile_2",
+			"path": "res://assets/art/effects/terrain/decorations/dark_dirt_ash_tile_2.png",
+			"tags": [
+				"art",
+				"effects",
+				"terrain",
+				"decorations",
+				"dark_dirt_ash_tile_2"
+			],
+			"type": "image",
+			"width": 48
+		},
+		{
+			"category": "terrain",
+			"extension": "png",
+			"height": 48,
+			"id": "art_effects_terrain_decorations_dark_dirt_ash_tile_3",
+			"name": "dark_dirt_ash_tile_3",
+			"path": "res://assets/art/effects/terrain/decorations/dark_dirt_ash_tile_3.png",
+			"tags": [
+				"art",
+				"effects",
+				"terrain",
+				"decorations",
+				"dark_dirt_ash_tile_3"
+			],
+			"type": "image",
+			"width": 48
+		},
+		{
+			"category": "terrain",
+			"extension": "png",
+			"height": 48,
+			"id": "art_effects_terrain_decorations_dark_dirt_ash_tile_4",
+			"name": "dark_dirt_ash_tile_4",
+			"path": "res://assets/art/effects/terrain/decorations/dark_dirt_ash_tile_4.png",
+			"tags": [
+				"art",
+				"effects",
+				"terrain",
+				"decorations",
+				"dark_dirt_ash_tile_4"
+			],
+			"type": "image",
+			"width": 48
+		},
+		{
+			"category": "terrain",
+			"extension": "png",
+			"height": 48,
+			"id": "art_effects_terrain_decorations_dark_dirt_ash_tile_5",
+			"name": "dark_dirt_ash_tile_5",
+			"path": "res://assets/art/effects/terrain/decorations/dark_dirt_ash_tile_5.png",
+			"tags": [
+				"art",
+				"effects",
+				"terrain",
+				"decorations",
+				"dark_dirt_ash_tile_5"
+			],
+			"type": "image",
+			"width": 48
+		},
+		{
+			"category": "terrain",
+			"extension": "png",
+			"height": 48,
+			"id": "art_effects_terrain_decorations_dark_dirt_ash_tile_6",
+			"name": "dark_dirt_ash_tile_6",
+			"path": "res://assets/art/effects/terrain/decorations/dark_dirt_ash_tile_6.png",
+			"tags": [
+				"art",
+				"effects",
+				"terrain",
+				"decorations",
+				"dark_dirt_ash_tile_6"
+			],
+			"type": "image",
+			"width": 48
+		},
+		{
+			"category": "terrain",
+			"extension": "png",
+			"height": 48,
+			"id": "art_effects_terrain_decorations_dark_dirt_ash_tile_7",
+			"name": "dark_dirt_ash_tile_7",
+			"path": "res://assets/art/effects/terrain/decorations/dark_dirt_ash_tile_7.png",
+			"tags": [
+				"art",
+				"effects",
+				"terrain",
+				"decorations",
+				"dark_dirt_ash_tile_7"
+			],
+			"type": "image",
+			"width": 48
+		},
+		{
+			"category": "terrain",
+			"extension": "png",
+			"height": 48,
+			"id": "art_effects_terrain_decorations_dark_dirt_ash_tile_8",
+			"name": "dark_dirt_ash_tile_8",
+			"path": "res://assets/art/effects/terrain/decorations/dark_dirt_ash_tile_8.png",
+			"tags": [
+				"art",
+				"effects",
+				"terrain",
+				"decorations",
+				"dark_dirt_ash_tile_8"
+			],
+			"type": "image",
+			"width": 48
+		},
+		{
+			"category": "terrain",
+			"extension": "png",
+			"height": 48,
+			"id": "art_effects_terrain_decorations_dark_dirt_ash_tile_9",
+			"name": "dark_dirt_ash_tile_9",
+			"path": "res://assets/art/effects/terrain/decorations/dark_dirt_ash_tile_9.png",
+			"tags": [
+				"art",
+				"effects",
+				"terrain",
+				"decorations",
+				"dark_dirt_ash_tile_9"
+			],
+			"type": "image",
+			"width": 48
+		},
+		{
+			"category": "terrain",
+			"extension": "png",
+			"height": 1024,
+			"id": "art_effects_terrain_landmarks_grim_warzone_ruins_sprite_sheet",
+			"name": "Grim Warzone Ruins Sprite Sheet",
+			"path": "res://assets/art/effects/terrain/landmarks/Grim Warzone Ruins Sprite Sheet.png",
+			"tags": [
+				"art",
+				"effects",
+				"terrain",
+				"landmarks",
+				"grim warzone ruins sprite sheet"
+			],
+			"type": "image",
+			"width": 1536
+		},
+		{
+			"category": "terrain",
+			"extension": "png",
+			"height": 256,
+			"id": "art_effects_terrain_roads_prepared_road_01",
+			"name": "road_01",
+			"path": "res://assets/art/effects/terrain/roads/prepared/road_01.png",
+			"tags": [
+				"art",
+				"effects",
+				"terrain",
+				"roads",
+				"prepared",
+				"road_01"
+			],
+			"type": "image",
+			"width": 256
+		},
+		{
+			"category": "terrain",
+			"extension": "png",
+			"height": 256,
+			"id": "art_effects_terrain_roads_prepared_road_02",
+			"name": "road_02",
+			"path": "res://assets/art/effects/terrain/roads/prepared/road_02.png",
+			"tags": [
+				"art",
+				"effects",
+				"terrain",
+				"roads",
+				"prepared",
+				"road_02"
+			],
+			"type": "image",
+			"width": 256
+		},
+		{
+			"category": "terrain",
+			"extension": "png",
+			"height": 256,
+			"id": "art_effects_terrain_roads_prepared_road_03",
+			"name": "road_03",
+			"path": "res://assets/art/effects/terrain/roads/prepared/road_03.png",
+			"tags": [
+				"art",
+				"effects",
+				"terrain",
+				"roads",
+				"prepared",
+				"road_03"
+			],
+			"type": "image",
+			"width": 256
+		},
+		{
+			"category": "terrain",
+			"extension": "png",
+			"height": 256,
+			"id": "art_effects_terrain_roads_prepared_road_04",
+			"name": "road_04",
+			"path": "res://assets/art/effects/terrain/roads/prepared/road_04.png",
+			"tags": [
+				"art",
+				"effects",
+				"terrain",
+				"roads",
+				"prepared",
+				"road_04"
+			],
+			"type": "image",
+			"width": 256
+		},
+		{
+			"category": "terrain",
+			"extension": "png",
+			"height": 256,
+			"id": "art_effects_terrain_roads_prepared_road_05",
+			"name": "road_05",
+			"path": "res://assets/art/effects/terrain/roads/prepared/road_05.png",
+			"tags": [
+				"art",
+				"effects",
+				"terrain",
+				"roads",
+				"prepared",
+				"road_05"
+			],
+			"type": "image",
+			"width": 256
+		},
+		{
+			"category": "terrain",
+			"extension": "png",
+			"height": 256,
+			"id": "art_effects_terrain_roads_prepared_road_06",
+			"name": "road_06",
+			"path": "res://assets/art/effects/terrain/roads/prepared/road_06.png",
+			"tags": [
+				"art",
+				"effects",
+				"terrain",
+				"roads",
+				"prepared",
+				"road_06"
+			],
+			"type": "image",
+			"width": 256
+		},
+		{
+			"category": "terrain",
+			"extension": "png",
+			"height": 256,
+			"id": "art_effects_terrain_roads_prepared_road_07",
+			"name": "road_07",
+			"path": "res://assets/art/effects/terrain/roads/prepared/road_07.png",
+			"tags": [
+				"art",
+				"effects",
+				"terrain",
+				"roads",
+				"prepared",
+				"road_07"
+			],
+			"type": "image",
+			"width": 256
+		},
+		{
+			"category": "terrain",
+			"extension": "png",
+			"height": 256,
+			"id": "art_effects_terrain_roads_prepared_road_08",
+			"name": "road_08",
+			"path": "res://assets/art/effects/terrain/roads/prepared/road_08.png",
+			"tags": [
+				"art",
+				"effects",
+				"terrain",
+				"roads",
+				"prepared",
+				"road_08"
+			],
+			"type": "image",
+			"width": 256
+		},
+		{
+			"category": "terrain",
+			"extension": "png",
+			"height": 256,
+			"id": "art_effects_terrain_roads_prepared_road_09",
+			"name": "road_09",
+			"path": "res://assets/art/effects/terrain/roads/prepared/road_09.png",
+			"tags": [
+				"art",
+				"effects",
+				"terrain",
+				"roads",
+				"prepared",
+				"road_09"
+			],
+			"type": "image",
+			"width": 256
+		},
+		{
+			"category": "terrain",
+			"extension": "png",
+			"height": 256,
+			"id": "art_effects_terrain_roads_prepared_road_10",
+			"name": "road_10",
+			"path": "res://assets/art/effects/terrain/roads/prepared/road_10.png",
+			"tags": [
+				"art",
+				"effects",
+				"terrain",
+				"roads",
+				"prepared",
+				"road_10"
+			],
+			"type": "image",
+			"width": 256
+		},
+		{
+			"category": "terrain",
+			"extension": "png",
+			"height": 256,
+			"id": "art_effects_terrain_roads_prepared_road_11",
+			"name": "road_11",
+			"path": "res://assets/art/effects/terrain/roads/prepared/road_11.png",
+			"tags": [
+				"art",
+				"effects",
+				"terrain",
+				"roads",
+				"prepared",
+				"road_11"
+			],
+			"type": "image",
+			"width": 256
+		},
+		{
+			"category": "terrain",
+			"extension": "png",
+			"height": 256,
+			"id": "art_effects_terrain_roads_prepared_road_12",
+			"name": "road_12",
+			"path": "res://assets/art/effects/terrain/roads/prepared/road_12.png",
+			"tags": [
+				"art",
+				"effects",
+				"terrain",
+				"roads",
+				"prepared",
+				"road_12"
+			],
+			"type": "image",
+			"width": 256
+		},
+		{
+			"category": "terrain",
+			"extension": "png",
+			"height": 256,
+			"id": "art_effects_terrain_roads_prepared_road_13",
+			"name": "road_13",
+			"path": "res://assets/art/effects/terrain/roads/prepared/road_13.png",
+			"tags": [
+				"art",
+				"effects",
+				"terrain",
+				"roads",
+				"prepared",
+				"road_13"
+			],
+			"type": "image",
+			"width": 256
+		},
+		{
+			"category": "terrain",
+			"extension": "png",
+			"height": 256,
+			"id": "art_effects_terrain_roads_prepared_road_14",
+			"name": "road_14",
+			"path": "res://assets/art/effects/terrain/roads/prepared/road_14.png",
+			"tags": [
+				"art",
+				"effects",
+				"terrain",
+				"roads",
+				"prepared",
+				"road_14"
+			],
+			"type": "image",
+			"width": 256
+		},
+		{
+			"category": "terrain",
+			"extension": "png",
+			"height": 256,
+			"id": "art_effects_terrain_roads_prepared_road_15",
+			"name": "road_15",
+			"path": "res://assets/art/effects/terrain/roads/prepared/road_15.png",
+			"tags": [
+				"art",
+				"effects",
+				"terrain",
+				"roads",
+				"prepared",
+				"road_15"
+			],
+			"type": "image",
+			"width": 256
+		},
+		{
+			"category": "terrain",
+			"extension": "png",
+			"height": 768,
+			"id": "art_effects_terrain_roads_prepared_road_edge_masks",
+			"name": "road_edge_masks",
+			"path": "res://assets/art/effects/terrain/roads/prepared/road_edge_masks.png",
+			"tags": [
+				"art",
+				"effects",
+				"terrain",
+				"roads",
+				"prepared",
+				"road_edge_masks"
+			],
+			"type": "image",
+			"width": 1280
+		},
+		{
+			"category": "terrain",
+			"extension": "png",
+			"height": 1024,
+			"id": "art_effects_terrain_roads_road",
+			"name": "road",
+			"path": "res://assets/art/effects/terrain/roads/road.png",
+			"tags": [
+				"art",
+				"effects",
+				"terrain",
+				"roads",
+				"road"
+			],
+			"type": "image",
+			"width": 1536
+		},
+		{
+			"category": "terrain",
+			"extension": "png",
+			"height": 128,
+			"id": "art_effects_terrain_tanks_tank1",
+			"name": "tank1",
+			"path": "res://assets/art/effects/terrain/tanks/tank1.png",
+			"tags": [
+				"art",
+				"effects",
+				"terrain",
+				"tanks",
+				"tank1"
+			],
+			"type": "image",
+			"width": 128
+		},
+		{
+			"category": "xp",
+			"extension": "png",
+			"height": 16,
+			"id": "art_effects_xp_bosses_skull_head_with_little_wings_golden",
+			"name": "Skull_head_with_little_wings_golden",
+			"path": "res://assets/art/effects/xp/bosses/Skull_head_with_little_wings_golden.png",
+			"tags": [
+				"art",
+				"effects",
+				"xp",
+				"bosses",
+				"skull_head_with_little_wings_golden"
+			],
+			"type": "image",
+			"width": 16
+		},
+		{
+			"category": "xp",
+			"extension": "png",
+			"height": 16,
+			"id": "art_effects_xp_high_level_skull_head_with_little_wings_red",
+			"name": "Skull_head_with_little_wings_red",
+			"path": "res://assets/art/effects/xp/high_level/Skull_head_with_little_wings_red.png",
+			"tags": [
+				"art",
+				"effects",
+				"xp",
+				"high_level",
+				"skull_head_with_little_wings_red"
+			],
+			"type": "image",
+			"width": 16
+		},
+		{
+			"category": "xp",
+			"extension": "png",
+			"height": 16,
+			"id": "art_effects_xp_low_level_skull_head_with_little_wings_white",
+			"name": "Skull_head_with_little_wings_white",
+			"path": "res://assets/art/effects/xp/low_level/Skull_head_with_little_wings_white.png",
+			"tags": [
+				"art",
+				"effects",
+				"xp",
+				"low_level",
+				"skull_head_with_little_wings_white"
+			],
+			"type": "image",
+			"width": 16
+		},
+		{
+			"category": "xp",
+			"extension": "png",
+			"height": 16,
+			"id": "art_effects_xp_mid_level_skull_head_with_little_wings_blue",
+			"name": "Skull_head_with_little_wings_blue",
+			"path": "res://assets/art/effects/xp/mid_level/Skull_head_with_little_wings_blue.png",
+			"tags": [
+				"art",
+				"effects",
+				"xp",
+				"mid_level",
+				"skull_head_with_little_wings_blue"
+			],
+			"type": "image",
+			"width": 16
+		}
+	],
+	"generated_by": "build_asset_catalog.gd"
+}
