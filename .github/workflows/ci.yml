@@ -32,3 +32,17 @@ jobs:
 
       - name: Run CI test suite
         run: godot --headless --path . --script tests/run_ci_tests.gd
+
+      - name: Regenerate asset catalog
+        run: godot --headless --path . --script tools/build_asset_catalog.gd
+
+      - name: Verify asset catalog is up to date
+        run: |
+          if ! git diff --exit-code -- data/asset_catalog.json; then
+            echo ""
+            echo "ERROR: data/asset_catalog.json is out of date."
+            echo "Run this locally:"
+            echo "godot --headless --path . --script tools/build_asset_catalog.gd"
+            echo "Then commit the updated catalog."
+            exit 1
+          fi
