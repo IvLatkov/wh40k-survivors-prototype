@@ -92,7 +92,7 @@ func run() -> void:
 	# Difficulty continues advancing while the active-enemy cap is full.
 	spawner.max_active_enemies = 1
 	spawner._process(1.0)
-	check(spawner.get_active_enemy_count() == 1 and spawner.spatial_grid._enemies.size() == 1, "Cap and grid registration preserved")
+	check(spawner.get_active_enemy_count() == 1 and spawner.spatial_grid._enemies.size() == 1 + int(main.get_node("BossEncounter").warboss_spawned), "Normal cap and grid registration preserved alongside the separate boss")
 	clock._process(120.0)
 	spawner._process(1.0)
 	check(spawner.spawn_tier > paused_tier and spawner.get_active_enemy_count() == 1, "Clock scales difficulty while cap stays enforced")

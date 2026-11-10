@@ -1,0 +1,22 @@
+{
+	"bolter_volleys": 19,
+	"boss_projectiles": 7,
+	"boss_spawned": true,
+	"boss_update_avg_usec": 37.3723021582734,
+	"boss_update_worst_usec": 139.0,
+	"boss_updates": 556,
+	"claw_escape": true,
+	"fight_seconds": 9.26666666666671,
+	"fps": 60.0,
+	"frame_avg_ms": 16.8461330935252,
+	"gun_preview": true,
+	"normal_enemies": 59,
+	"player_health": 46.0,
+	"player_level": 15,
+	"upgrade_levels": {
+		"bolter_damage": 5,
+		"fire_rate": 5,
+		"multishot": 2
+	},
+	"victory": true
+}

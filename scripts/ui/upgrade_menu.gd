@@ -7,6 +7,12 @@ var stats: CombatStats
 var _accepting_selection: bool = false
 
 
+func end_run() -> void:
+	_accepting_selection = false
+	hide()
+	process_mode = Node.PROCESS_MODE_DISABLED
+
+
 func show_choices(choices: Array, levels: Dictionary) -> void:
 	for child in choices_container.get_children():
 		choices_container.remove_child(child)

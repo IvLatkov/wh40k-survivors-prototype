@@ -8,6 +8,7 @@ var player: Player
 var rewards: UpgradeSystem
 var modal_menus: Array[CanvasLayer] = []
 var _owns_pause: bool = false
+var run_ended: bool = false
 var _value_labels: Dictionary = {}
 var _stat_labels: Dictionary = {}
 
@@ -100,6 +101,8 @@ func _other_modal_active() -> bool:
 
 
 func open_panel() -> void:
+	if run_ended:
+		return
 	if visible or player == null or player.current_health <= 0.0 or get_tree().paused or _other_modal_active():
 		return
 	_owns_pause = true
@@ -110,12 +113,21 @@ func open_panel() -> void:
 
 
 func close_panel() -> void:
+	if run_ended:
+		return
 	if not visible:
 		return
 	hide()
 	if _owns_pause and not _other_modal_active() and player.current_health > 0.0:
 		get_tree().paused = false
 	_owns_pause = false
+
+
+func end_run() -> void:
+	run_ended = true
+	_owns_pause = false
+	hide()
+	process_mode = Node.PROCESS_MODE_DISABLED
 
 
 func refresh_stats() -> void:

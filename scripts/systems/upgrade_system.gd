@@ -30,6 +30,7 @@ var levels: Dictionary = {}
 var pending_levels: int = 0
 var offered: Array[UpgradeDefinition] = []
 var _was_paused: bool = false
+var run_ended: bool = false
 # Keep the full ownership catalog even if the eligible definition list is narrowed.
 var _build_definitions: Array[UpgradeDefinition] = []
 
@@ -135,6 +136,8 @@ func get_selected_ultimates() -> Array[UltimateDefinition]:
 
 
 func queue_level() -> void:
+	if run_ended:
+		return
 	if pending_levels == 0:
 		# Allow an informational overlay to release its pause before rewards own it.
 		reward_queue_started.emit()
@@ -148,6 +151,8 @@ func queue_level() -> void:
 
 
 func _offer_choices() -> void:
+	if run_ended:
+		return
 	if reward_levels.is_empty():
 		return
 	var reward_level := reward_levels[0]
@@ -175,6 +180,8 @@ func _offer_choices() -> void:
 
 
 func select_upgrade(id: StringName) -> void:
+	if run_ended:
+		return
 	for ultimate in offered_ultimates:
 		if ultimate.id == id and can_select_ultimate(ultimate):
 			offered = []
@@ -198,6 +205,8 @@ func select_upgrade(id: StringName) -> void:
 
 
 func select_chapter_perk(id: StringName) -> void:
+	if run_ended:
+		return
 	for perk in chapter_offered:
 		if perk.id == id:
 			chapter_offered = []
@@ -207,6 +216,8 @@ func select_chapter_perk(id: StringName) -> void:
 
 
 func _finish_reward() -> void:
+	if run_ended:
+		return
 	reward_levels.pop_front()
 	pending_levels = reward_levels.size()
 	selection_finished.emit()
@@ -214,3 +225,12 @@ func _finish_reward() -> void:
 		_offer_choices.call_deferred()
 	else:
 		get_tree().paused = _was_paused
+
+
+func end_run() -> void:
+	run_ended = true
+	reward_levels.clear()
+	pending_levels = 0
+	offered.clear()
+	offered_ultimates.clear()
+	chapter_offered.clear()

@@ -30,3 +30,4 @@ func _ready() -> void:
 	$UpgradeSystem.bind_player(player)
 	var reward_menus: Array[CanvasLayer] = [$UpgradeMenu, $ChapterPerkMenu]
 	$CharacterInfoPanel.bind_player(player, $UpgradeSystem, reward_menus)
+	$BossEncounter.bind_run($RunClock, player, enemy_spawner, $UpgradeSystem, $CharacterInfoPanel, reward_menus)

@@ -1,4 +1,4 @@
-[gd_scene load_steps=31 format=3]
+[gd_scene load_steps=32 format=3]
 
 [ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="1_player"]
 [ext_resource type="PackedScene" path="res://scenes/systems/chunk_manager.tscn" id="2_chunks"]
@@ -17,6 +17,8 @@
 [ext_resource type="Script" path="res://scripts/systems/run_clock.gd" id="13_clock"]
 
 [ext_resource type="PackedScene" path="res://scenes/ui/character_info_panel.tscn" id="14_character_info"]
+
+[ext_resource type="PackedScene" path="res://scenes/systems/boss_encounter.tscn" id="15_boss"]
 
 [sub_resource type="Resource" id="Upgrade_bolter_damage"]
 script = ExtResource("9_definition")
@@ -211,3 +213,5 @@ catalogs = Array[ExtResource("12_catalog")]([ExtResource("11_ultramarines")])
 [node name="ChapterPerkMenu" parent="." instance=ExtResource("7_menu")]
 
 [node name="CharacterInfoPanel" parent="." instance=ExtResource("14_character_info")]
+
+[node name="BossEncounter" parent="." instance=ExtResource("15_boss")]

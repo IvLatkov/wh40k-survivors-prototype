@@ -1,0 +1,50 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/warboss.gd" id="1_boss"]
+[ext_resource type="Texture2D" path="res://assets/art/effects/enemy/bosses/Pixel-Art Ork Warboss in Mega-Armour.png" id="2_art"]
+
+[sub_resource type="SpriteFrames" id="BossFrames"]
+animations = [{"frames": [{"duration": 1.0, "texture": ExtResource("2_art")}], "loop": false, "name": &"default", "speed": 1.0}]
+
+[sub_resource type="CircleShape2D" id="BossBody"]
+radius = 32.0
+
+[node name="Warboss" type="CharacterBody2D"]
+texture_filter = 1
+collision_layer = 2
+collision_mask = 1
+script = ExtResource("1_boss")
+movement_animations = Array[StringName]([])
+movement_speed = 40.0
+speed_variation_limit = 0.0
+max_health = 750.0
+stop_distance = 75.0
+separation_radius = 60.0
+separation_strength = 0.65
+contact_damage = 0.0
+contact_damage_enabled = false
+damage_tier = 3
+
+[node name="Visual" type="AnimatedSprite2D" parent="."]
+position = Vector2(0, -10)
+scale = Vector2(0.07, 0.07)
+sprite_frames = SubResource("BossFrames")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("BossBody")
+
+[node name="PhaseTimer" type="Timer" parent="."]
+process_callback = 0
+one_shot = true
+
+[node name="ClawCooldown" type="Timer" parent="."]
+process_callback = 0
+one_shot = true
+
+[node name="GunCooldown" type="Timer" parent="."]
+process_callback = 0
+one_shot = true
+
+[node name="HitFlashTimer" type="Timer" parent="."]
+process_callback = 0
+one_shot = true

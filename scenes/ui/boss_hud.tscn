@@ -1,0 +1,96 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/boss_hud.gd" id="1_hud"]
+
+[sub_resource type="StyleBoxFlat" id="Backdrop"]
+bg_color = Color(0.035, 0.035, 0.03, 0.95)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.78, 0.69, 0.44, 1)
+
+[sub_resource type="StyleBoxFlat" id="Fill"]
+bg_color = Color(0.65, 0.16, 0.09, 1)
+
+[node name="BossHUD" type="CanvasLayer"]
+process_mode = 3
+layer = 40
+script = ExtResource("1_hud")
+
+[node name="HUD" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="BossDisplay" type="VBoxContainer" parent="HUD"]
+visible = false
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -210.0
+offset_right = 210.0
+offset_top = 58.0
+offset_bottom = 124.0
+mouse_filter = 2
+
+[node name="Title" type="Label" parent="HUD/BossDisplay"]
+text = "ORK WARBOSS"
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.9, 0.78, 0.5, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 20
+
+[node name="HealthBar" type="ProgressBar" parent="HUD/BossDisplay"]
+custom_minimum_size = Vector2(0, 18)
+max_value = 750.0
+value = 750.0
+step = 0.0
+show_percentage = false
+theme_override_styles/background = SubResource("Backdrop")
+theme_override_styles/fill = SubResource("Fill")
+
+[node name="HealthLabel" type="Label" parent="HUD/BossDisplay"]
+text = "750 / 750"
+horizontal_alignment = 1
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 3
+
+[node name="Victory" type="ColorRect" parent="HUD"]
+visible = false
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.015, 0.02, 0.025, 0.94)
+
+[node name="Center" type="CenterContainer" parent="HUD/Victory"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Content" type="VBoxContainer" parent="HUD/Victory/Center"]
+theme_override_constants/separation = 18
+
+[node name="Title" type="Label" parent="HUD/Victory/Center/Content"]
+text = "VICTORY"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 48
+theme_override_colors/font_color = Color(0.9, 0.78, 0.5, 1)
+
+[node name="Subtitle" type="Label" parent="HUD/Victory/Center/Content"]
+text = "WARLORD SLAIN"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 26
+
+[node name="Motto" type="Label" parent="HUD/Victory/Center/Content"]
+text = "For the Emperor!"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 20
