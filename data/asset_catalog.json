@@ -1,6 +1,23 @@
 {
-	"asset_count": 68,
+	"asset_count": 69,
 	"assets": [
+		{
+			"category": "enemy",
+			"extension": "png",
+			"height": 1254,
+			"id": "art_effects_enemy_bosses_pixel-art_ork_warboss_in_mega-armour",
+			"name": "Pixel-Art Ork Warboss in Mega-Armour",
+			"path": "res://assets/art/effects/enemy/bosses/Pixel-Art Ork Warboss in Mega-Armour.png",
+			"tags": [
+				"art",
+				"effects",
+				"enemy",
+				"bosses",
+				"pixel-art ork warboss in mega-armour"
+			],
+			"type": "image",
+			"width": 1254
+		},
 		{
 			"category": "enemy",
 			"extension": "png",

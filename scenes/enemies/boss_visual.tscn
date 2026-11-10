@@ -1,0 +1,9 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Texture2D" path="res://assets/art/effects/enemy/bosses/Pixel-Art Ork Warboss in Mega-Armour.png" id="1_boss"]
+
+[node name="BossVisual" type="Node2D"]
+texture_filter = 1
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("1_boss")
