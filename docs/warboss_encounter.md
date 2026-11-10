@@ -29,7 +29,7 @@ The run-owned `BossEncounter` subscribes to `RunClock.seconds_changed`. At elaps
 
 The flag lives for the entire Main run, independent of terrain/boss scene lifetimes. Reloading the entire Main scene deliberately starts a new run with a fresh clock/flag; no boss state leaks between new runs. No autoload or disk persistence was added.
 
-Spawn placement reuses `EnemySpawner._get_spawn_origin()` (off-camera, camera-lag-aware margin and minimum player clearance). The boss is manually registered in the existing enemy spatial grid, separately from the normal active count, so a full 200-enemy normal cap cannot defer the boss or suppress a normal spawn. **Normal Squig/Ork spawning continues** throughout the fight, with unchanged schedules, probabilities, cap, jitter and 0–6 minute scaling. The spawner source is unchanged.
+Spawn placement reuses `EnemySpawner._get_spawn_origin()` (off-camera, camera-lag-aware margin and minimum player clearance). The boss is manually registered in the existing enemy spatial grid, separately from the normal active count, so a full 200-enemy normal cap cannot defer the boss or suppress a normal spawn. **Normal Squig/Ork spawning continues** throughout the fight, with unchanged schedules, probabilities, cap, jitter and 0â€“6 minute scaling. The spawner source is unchanged.
 
 ## Attack states and timers
 
@@ -44,7 +44,7 @@ States: **CHASE, CLAW_WINDUP, CLAW_SWING, CLAW_RECOVERY, GUN_WINDUP, GUN_BURST, 
 | Cadence | One hit maximum per swing | 0.18s between shots |
 | Recovery | 0.45s | 0.35s |
 | Cooldown | 1.8s from completed swing/impact, including misses | 3.5s from final burst shot |
-| Projectile | — | 320px/s; 2.5s lifetime (~800px maximum travel) |
+| Projectile | â€” | 320px/s; 2.5s lifetime (~800px maximum travel) |
 
 Claw direction locks when preparation begins, then actual player position is checked only at impact. Leaving 105px or moving behind the locked direction avoids damage. CLAW_SWING is the instantaneous impact event, followed immediately by recovery. The orange half-disc marks its reach; the existing KnifeSlash effect supplies swing feedback.
 
@@ -63,18 +63,18 @@ Only terminal `run_ended` guards were added to existing UpgradeSystem and Charac
 ## Verification
 
 - `godot --headless --path . --script tests/run_ci_tests.gd`: **6/6 pass**.
-- Full functional regression scripts: **37/37 pass**, including Squig/Ork attacks and spawning, fractional damage, Bolter/splash/ultimate/Knife, upgrades/modal ownership, XP, terrain artwork/determinism/chunk streaming/prefetch and roads. `docs/warboss_regressions.json` records outputs. The existing run-timer cap assertion now accounts for the separate boss in the spatial grid; normal cap expectations remain unchanged.
+- Full functional regression scripts: **39/39 pass**, including Squig/Ork attacks and spawning, fractional damage, Bolter/splash/ultimate/Knife, upgrades/modal ownership, XP, terrain artwork/determinism/chunk streaming/prefetch and roads. `docs/boss_spawn_stop_regressions.json` records the current outputs; `docs/warboss_regressions.json` retains the initial encounter evidence. The existing run-timer cap assertion now accounts for the separate boss in the spatial grid; normal cap expectations remain unchanged.
 - `tests/warboss_test.gd`: **64 checks** covering requested stats, source/scale/filtering, armor/minimum/crit damage, actual Knife hits/crits, every trigger boundary, locked arc/range escapes, one-hit gate, real claw/gun timer cadence, defensive pipeline, stopped aiming, actual projectile collision/lifetime and non-homing behavior.
-- `tests/warboss_encounter_test.gd`: **101 checks** covering 09:59.999 / 10:00, full-cap spawning, no duplicates after repeated events/rebind/chunk changes, ordinary spawns during the fight, live HUD, terminal pause under Character Info/Upgrade/Chapter menus, real lethal Bolter collision, interrupted attack timers, stale gun callbacks, frozen run state and no XP/upgrade reward.
-- `tests/warboss_playthrough.gd`: rendered end-to-end fight using the real boss AI/timers/projectiles, normal spawning, actual player Bolter shots and existing legal upgrades. The fixture grants level-15-equivalent choices through XP/reward logic (Bolter damage 5, fire rate 5, multishot 2, Devastator plus eligible chapter choices), fast-forwards the clock to 10:00 and repositions the boss into camera view. It drives a deterministic evasive orbit; it does not weaken the boss or change weapon formulas. This is not a claim that a level-one loadout beats the 10-minute swarm.
-- The playthrough escaped the claw, rendered gun volleys, killed the boss with a normal projectile and reached Victory after **9.27 simulated fight seconds**, 19 Bolter volleys and 7 boss projectiles (death cancels the last burst). Player finished **46/50 HP**, with **59 normal enemies** present. Fixture clock is held at 10:00 for repeatable screenshots; production clock runs normally until Victory.
+- `tests/warboss_encounter_test.gd`: **101 checks** covering 09:59.999 / 10:00, full-cap spawning, no duplicates after repeated events/rebind/chunk changes, preserved pre-encounter mobs and the disabled normal scheduler, live HUD, terminal pause under Character Info/Upgrade/Chapter menus, real lethal Bolter collision, interrupted attack timers, stale gun callbacks, frozen run state and no XP/upgrade reward.
+- `tests/warboss_playthrough.gd`: rendered end-to-end fight using the real boss AI/timers/projectiles, eight pre-existing mobs and no reinforcements, actual player Bolter shots and existing legal upgrades. The fixture grants level-15-equivalent choices through XP/reward logic (Bolter damage 5, fire rate 5, multishot 2, Devastator plus eligible chapter choices), fast-forwards the clock to 10:00 and repositions the boss into camera view. It drives a deterministic evasive orbit; it does not weaken the boss or change weapon formulas. This is not a claim that a level-one loadout beats the 10-minute swarm.
+- The playthrough escaped the claw, rendered gun volleys, killed the boss with a normal projectile and reached Victory after **9.27 simulated fight seconds**, 19 Bolter volleys and 7 boss projectiles (death cancels the last burst). Player finished **48/50 HP**, with **four of the eight original normal enemies** still present. Others died through ordinary combat; no replacements spawned. Fixture clock is held at 10:00 for repeatable screenshots; production clock runs normally until Victory.
 - Rendered editor validation and the normal 300-frame project smoke test pass without parser/import/runtime errors. Source PNG SHA256 remains `5cde1f492f72184af44e72dee2e6c9c092ad847240116e9d26408a9e3bf944e2`.
 
 Screenshots inspected: [claw](warboss_claw.png), [gun/boss health](warboss_gun.png), [Victory](warboss_victory.png). No new artwork was generated. Local ignored logs: `warboss_ci.log`, `warboss_playthrough.log`, `warboss_editor.log`, `warboss_smoke.log`.
 
 ## Performance
 
-The rendered playthrough maintained **60 FPS** (mean observed frame interval 16.85ms, including capture overhead). Across **556 real boss AI updates**, mean update CPU was **37.37 microseconds (0.037ms)**, worst **139 microseconds (0.139ms)**. This timer measures the boss update, including reused chase/separation, not all rendering, timers or projectile costs. It is a live-fight measurement with up to 59 normal enemies, not a paired 200-enemy benchmark or a universal hardware guarantee.
+The rendered playthrough maintained **60 FPS** (mean observed frame interval 16.85ms, including capture overhead). Across **556 real boss AI updates**, mean update CPU was **38.11 microseconds (0.038ms)**, worst **242 microseconds (0.242ms)**. This timer measures the boss update, including reused chase/separation, not all rendering, timers or projectile costs. It is a live-fight measurement with eight pre-existing normal enemies, not a paired 200-enemy benchmark or a universal hardware guarantee.
 
 Boss code performs a direct target-distance check and reuses the bounded local grid for separation. It adds no per-frame scene-tree scans, global enemy searches, pathfinding or custom physics-query loops. Existing projectile collision callbacks provide hit detection. The controller is clock-event-driven, not polled per frame.
 
@@ -87,7 +87,11 @@ Modified:
 - `scripts/systems/upgrade_system.gd`: terminal reward/selection guards and queue cleanup.
 - `scripts/ui/character_info_panel.gd`: terminal pause ownership/visibility guard.
 - `scripts/ui/upgrade_menu.gd`: disable stale menu interaction after Victory.
-- `tests/run_timer_test.gd`: distinguish normal cap from separately registered boss.
+- `tests/run_timer_test.gd`: distinguish normal cap from separately registered boss; populate the survivor before the 10:00 cutoff and test jitter while scheduling is still enabled.
+- `scripts/systems/enemy_spawner.gd`: explicit normal-spawn enable flag, idempotent scheduler cancellation and stale-call guards.
+- `tests/debug_boss_skip_test.gd`: F10 now expects the normal scheduler to stop.
+- `tests/warboss_encounter_test.gd`: preserve a pre-existing mob rather than requiring new spawns during the encounter.
+- `tests/warboss_playthrough.gd`: seed eight pre-encounter survivors, assert cutoff, and report no reinforcements.
 
 Added:
 
@@ -95,8 +99,14 @@ Added:
 - `scenes/projectiles/warboss_projectile.tscn`, `scripts/projectiles/warboss_projectile.gd`.
 - `scenes/systems/boss_encounter.tscn`, `scripts/systems/boss_encounter.gd`.
 - `scenes/ui/boss_hud.tscn`, `scripts/ui/boss_hud.gd`.
-- `tests/warboss_test.gd`, `tests/warboss_encounter_test.gd`, `tests/warboss_playthrough.gd`.
+- `tests/warboss_test.gd`, `tests/warboss_encounter_test.gd`, `tests/warboss_playthrough.gd`; `tests/boss_spawn_stop_test.gd` adds natural/F10 cutoff, pending-callback rejection, survivor movement/attacks/death/rewards and no-refill tests.
 - Beside-script Godot UID files for new scripts.
 - This report; `docs/warboss_regressions.json`, `docs/warboss_playthrough.json`; claw/gun/Victory screenshots and their Godot import metadata.
 
-No modifications to Enemy/Ork/Player damage or behavior, normal spawner, spatial grid, RunClock, player weapons/projectiles, terrain, XP resources, existing upgrade definitions, source art or asset catalog. No commits or pushes.
+No modifications to Enemy/Ork/Player damage or behavior, spatial grid, RunClock, player weapons/projectiles, terrain, XP resources, existing upgrade definitions, source art or asset catalog. No commits or pushes.
+
+## Reinforcement cutoff follow-up
+
+Changed production files: `scripts/systems/enemy_spawner.gd` and `scripts/systems/boss_encounter.gd`. Updated the four existing shortcut/encounter/timer/playthrough tests, added `tests/boss_spawn_stop_test.gd` (and UID), updated this report and rendered playthrough JSON/three screenshots. Current functional evidence: `docs/boss_spawn_stop_regressions.json`; requested CI log: locally ignored `docs/boss_spawn_stop_ci.log`.
+
+The new test uses actual physics to verify that pre-existing Squigs and Orks move and damage the player after spawning stops, then die and grant their usual pickups. It exercises both natural 10:00 and F10; near-due delays, deferred spawn calls, later time events, direct burst/additive calls and deaths cannot replenish mobs. It also checks that the boss remains unique and Victory still freezes the run. No Victory implementation changes were needed.

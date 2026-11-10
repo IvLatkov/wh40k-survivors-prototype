@@ -44,6 +44,17 @@ var _next_normal_spawn_delay: float
 var _was_stress_test_enabled: bool
 var spawn_tier: int = 0
 var _has_scheduled_normal_spawn: bool = false
+var normal_spawning_enabled: bool = true
+
+
+func stop_normal_spawning() -> void:
+	# Cancel the delta-based scheduler without touching living enemies or the
+	# child spatial grid's physics processing. New runs get a fresh spawner.
+	normal_spawning_enabled = false
+	_elapsed_time = 0.0
+	_has_scheduled_normal_spawn = false
+	_next_normal_spawn_delay = INF
+	set_process(false)
 
 
 func bind_run_clock(clock: RunClockScript) -> void:
@@ -78,6 +89,8 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
+	if not normal_spawning_enabled:
+		return
 	if stress_test_enabled != _was_stress_test_enabled:
 		_was_stress_test_enabled = stress_test_enabled
 		_elapsed_time = 0.0
@@ -112,6 +125,8 @@ func get_average_separation_candidate_count() -> float:
 
 
 func _spawn_burst(burst_size: int, enemy_scene: PackedScene = ENEMY_SCENE) -> void:
+	if not normal_spawning_enabled:
+		return
 	var spawn_origin := _get_spawn_origin()
 	for _index: int in burst_size:
 		var offset_direction := Vector2.RIGHT.rotated(randf_range(0.0, TAU))
@@ -129,6 +144,8 @@ func _spawn_enemy(spawn_position: Vector2, enemy_scene: PackedScene = ENEMY_SCEN
 
 
 func _profile_enemy_spawner_spawn_enemy(spawn_position: Vector2, enemy_scene: PackedScene = ENEMY_SCENE) -> void:
+	if not normal_spawning_enabled:
+		return
 	var instantiate_start := Time.get_ticks_usec() if CombatProfile.enabled else 0
 	var enemy := enemy_scene.instantiate() as Enemy
 	CombatProfile.finish(&"enemy_instantiate", instantiate_start)
@@ -170,6 +187,8 @@ func get_ork_spawn_factor() -> float:
 
 
 func _spawn_additional_orks() -> void:
+	if not normal_spawning_enabled:
+		return
 	# Squigs have already spawned at full cadence. Orks never replace that burst.
 	# Preserve the shared active limit and give the original stream first claim.
 	var remaining := get_target_enemy_count() - _active_enemy_count
@@ -230,6 +249,8 @@ func _roll_normal_burst_size() -> int:
 
 
 func _schedule_next_normal_spawn() -> void:
+	if not normal_spawning_enabled:
+		return
 	var timing_multiplier := randf_range(
 		1.0 - spawn_timing_variation,
 		1.0 + spawn_timing_variation

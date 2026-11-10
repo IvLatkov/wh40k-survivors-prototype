@@ -83,7 +83,7 @@ func run() -> void:
 	boss.set_physics_process(false)
 	check(boss.max_health == 750 and boss.armor == 5 and boss.movement_speed == 40, "Production boss stats preserved")
 	check(encounter.hud.get_node("HUD/BossDisplay").visible, "Real boss health bar appears")
-	check(spawner.is_processing() and spawner.spawn_tier == 5 and spawner.get_ork_spawn_factor() == 1.0, "Normal 10-minute enemy behavior stays active")
+	check(not spawner.normal_spawning_enabled and not spawner.is_processing() and spawner.spawn_tier == 5, "F10 stops normal spawning through the production encounter")
 	check(player_before == var_to_bytes([player.current_health, player.max_health, player.xp, player.level, player.combat_stats.modifiers, player.combat_stats.temporary_modifiers, rewards.levels, rewards.active_ultimates]), "F10 preserves current HP/XP/level/stats/upgrades")
 	if OS.get_cmdline_user_args().has("--capture"):
 		await process_frame

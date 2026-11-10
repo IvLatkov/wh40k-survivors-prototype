@@ -41,6 +41,9 @@ func run() -> void:
 		check(not encounter.warboss_spawned and not encounter.hud.get_node("HUD/BossDisplay").visible, "No boss/health bar before 10:00; fresh run resets flag")
 		clock._process(599.999)
 		check(not encounter.warboss_spawned, "No Warboss at 09:59.999")
+		spawner._spawn_enemy(Vector2(500, 100))
+		var normal := spawner.spatial_grid._enemies.back() as Enemy
+		normal.set_physics_process(false)
 		# Normal population cap cannot postpone the one-time boss event.
 		spawner._active_enemy_count = 200
 		clock._process(0.001)
@@ -48,13 +51,9 @@ func run() -> void:
 		var boss := encounter.boss
 		boss.set_physics_process(false)
 		check(boss.global_position.distance_to(player.global_position) >= spawner.minimum_player_spawn_distance, "Existing safe spawn origin avoids player")
-		check(spawner.is_processing() and spawner._active_enemy_count == 200 and spawner.spatial_grid._enemies.has(boss), "Normal spawns remain active and boss is registered separately")
-		spawner._active_enemy_count = 0
-		spawner.set_process(false)
-		spawner._spawn_enemy(Vector2(500, 100))
-		var normal := spawner.spatial_grid._enemies.back() as Enemy
-		normal.set_physics_process(false)
-		check(not normal is Warboss and normal.max_health == 25 and spawner.get_active_enemy_count() == 1, "Ordinary Squig spawning still works during encounter")
+		check(not spawner.normal_spawning_enabled and not spawner.is_processing() and spawner._active_enemy_count == 200 and spawner.spatial_grid._enemies.has(boss), "Normal scheduler stops; boss registered separately")
+		spawner._active_enemy_count = 1
+		check(not normal is Warboss and normal.max_health == 25 and is_instance_valid(normal), "Pre-encounter Squig survives the transition")
 		var original := boss.get_instance_id()
 		clock.seconds_changed.emit(600)
 		clock._process(1.0)

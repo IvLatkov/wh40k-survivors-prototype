@@ -51,6 +51,13 @@ func run() -> void:
 	check(is_equal_approx(spawner._elapsed_time / spawner._next_normal_spawn_delay, 0.5), "Tier change preserves pending spawn progress")
 	clock._process(15.0)
 	check(hud.run_timer_label.text == "02:15", "Minutes and seconds format")
+	# Populate the cap before 10:00; the boss transition preserves survivors.
+	spawner.max_active_enemies = 1
+	spawner._spawn_enemy(Vector2(800, 0))
+	spawner.spatial_grid._enemies.back().set_physics_process(false)
+	for iteration in 1000:
+		spawner._schedule_next_normal_spawn()
+		check(spawner._next_normal_spawn_delay >= 0.22, "Jitter never breaches hard minimum")
 	for tier in range(2, 11):
 		clock._process(tier * 120.0 - 0.001 - clock.elapsed_time)
 		check(spawner.spawn_tier == tier - 1, "Tier does not increase early")
@@ -58,9 +65,6 @@ func run() -> void:
 		check(spawner.spawn_tier == tier, "Exact two-minute boundary")
 		check(is_equal_approx(spawner.get_effective_spawn_interval(), maxf(0.22, 0.6 * pow(0.9, tier))), "Geometric scaling")
 	check(is_equal_approx(spawner.get_effective_spawn_interval(), 0.22), "Minimum reached at 20 minutes")
-	for iteration in 1000:
-		spawner._schedule_next_normal_spawn()
-		check(spawner._next_normal_spawn_delay >= 0.22, "Jitter never breaches hard minimum")
 	# Normal reward pause uses real SceneTree processing, not a manual clock tick.
 	clock.set_process(true)
 	player.add_xp(player.get_xp_required())

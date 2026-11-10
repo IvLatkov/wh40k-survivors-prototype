@@ -1,5 +1,5 @@
 # Rendered end-to-end fixture: natural 10:00 spawn, existing legal upgrades
-# and normal enemy spawning. A deterministic orbit drives movement/aim only.
+# and surviving normal enemies. A deterministic orbit drives movement/aim only.
 extends SceneTree
 
 func _initialize() -> void:
@@ -55,8 +55,14 @@ func run() -> void:
 	grant_build(player, rewards)
 	await create_timer(1.5).timeout
 	spawner.set_process(true)
-	clock._process(600.0)
-	assert(encounter.warboss_spawned and spawner.is_processing())
+	clock.advance_to(599.999)
+	# Populate a small pre-existing swarm before the production spawn cutoff.
+	for index in 8:
+		spawner._spawn_enemy(Vector2.from_angle(index * TAU / 8.0) * 600.0, spawner.ENEMY_SCENE if index % 2 == 0 else spawner.tier_2_enemy_scene)
+	var survivor_count := spawner.get_active_enemy_count()
+	clock.advance_to(600.0)
+	assert(encounter.warboss_spawned and not spawner.is_processing() and not spawner.normal_spawning_enabled)
+	assert(spawner.get_active_enemy_count() == survivor_count)
 	var boss := encounter.boss
 	# Preview framing only: bring the naturally spawned boss into camera view.
 	boss.position = Vector2(200, 0)
@@ -128,7 +134,7 @@ func run() -> void:
 	var average_frame: float = frames.reduce(func(a: float, b: float): return a + b, 0.0) / frames.size()
 	var report := {"victory": encounter.run_ended, "boss_spawned": encounter.warboss_spawned, "claw_escape": captured_claw,
 		"gun_preview": captured_gun, "fight_seconds": elapsed, "bolter_volleys": shot_count, "boss_projectiles": shots[0],
-		"player_health": player.current_health, "player_level": player.level, "upgrade_levels": rewards.levels.duplicate(), "normal_enemies": spawner.get_active_enemy_count(),
+		"player_health": player.current_health, "player_level": player.level, "upgrade_levels": rewards.levels.duplicate(), "normal_enemies": spawner.get_active_enemy_count(), "pre_encounter_survivors": survivor_count, "normal_spawning_enabled": spawner.normal_spawning_enabled,
 		"boss_updates": updates.size(), "boss_update_avg_usec": average_usec, "boss_update_worst_usec": updates.max(),
 		"frame_avg_ms": average_frame, "fps": Engine.get_frames_per_second()}
 	var file := FileAccess.open("res://docs/warboss_playthrough.json", FileAccess.WRITE)

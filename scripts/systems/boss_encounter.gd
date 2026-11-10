@@ -39,6 +39,7 @@ func _on_seconds_changed(seconds: int) -> void:
 	# Run-owned flag is set before insertion/signals. Chunk streaming, repeated
 	# clock notifications, rebinds or removal of the boss cannot respawn it.
 	warboss_spawned = true
+	_spawner.stop_normal_spawning()
 	boss = BOSS.instantiate() as Warboss
 	boss.position = (get_parent() as Node2D).to_local(_spawner._get_spawn_origin())
 	boss.set_target(_player)
@@ -46,7 +47,7 @@ func _on_seconds_changed(seconds: int) -> void:
 	boss.defeated.connect(_on_boss_defeated)
 	get_parent().add_child(boss)
 	# Boss is targetable by the normal weapon grid but does not consume the
-	# ordinary 200-enemy budget or change normal spawn cadence/probabilities.
+	# ordinary enemy budget. Only the pre-encounter survivors remain alongside it.
 	_spawner.spatial_grid.register_enemy(boss)
 	hud.bind_boss(boss)
 	boss_spawned.emit(boss)
