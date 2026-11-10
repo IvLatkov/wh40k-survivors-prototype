@@ -19,6 +19,10 @@ Uses the exact existing `assets/art/effects/enemy/bosses/Pixel-Art Ork Warboss i
 
 `Warboss extends Enemy` reuses normal collision membership, player target, cached spatial-grid separation, chase movement, damage numbers and crit/stat reporting. Its incoming damage override applies `max(1, incoming - 5)` for positive incoming hits before delegating to Enemy. Weapon damage and crits are calculated at the original source, so direct Bolter, splash, forks, Devastator and Knife all use the same boss armor entry point. Examples: 25 -> 20, 6 -> 1, 5 -> 1; a normal 25-damage 1.5x crit becomes 37.5 -> 32.5. HP remains fractional where appropriate; armor does not reroll crits. Existing damage-number pooling is reused, with a brief 0.08s boss hit flash.
 
+## Local developer shortcut
+
+In debug builds, **F10** advances RunClock forward to 10:00 through its normal time-change event, triggering the real boss controller, HUD and normal spawn tier. `DEBUG_BOSS_SKIP_ENABLED` in `scripts/systems/main.gd` is the single disable switch; release builds also reject the shortcut. It ignores repeats, modified keys, text-entry focus, paused/modals, dead players and already spawned/completed encounters. Player HP, weapons and upgrades are retained. `tests/debug_boss_skip_test.gd` exercises the gameplay input route, modal/text guards, unchanged player state, duplicate/rewind protection and normal Victory. No separate debug boss exists.
+
 ## Spawn and ordinary enemies
 
 The run-owned `BossEncounter` subscribes to `RunClock.seconds_changed`. At elapsed **600 seconds**, it sets `warboss_spawned` before constructing exactly one boss. It also synchronizes the current clock on initial binding, so a late bind past 600s is safe. Repeated clock notifications, rebinding, chunk streaming and boss removal cannot reset the flag.
