@@ -81,8 +81,8 @@ func run() -> void:
 	check(encounter.warboss_spawned and is_instance_valid(encounter.boss), "Real clock notification spawns the production Warboss")
 	var boss := encounter.boss
 	boss.set_physics_process(false)
-	check(boss.max_health == 750 and boss.armor == 5 and boss.movement_speed == 40, "Production boss stats preserved")
-	check(encounter.hud.get_node("HUD/BossDisplay").visible, "Real boss health bar appears")
+	check(boss.max_health == 2000 and boss.current_health == 2000 and boss.armor == 5 and boss.movement_speed == 40, "Production boss stats preserved")
+	check(not encounter.hud.has_node("HUD/BossDisplay") and encounter.hud.get_node("HUD").get_child_count() == 1, "Boss spawns without health UI; only Victory overlay remains")
 	check(not spawner.normal_spawning_enabled and not spawner.is_processing() and spawner.spawn_tier == 5, "F10 stops normal spawning through the production encounter")
 	check(player_before == var_to_bytes([player.current_health, player.max_health, player.xp, player.level, player.combat_stats.modifiers, player.combat_stats.temporary_modifiers, rewards.levels, rewards.active_ultimates]), "F10 preserves current HP/XP/level/stats/upgrades")
 	if OS.get_cmdline_user_args().has("--capture"):

@@ -97,7 +97,7 @@ func run() -> void:
 		check(is_equal_approx(player.get_node("KnifeAttack").detection_shape.shape.radius, stats.scale_base(&"knife_range", 55.0)), "Knife collision range follows perk")
 		if id == &"codex_discipline":
 			check(is_equal_approx(player.get_node("Bolter").get_fire_interval(), 0.75 / 1.05), "Fire rate uses inverse interval")
-			check(is_equal_approx(stats.scale_base(&"movement_speed", player.speed), 262.5), "Movement speed bonus")
+			check(is_equal_approx(stats.scale_base(&"movement_speed", player.speed), 157.5), "Movement speed bonus")
 		if id == &"battle_hardened":
 			check(is_equal_approx(player.max_health, 57.5) and is_equal_approx(player.current_health, 57.5), "Max HP increases and heals gained HP")
 			player.take_damage(10.0)

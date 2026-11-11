@@ -17,7 +17,7 @@ signal leveled_up
 @export var combat_stats: CombatStats = CombatStats.new()
 @export var xp_progression: XPProgressionData = preload("res://resources/progression/default_xp_progression.tres")
 
-@export var speed: float = 250.0
+@export var speed: float = 150.0
 @export var acceleration: float = 1200.0
 @export var deceleration: float = 1600.0
 @export var max_health: float = 50.0

@@ -123,16 +123,26 @@ func run() -> void:
 	another.get_node("KnifeAttack").set_physics_process(false)
 	check(another.get_pickup_radius() == 60.0 and another.xp_collection_shape.shape != player.xp_collection_shape.shape, "Pickup shape bonuses are private to each player")
 	another.queue_free()
-	for multiplier in [1.05, 1.10, 1.15]:
+	check(player.speed == 150.0 and player.get_movement_speed() == 150.0, "Base movement is 150 px/s")
+	for expected_speed in [157.5, 165.0, 172.5, 180.0]:
 		select(&"combat_stims")
-		check(is_equal_approx(player.get_movement_speed(), 250.0 * multiplier) and player.speed == 250.0, "Movement stacks from original speed")
-	Input.action_press("move_right")
-	player.set_physics_process(true)
-	for _frame in 20:
-		await physics_frame
-	check(is_equal_approx(player.velocity.x, 287.5), "Actual movement reaches upgraded speed")
-	Input.action_release("move_right")
-	player.set_physics_process(false)
+		check(is_equal_approx(player.get_movement_speed(), expected_speed) and player.speed == 150.0, "Combat Stims adds 5% of the 150 px/s base per level")
+	var movement_cases := [["move_up", KEY_W, Vector2.UP], ["move_left", KEY_A, Vector2.LEFT], ["move_down", KEY_S, Vector2.DOWN], ["move_right", KEY_D, Vector2.RIGHT]]
+	for movement in movement_cases:
+		var mapped := false
+		for event in InputMap.action_get_events(movement[0]):
+			if event is InputEventKey and event.physical_keycode == movement[1]:
+				mapped = true
+		check(mapped, "WASD key maps to its movement action")
+		player.position = Vector2.ZERO
+		player.velocity = Vector2.ZERO
+		Input.action_press(movement[0])
+		player.set_physics_process(true)
+		for _frame in 20:
+			await physics_frame
+		check(player.velocity.is_equal_approx(movement[2] * 180.0), "Actual WASD movement reaches upgraded speed in the correct direction")
+		Input.action_release(movement[0])
+		player.set_physics_process(false)
 	await cleanup()
 
 	setup()
@@ -274,7 +284,7 @@ func run() -> void:
 	select(&"iron_halo")
 	var panel = main.get_node("CharacterInfoPanel")
 	panel.open_panel()
-	var expected := {"Movement Speed": "262.5", "Pickup Radius": "66 px", "XP Gain": "+0%", "Dodge Chance": "2%", "Better XP Drop Chance": "+40%"}
+	var expected := {"Movement Speed": "157.5", "Pickup Radius": "66 px", "XP Gain": "+0%", "Dodge Chance": "2%", "Better XP Drop Chance": "+40%"}
 	for name: String in expected:
 		check(panel._value_labels[name].text == expected[name], "Character Info reads actual live " + name)
 	check(panel._value_labels["Better XP Drop Chance"].visible, "Owned Salvage stat displayed")

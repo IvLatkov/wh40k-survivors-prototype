@@ -49,7 +49,6 @@ func _on_seconds_changed(seconds: int) -> void:
 	# Boss is targetable by the normal weapon grid but does not consume the
 	# ordinary enemy budget. Only the pre-encounter survivors remain alongside it.
 	_spawner.spatial_grid.register_enemy(boss)
-	hud.bind_boss(boss)
 	boss_spawned.emit(boss)
 
 

@@ -5,13 +5,13 @@
 - Boss scene/script: `scenes/enemies/warboss.tscn`, `scripts/enemies/warboss.gd`.
 - Encounter owner: `scenes/systems/boss_encounter.tscn`, `scripts/systems/boss_encounter.gd`, bound by `scripts/systems/main.gd`.
 - Shared projectile specialization: `scenes/projectiles/warboss_projectile.tscn`, `scripts/projectiles/warboss_projectile.gd`.
-- Boss HUD/Victory: `scenes/ui/boss_hud.tscn`, `scripts/ui/boss_hud.gd`.
+- Victory overlay: `scenes/ui/boss_hud.tscn`, `scripts/ui/boss_hud.gd`.
 
 Uses the exact existing `assets/art/effects/enemy/bosses/Pixel-Art Ork Warboss in Mega-Armour.png`, without source changes or new artwork. A static, one-frame AnimatedSprite2D matches the existing Enemy visual interface. Nearest filtering, proportional **0.07 scale** (~88px tall; ~1.9x normal Ork visible height), and a 32px body radius (normal Ork: 18px). The standalone asset-only `boss_visual.tscn` is untouched.
 
 | Stat | Value |
 |---|---:|
-| Maximum HP | 750 |
+| Maximum / starting HP | 2000 / 2000 |
 | Flat armor | 5 |
 | Movement | 40px/s, no spawn speed jitter |
 | Contact damage | None; disabled |
@@ -54,7 +54,7 @@ Both attacks call **Player.take_damage**. Existing dodge, percentage reduction, 
 
 ## HUD and Victory
 
-The additional HUD is hidden before spawn. A top-center `ORK WARBOSS` label, red ProgressBar and current/max HP text update through a boss health signal. It sits beneath the existing timer and does not replace the normal HUD.
+The encounter HUD contains only the Victory overlay, hidden until the boss dies. There is no boss name label, health bar or remaining-HP display. The boss-only health-update signal and HUD binding have been removed; actual health, armored damage and death remain gameplay-owned. The normal player HP, XP, level and timer HUD is unchanged.
 
 Boss death sets DEAD, stops all attack/flash timers and AI, and emits `defeated`. The boss-specific death path bypasses the normal enemy XP/reward drop entirely. The encounter stops normal spawning, dismisses informational/reward modals, clears pending reward offers, displays **VICTORY / WARLORD SLAIN / For the Emperor!**, and pauses immediately. Gameplay subtree disabling is deferred to avoid removing collision objects inside an Area2D hit callback. Always-processing reward/info menus are separately made terminal; stale close/selection/offer callbacks cannot release the Victory pause or reopen rewards.
 

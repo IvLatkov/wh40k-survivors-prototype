@@ -27,6 +27,11 @@ func prepare_main() -> Node2D:
 	main.get_node("ChunkManager").set_physics_process(false)
 	return main
 
+func check_no_boss_health_ui(encounter: BossEncounter) -> void:
+	var hud_root := encounter.hud.get_node("HUD")
+	check(not hud_root.has_node("BossDisplay") and hud_root.get_child_count() == 1 and hud_root.get_child(0).name == &"Victory", "Encounter HUD contains only Victory; no boss name, HP label or health bar")
+	check(not encounter.hud.has_method("bind_boss") and not encounter.hud.has_method("_update_health"), "No boss health UI binding or update code remains")
+
 func run() -> void:
 	root.size = Vector2i(1152, 648)
 	for modal in ["none", "info", "upgrade", "chapter", "projectile"]:
@@ -37,8 +42,8 @@ func run() -> void:
 		var encounter: BossEncounter = main.get_node("BossEncounter")
 		var rewards: UpgradeSystem = main.get_node("UpgradeSystem")
 		var info = main.get_node("CharacterInfoPanel")
-		var bar: ProgressBar = encounter.hud.get_node("HUD/BossDisplay/HealthBar")
-		check(not encounter.warboss_spawned and not encounter.hud.get_node("HUD/BossDisplay").visible, "No boss/health bar before 10:00; fresh run resets flag")
+		check(not encounter.warboss_spawned, "No boss before 10:00; fresh run resets flag")
+		check_no_boss_health_ui(encounter)
 		clock._process(599.999)
 		check(not encounter.warboss_spawned, "No Warboss at 09:59.999")
 		spawner._spawn_enemy(Vector2(500, 100))
@@ -50,6 +55,11 @@ func run() -> void:
 		check(encounter.warboss_spawned and is_instance_valid(encounter.boss), "One Warboss at exactly 10:00 regardless of normal cap")
 		var boss := encounter.boss
 		boss.set_physics_process(false)
+		check(boss.max_health == 2000 and boss.current_health == 2000 and boss.armor == 5, "Production boss spawns with 2000 maximum/current HP and 5 armor")
+		check_no_boss_health_ui(encounter)
+		check(not boss.has_signal("health_changed"), "Boss health signal used only by removed UI is gone")
+		var player_hud: HealthHud = main.get_node("HealthHUD")
+		check(player_hud.health_bar.is_visible_in_tree() and player_hud.health_bar.value == player.current_health and player_hud.xp_bar.is_visible_in_tree() and player_hud.xp_label.text.begins_with("LEVEL 1"), "Player health, XP and level HUD remain active during boss encounter")
 		check(boss.global_position.distance_to(player.global_position) >= spawner.minimum_player_spawn_distance, "Existing safe spawn origin avoids player")
 		check(not spawner.normal_spawning_enabled and not spawner.is_processing() and spawner._active_enemy_count == 200 and spawner.spatial_grid._enemies.has(boss), "Normal scheduler stops; boss registered separately")
 		spawner._active_enemy_count = 1
@@ -62,9 +72,9 @@ func run() -> void:
 		player.position = Vector2(4097, -4097)
 		main.get_node("ChunkManager").update_chunks()
 		check(encounter.boss.get_instance_id() == original, "Terrain chunk transition preserves encounter")
-		check(bar.visible and bar.value == 750 and encounter.hud.get_node("HUD/BossDisplay/HealthLabel").text == "750 / 750", "Boss bar initialized live")
 		boss.take_damage(25)
-		check(bar.value == 730 and encounter.hud.get_node("HUD/BossDisplay/HealthLabel").text == "730 / 750", "Boss bar updates with armored damage")
+		check(boss.current_health == 1980 and not encounter.run_ended, "Boss takes armored damage without ending the fight")
+		check_no_boss_health_ui(encounter)
 		boss.position = player.position + Vector2(300, 0)
 		boss._physics_process(0)
 		check(boss.state == Warboss.State.GUN_WINDUP, "Kill interrupts an actual attack wind-up")
@@ -86,12 +96,16 @@ func run() -> void:
 			main.add_child(bolt)
 			await create_timer(0.35, true).timeout
 		else:
-			boss.take_damage(9999)
+			boss.take_damage(boss.current_health - 1.0 + boss.armor)
+			check(boss.current_health == 1.0 and not encounter.run_ended and not encounter.hud.get_node("HUD/Victory").visible, "Boss survives at 1 HP without Victory")
+			boss.take_damage(1.0 + boss.armor)
+			check(boss.current_health == 0.0, "Lethal armored hit reaches exactly 0 HP")
 			check(boss.state == Warboss.State.DEAD and boss.phase_timer.is_stopped() and boss.gun_timer.is_stopped() and boss.claw_timer.is_stopped(), "Death stops all attack timers/AI")
 			boss._fire_shot()
 			check(boss.state == Warboss.State.DEAD, "Stale gun callback cannot resurrect a dead boss")
 		check(encounter.run_ended and paused and not spawner.is_processing(), "Boss death stops spawns and pauses gameplay immediately")
-		check(encounter.hud.get_node("HUD/Victory").visible and not encounter.hud.get_node("HUD/BossDisplay").visible, "Victory overlay visible; boss bar hidden")
+		check(encounter.hud.get_node("HUD/Victory").visible, "Victory overlay visible on boss death")
+		check_no_boss_health_ui(encounter)
 		check(not info.visible and not main.get_node("UpgradeMenu").visible and not main.get_node("ChapterPerkMenu").visible and rewards.pending_levels == 0, "Terminal Victory clears all conflicting modals/rewards")
 		info.close_panel()
 		info.open_panel()

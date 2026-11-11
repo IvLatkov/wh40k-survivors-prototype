@@ -1,7 +1,6 @@
 class_name Warboss
 extends Enemy
 
-signal health_changed(health: float, maximum: float)
 signal defeated
 signal state_changed(next_state: State)
 signal shot_fired(projectile: BoltProjectile)
@@ -152,7 +151,6 @@ func take_damage(amount: float, critical: bool = false, attacker_stats: CombatSt
 	# Weapon/crit calculations already happened at the source. Every weapon
 	# reaches this override through the existing Enemy damage entry point.
 	super.take_damage(maxf(1.0, amount - armor), critical, attacker_stats, source)
-	health_changed.emit(maxf(0.0, current_health), max_health)
 
 
 func _on_hit(_amount: float, _critical: bool) -> void:
