@@ -31,4 +31,14 @@ Godot 4.6.x
 
 ## Running the project
 
+Source WAV audio is stored with Git LFS. Install Git LFS and run these commands
+from the repository before opening the project on a new checkout:
+
+```sh
+git lfs install
+git lfs pull
+```
+
+This downloads the playable audio files rather than leaving LFS pointer files.
+
 Open `project.godot` in Godot 4.6.x, then run the project with F6 for the current scene or F5 for the main scene.
