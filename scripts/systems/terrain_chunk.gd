@@ -335,13 +335,17 @@ func _populate_large_props() -> void:
 	for child in large_props.get_children():
 		child.free()
 	var tank_at := get_tank_position(chunk_coordinate, chunk_size)
+	var occupied: Array[Rect2] = []
 	if tank_at != Vector2.INF:
 		var tank := Sprite2D.new()
 		tank.name = "TankWreck"
 		tank.texture = TANK_TEXTURE
 		tank.position = tank_at
 		tank.scale = Vector2.ONE * TANK_SCALE
+		TerrainObstacles.add_to(tank)
 		large_props.add_child(tank)
+		var tank_size := TANK_TEXTURE.get_size() * TANK_SCALE
+		occupied.append(Rect2(tank_at - tank_size * 0.5, tank_size))
 	var buildings := get_building_placements(chunk_coordinate, chunk_size)
 	for building in buildings:
 		var ruin := Sprite2D.new()
@@ -349,4 +353,14 @@ func _populate_large_props() -> void:
 		ruin.texture = BUILDING_TEXTURES[building.variant]
 		ruin.position = building.position
 		ruin.scale = Vector2.ONE * BUILDING_SCALE
+		TerrainObstacles.add_to(ruin)
 		large_props.add_child(ruin)
+		occupied.append(Rect2(building.position - BUILDING_FOOTPRINT * 0.5, BUILDING_FOOTPRINT))
+	for placement in TerrainTrees.get_placements(chunk_coordinate, chunk_size, occupied):
+		var tree := Sprite2D.new()
+		tree.name = "Tree%d" % (placement.variant + 1)
+		tree.texture = TerrainTrees.TEXTURES[placement.variant]
+		tree.position = placement.position
+		tree.scale = TerrainTrees.FOOTPRINT / tree.texture.get_size()
+		TerrainObstacles.add_to(tree, true)
+		large_props.add_child(tree)

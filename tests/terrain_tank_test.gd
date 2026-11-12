@@ -51,8 +51,8 @@ func run() -> void:
 			chunk.configure(coordinate, 1024)
 			root.add_child(chunk)
 			check(chunk.get_child_count() == 4 and chunk.large_props.z_index == 2, "Dedicated visual road layer and unchanged large-prop depth")
-			check(chunk.large_props.get_child_count() <= 5, "At most one tank and four independent buildings per chunk")
-			check(chunk.find_children("*", "CollisionObject2D", true, false).is_empty() and chunk.find_children("*", "CollisionShape2D", true, false).is_empty(), "No prop physics")
+			check(chunk.large_props.get_child_count() <= 6, "At most one tank, four independent buildings and one tree per chunk")
+			check(chunk.find_children("*", "StaticBody2D", true, false).size() == chunk.large_props.get_child_count() and chunk.find_children("*", "CollisionShape2D", true, false).size() == chunk.large_props.get_child_count(), "One static obstacle and shape per terrain prop")
 			var before := TerrainChunk.get_tank_position(coordinate, 1024)
 			if before != Vector2.INF:
 				tanks += 1

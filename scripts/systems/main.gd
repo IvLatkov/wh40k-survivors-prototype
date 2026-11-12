@@ -6,6 +6,7 @@ const DEBUG_BOSS_SKIP_ENABLED: bool = true
 @onready var player: Player = $Player
 @onready var health_hud: HealthHud = $HealthHUD
 @onready var enemy_spawner: EnemySpawner = $EnemySpawner
+@onready var background_audio: Array[AudioStreamPlayer] = [$BackgroundMusic, $BackgroundAtmosphere]
 
 
 func _ready() -> void:
@@ -34,6 +35,26 @@ func _ready() -> void:
 	var reward_menus: Array[CanvasLayer] = [$UpgradeMenu, $ChapterPerkMenu]
 	$CharacterInfoPanel.bind_player(player, $UpgradeSystem, reward_menus)
 	$BossEncounter.bind_run($RunClock, player, enemy_spawner, $UpgradeSystem, $CharacterInfoPanel, reward_menus)
+	$UpgradeSystem.reward_queue_started.connect(_on_reward_queue_started)
+	$UpgradeSystem.selection_finished.connect(_on_reward_selection_finished)
+	$BossEncounter.victory.connect(_restore_background_audio_pause)
+	player.health_depleted.connect(_restore_background_audio_pause)
+
+
+func _on_reward_queue_started() -> void:
+	# Only the background layers keep processing while rewards pause gameplay.
+	for audio in background_audio:
+		audio.process_mode = Node.PROCESS_MODE_ALWAYS
+
+
+func _on_reward_selection_finished() -> void:
+	if $UpgradeSystem.pending_levels == 0:
+		_restore_background_audio_pause()
+
+
+func _restore_background_audio_pause() -> void:
+	for audio in background_audio:
+		audio.process_mode = Node.PROCESS_MODE_INHERIT
 
 
 func _unhandled_key_input(event: InputEvent) -> void:

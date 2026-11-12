@@ -382,7 +382,8 @@ func _process_very_far_movement(delta: float) -> void:
 	var movement_direction := global_position.direction_to(target.global_position + _chase_offset)
 	velocity = movement_direction * _individual_movement_speed
 	_update_visual_facing(velocity.x)
-	global_position += velocity * _very_far_elapsed_time
+	# Keep the throttled update, but sweep against terrain instead of teleporting.
+	move_and_collide(velocity * _very_far_elapsed_time)
 	_very_far_elapsed_time = 0.0
 
 

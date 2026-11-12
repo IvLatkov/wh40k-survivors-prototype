@@ -51,7 +51,7 @@ func run() -> void:
 		var active_roads := 0
 		for chunk: TerrainChunk in manager.active_chunks.values():
 			active_tanks += int(chunk.large_props.has_node("TankWreck"))
-			active_buildings += chunk.large_props.get_child_count() - int(chunk.large_props.has_node("TankWreck"))
+			active_buildings += chunk.large_props.find_children("BuildingRuin*", "Sprite2D", false, false).size()
 			active_roads += chunk.roads.get_child_count()
 		road_peak = maxi(road_peak, active_roads)
 		road_windows += int(active_roads > 0)
