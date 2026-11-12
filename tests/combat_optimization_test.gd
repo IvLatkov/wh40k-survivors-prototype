@@ -41,6 +41,17 @@ func run() -> void:
 	grid._rebuild_grid()
 	for enemy in grid._enemies:
 		check(grid.calculate_separation(enemy) == reference(enemy, grid), "Separation retains exact summation and positions")
+	var original_buckets := grid._cells.values()
+	grid._rebuild_grid()
+	for bucket: Array in grid._cells.values():
+		var reused := false
+		for original: Array in original_buckets:
+			if is_same(bucket, original):
+				reused = true
+				break
+		check(reused, "Stable grid rebuild reuses existing buckets")
+	for enemy in grid._enemies:
+		check(grid.calculate_separation(enemy) == reference(enemy, grid), "Bucket reuse preserves exact separation results")
 	# Remove between rebuilds: the former stale-reference case must stay safe.
 	var dead: Enemy = grid._enemies.back()
 	grid.unregister_enemy(dead)

@@ -36,12 +36,18 @@ func bind_run(clock: RunClock, player: Player, spawner: EnemySpawner, rewards: U
 func _on_seconds_changed(seconds: int) -> void:
 	if seconds < SPAWN_SECONDS or warboss_spawned or run_ended or _player.current_health <= 0.0:
 		return
-	# Run-owned flag is set before insertion/signals. Chunk streaming, repeated
-	# clock notifications, rebinds or removal of the boss cannot respawn it.
+	# Resolve placement before committing the encounter. A completely blocked
+	# area retries on a later clock tick instead of losing or duplicating the boss.
+	boss = BOSS.instantiate() as Warboss
+	var safe_position := _spawner.find_clear_spawn_position(_spawner._get_spawn_origin(), boss)
+	if safe_position == Vector2.INF:
+		boss.free()
+		boss = null
+		return
+	# The run-owned flag is set before insertion/signals and never resets on death.
 	warboss_spawned = true
 	_spawner.stop_normal_spawning()
-	boss = BOSS.instantiate() as Warboss
-	boss.position = (get_parent() as Node2D).to_local(_spawner._get_spawn_origin())
+	boss.position = (get_parent() as Node2D).to_local(safe_position)
 	boss.set_target(_player)
 	boss.set_spatial_grid(_spawner.spatial_grid)
 	boss.defeated.connect(_on_boss_defeated)

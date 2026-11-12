@@ -152,7 +152,11 @@ func _profile_enemy_spawner_spawn_enemy(spawn_position: Vector2, enemy_scene: Pa
 	if enemy == null:
 		return
 
-	enemy.global_position = spawn_position
+	var safe_position := find_clear_spawn_position(spawn_position, enemy)
+	if safe_position == Vector2.INF:
+		enemy.free()
+		return
+	enemy.position = (get_parent() as Node2D).to_local(safe_position)
 	enemy.set_target(player)
 	enemy.set_run_clock(_run_clock)
 	enemy.set_spatial_grid(spatial_grid)
@@ -171,6 +175,18 @@ func _profile_enemy_spawner_spawn_enemy(spawn_position: Vector2, enemy_scene: Pa
 	spatial_grid.register_enemy(enemy)
 	_active_enemy_count += 1
 	active_enemy_count_changed.emit(_active_enemy_count, get_target_enemy_count())
+
+
+func find_clear_spawn_position(desired: Vector2, enemy: Enemy) -> Vector2:
+	var forbidden := Rect2()
+	var camera := get_viewport().get_camera_2d()
+	if camera != null:
+		var size := get_viewport().get_visible_rect().size / camera.zoom
+		var visible := Rect2(camera.get_screen_center_position() - size * 0.5, size).grow(minimum_spawn_margin)
+		if not visible.has_point(desired):
+			forbidden = visible.grow(enemy.get_body_radius())
+	var distance := minf(minimum_player_spawn_distance, desired.distance_to(player.global_position))
+	return TerrainObstacles.find_spawn_position(player.get_world_2d().direct_space_state, desired, enemy.get_body_radius(), player.global_position, distance, forbidden)
 
 
 func get_ork_spawn_factor() -> float:

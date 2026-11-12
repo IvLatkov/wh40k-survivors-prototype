@@ -4,7 +4,11 @@ Generated with the built-in image generation tool. Transparent PNG source assets
 are saved in `assets/art/terrain/trees/`. Original generated files were preserved.
 
 The sprites are now used by `TerrainTrees` when terrain chunks populate their
-large props. Each fixed 3x2-chunk region selects two or three distinct tree
+large props. The original 1254x1254 PNGs are preserved; Godot's import size limit
+is 256px per tree, reducing imported RGBA pixel storage from 18,870,192 bytes
+to 786,432 bytes. Their 160x160 world footprints and trunk collisions stay the same.
+
+Each fixed 3x2-chunk region selects two or three distinct tree
 chunks; each selected chunk tries up to 64 safe positions. Conflicting chunks
 may remain empty. All three variants share a 160x160 visual footprint, nearest
 filtering, and the existing prop layer below combatants. Trees now have solid

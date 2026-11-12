@@ -40,6 +40,8 @@ const SQUIG_ANIMATIONS: Array[StringName] = [
 @export var full_simulation_distance: float = 900.0
 @export var reduced_simulation_distance: float = 1500.0
 @export_range(0.05, 0.5, 0.01) var very_far_update_interval: float = 0.1
+@export_range(0.05, 0.5, 0.01) var obstacle_probe_interval: float = 0.2
+@export var obstacle_lookahead: float = 96.0
 
 @export_group("XP Drops")
 @export var xp_tier: XPTier = XPTier.LOW
@@ -74,12 +76,17 @@ var _chase_offset: Vector2 = Vector2.ZERO
 var _movement_speed_multiplier: float = 1.0
 var _individual_movement_speed: float
 var _damage_number_slot: int = 0
+var _obstacle_steering := ObstacleSteering.new()
+var _body_radius: float = 0.0
+var _obstacle_probe_remaining: float = 0.0
 
 
 func _ready() -> void:
 	damage_received.connect(_show_damage_number)
 	current_health = max_health
 	_individual_movement_speed = movement_speed * _movement_speed_multiplier
+	_body_radius = get_body_radius()
+	_obstacle_probe_remaining = float(get_instance_id() % 13) / 13.0 * obstacle_probe_interval
 	if not movement_animations.is_empty():
 		visual.play(movement_animations.pick_random())
 
@@ -324,6 +331,7 @@ func _profile_enemy_physics_process(delta: float) -> void:
 
 	var separation_direction := _get_separation_direction(delta) if uses_full_simulation else Vector2.ZERO
 	var movement_direction := chase_direction + separation_direction * separation_strength
+	movement_direction = _steer_around_obstacles(chase_target_position, movement_direction.limit_length(1.0), delta)
 	velocity = movement_direction.limit_length(1.0) * _individual_movement_speed
 	_update_visual_facing(velocity.x)
 
@@ -380,11 +388,35 @@ func _process_very_far_movement(delta: float) -> void:
 		return
 
 	var movement_direction := global_position.direction_to(target.global_position + _chase_offset)
+	movement_direction = _steer_around_obstacles(target.global_position + _chase_offset, movement_direction, _very_far_elapsed_time)
 	velocity = movement_direction * _individual_movement_speed
 	_update_visual_facing(velocity.x)
 	# Keep the throttled update, but sweep against terrain instead of teleporting.
 	move_and_collide(velocity * _very_far_elapsed_time)
 	_very_far_elapsed_time = 0.0
+
+
+func get_body_radius() -> float:
+	var collision := get_node_or_null("CollisionShape2D") as CollisionShape2D
+	# Logic-only standalone enemy fixtures can omit a physical body shape.
+	if collision == null or collision.shape == null:
+		return 0.0
+	var size := collision.shape.get_rect().size * collision.scale.abs()
+	return maxf(size.x, size.y) * 0.5
+
+
+func _steer_around_obstacles(goal: Vector2, desired: Vector2, delta: float) -> Vector2:
+	_obstacle_probe_remaining -= delta
+	var probe_due := _obstacle_probe_remaining <= 0.0
+	if not probe_due and not _obstacle_steering.active:
+		return desired
+	if probe_due:
+		_obstacle_probe_remaining = obstacle_probe_interval
+	var started := Time.get_ticks_usec() if CombatProfile.enabled else 0
+	var direction := _obstacle_steering.direction(self, goal, desired, probe_due, obstacle_lookahead, _body_radius)
+	if CombatProfile.enabled:
+		CombatProfile.finish(&"obstacle_steering", started)
+	return direction
 
 
 func _get_separation_direction(delta: float) -> Vector2:

@@ -8,6 +8,7 @@ var _enemies: Array[Enemy] = []
 var _cells: Dictionary = {}
 var _enemy_cells: Dictionary = {}
 var _empty_bucket: Array[Enemy] = []
+var _recycled_buckets: Array = []
 var _elapsed_time: float = 0.0
 var _candidate_query_count: int = 0
 var _candidate_result_count: int = 0
@@ -74,6 +75,10 @@ func _rebuild_grid() -> void:
 
 
 func _profile_enemy_spatial_grid_rebuild_grid() -> void:
+	# Reuse empty buckets across rebuilds; preserve the exact insertion/query order.
+	for bucket: Array in _cells.values():
+		bucket.clear()
+		_recycled_buckets.append(bucket)
 	_cells.clear()
 	_enemy_cells.clear()
 
@@ -89,8 +94,11 @@ func _profile_enemy_spatial_grid_rebuild_grid() -> void:
 
 		var cell := _world_to_cell(enemy.global_position)
 		if not _cells.has(cell):
-			var bucket: Array[Enemy] = []
-			_cells[cell] = bucket
+			if not _recycled_buckets.is_empty():
+				_cells[cell] = _recycled_buckets.pop_back()
+			else:
+				var bucket: Array[Enemy] = []
+				_cells[cell] = bucket
 		var cell_enemies: Array[Enemy] = _cells[cell]
 		cell_enemies.append(enemy)
 		_enemy_cells[enemy] = cell

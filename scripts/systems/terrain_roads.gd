@@ -84,10 +84,14 @@ static func get_layout(coordinate: Vector2i, size: int) -> Array[Vector3i]:
 	return result
 
 
+var layout: Array[Vector3i] = []
+
+
 func populate(coordinate: Vector2i, size: int) -> void:
 	for child in get_children():
 		child.free()
-	for cell in get_layout(coordinate, size):
+	layout = get_layout(coordinate, size)
+	for cell in layout:
 		var piece := Sprite2D.new()
 		piece.texture = TEXTURES[cell.z]
 		piece.material = EDGE_MATERIAL

@@ -3,6 +3,10 @@ extends SceneTree
 const WARMUP := 60
 const FRAMES := 1800
 const TARGET := 200
+var measured_frames: int = FRAMES
+var process_ms: float = 0.0
+var physics_ms: float = 0.0
+var draw_calls: float = 0.0
 var main: Node2D
 var player: Player
 var spawner: EnemySpawner
@@ -72,6 +76,9 @@ func accumulate() -> void:
 		query_totals[key] = entry
 
 func run() -> void:
+	for arg in OS.get_cmdline_user_args():
+		if arg.begins_with("--frames="):
+			measured_frames = maxi(300, int(arg.trim_prefix("--frames=")))
 	root.size = Vector2i(1152, 648)
 	initial_nodes = int(Performance.get_monitor(Performance.OBJECT_NODE_COUNT))
 	seed(741)
@@ -100,7 +107,7 @@ func run() -> void:
 	replenish()
 	await process_frame
 	var start := Time.get_ticks_usec()
-	for frame in WARMUP + FRAMES:
+	for frame in WARMUP + measured_frames:
 		CombatProfile.clear_frame()
 		player.current_health = player.max_health
 		# Bounded movement uses production input/acceleration, no terrain crossings.
@@ -115,6 +122,9 @@ func run() -> void:
 		var ms := (now - start) / 1000.0
 		start = now
 		if frame < WARMUP: continue
+		process_ms += Performance.get_monitor(Performance.TIME_PROCESS) * 1000.0
+		physics_ms += Performance.get_monitor(Performance.TIME_PHYSICS_PROCESS) * 1000.0
+		draw_calls += Performance.get_monitor(Performance.RENDER_TOTAL_DRAW_CALLS_IN_FRAME)
 		enemy_sum += spawner.get_active_enemy_count()
 		min_enemies = mini(min_enemies, spawner.get_active_enemy_count())
 		samples.append(ms)
@@ -132,21 +142,22 @@ func run() -> void:
 		sum += ms
 		for i in 4:
 			if ms > [16.7, 25.0, 33.3, 50.0][i]: over[i] += 1
-	var average := sum / FRAMES
+	var average := sum / measured_frames
 	var cpu: Dictionary = {}
 	for key in cpu_totals:
-		cpu[key] = {"average_ms_per_frame": cpu_totals[key] / 1000.0 / FRAMES, "max_ms_per_frame": cpu_max[key] / 1000.0}
+		cpu[key] = {"average_ms_per_frame": cpu_totals[key] / 1000.0 / measured_frames, "max_ms_per_frame": cpu_max[key] / 1000.0}
 	var queries: Dictionary = {}
 	for key in query_totals:
 		var q: Array = query_totals[key]
 		queries[key] = {"count": q[0], "average_candidates": float(q[1]) / maxi(1, q[0]), "worst_candidates": q[2]}
-	var result := {"seed": 741, "warmup": WARMUP, "frames": FRAMES, "renderer": RenderingServer.get_current_rendering_method(), "display": DisplayServer.get_name(), "average_ms": average, "median_ms": samples[FRAMES / 2], "p95_ms": samples[ceili(FRAMES * 0.95) - 1], "p99_ms": samples[ceili(FRAMES * 0.99) - 1], "worst_ms": samples.back(), "fps": 1000.0 / average, "over_16_7_25_33_3_50": over, "events": totals, "cpu": cpu, "queries": queries, "memory_bytes_every_300_frames": memory_samples, "nodes_every_300_frames": node_samples, "spikes": spikes}
+	var result := {"seed": 741, "warmup": WARMUP, "frames": measured_frames, "renderer": RenderingServer.get_current_rendering_method(), "display": DisplayServer.get_name(), "average_ms": average, "median_ms": samples[measured_frames / 2], "p95_ms": samples[ceili(measured_frames * 0.95) - 1], "p99_ms": samples[ceili(measured_frames * 0.99) - 1], "worst_ms": samples.back(), "fps": 1000.0 / average, "over_16_7_25_33_3_50": over, "events": totals, "cpu": cpu, "queries": queries, "memory_bytes_every_300_frames": memory_samples, "nodes_every_300_frames": node_samples, "spikes": spikes}
 	var label := "latest"
 	for arg in OS.get_cmdline_user_args():
 		if arg.begins_with("--label="): label = arg.trim_prefix("--label=")
-	result["average_active_enemies"] = float(enemy_sum) / FRAMES
+	result["average_active_enemies"] = float(enemy_sum) / measured_frames
 	result["minimum_active_enemies"] = min_enemies
 	result["remaining_xp_pickups"] = active_pickups
+	result["engine_monitors"] = {"process_ms": process_ms / measured_frames, "physics_ms": physics_ms / measured_frames, "draw_calls": draw_calls / measured_frames, "texture_bytes": Performance.get_monitor(Performance.RENDER_TEXTURE_MEM_USED)}
 	assert(totals.get(&"numbers_spawned", 0) == totals.get(&"damage_events", 0), "Exactly one number per damage event")
 	assert(totals.get(&"death", 0) == totals.get(&"xp_creation", 0), "Exactly one XP drop operation per death")
 	var file := FileAccess.open("res://docs/combat_" + label + ".json", FileAccess.WRITE)

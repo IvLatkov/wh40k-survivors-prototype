@@ -45,7 +45,7 @@ static func get_region_tree_chunks(region: Vector2i) -> Array[Vector2i]:
 	return chunks
 
 
-static func get_placements(coordinate: Vector2i, size: int, occupied: Array[Rect2]) -> Array[Placement]:
+static func get_placements(coordinate: Vector2i, size: int, occupied: Array[Rect2], road_layout: Variant = null) -> Array[Placement]:
 	var placements: Array[Placement] = []
 	var margin := FOOTPRINT * 0.5 + Vector2.ONE * EDGE_GAP
 	if size < margin.x * 2.0 or size < margin.y * 2.0:
@@ -55,7 +55,8 @@ static func get_placements(coordinate: Vector2i, size: int, occupied: Array[Rect
 	var exclusions: Array[Rect2] = []
 	for bounds in occupied:
 		exclusions.append(bounds.grow(PROP_GAP))
-	for cell in TerrainRoads.get_layout(coordinate, size):
+	var road_cells: Array[Vector3i] = TerrainRoads.get_layout(coordinate, size) if road_layout == null else road_layout
+	for cell in road_cells:
 		exclusions.append(Rect2(Vector2(cell.x, cell.y) * TerrainRoads.CELL_SIZE, Vector2.ONE * TerrainRoads.CELL_SIZE).grow(ROAD_GAP))
 	var rng := RandomNumberGenerator.new()
 	rng.seed = hash(Vector3i(coordinate.x, coordinate.y, POSITION_SALT))

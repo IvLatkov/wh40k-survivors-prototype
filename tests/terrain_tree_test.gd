@@ -35,6 +35,13 @@ func signature(chunk: TerrainChunk) -> Array:
 
 
 func run() -> void:
+	var imported_bytes := 0
+	for texture in TerrainTrees.TEXTURES:
+		check(texture.get_width() <= 256 and texture.get_height() <= 256, "Tree imports are capped at 256px")
+		var source := Image.new()
+		check(source.load_png_from_buffer(FileAccess.get_file_as_bytes(texture.resource_path)) == OK and source.get_size() == Vector2i(1254, 1254), "Original high-resolution tree PNGs remain intact")
+		imported_bytes += texture.get_image().get_data().size()
+	print("TREE_TEXTURE_BYTES ", imported_bytes)
 	var selected := 0
 	var placed := 0
 	var variants: Array[int] = [0, 0, 0]
@@ -52,10 +59,14 @@ func run() -> void:
 					check(TerrainTrees.get_region(coordinate) == region, "Negative and positive coordinates use floor-based region ownership")
 					var occupied := occupied_at(coordinate)
 					var trees := TerrainTrees.get_placements(coordinate, 1024, occupied)
+					var road_layout := TerrainRoads.get_layout(coordinate, 1024)
+					var prepared := TerrainTrees.get_placements(coordinate, 1024, occupied, road_layout)
+					check(trees.size() == prepared.size(), "Reusing an existing road layout preserves tree counts")
 					check(trees.size() <= 1 and (trees.is_empty() or chunks.has(coordinate)), "At most one tree in a selected chunk")
 					var repeated := TerrainTrees.get_placements(coordinate, 1024, occupied)
 					check(trees.size() == repeated.size(), "Placement independent of generation order")
 					for tree in trees:
+						check(tree.position == prepared[0].position and tree.variant == prepared[0].variant, "Reused road layout preserves exact tree variant and position")
 						check(not seen.has(coordinate), "No duplicate tree chunk in a region")
 						seen.append(coordinate)
 						check(tree.position == repeated[0].position and tree.variant == repeated[0].variant, "Variant and position deterministic")

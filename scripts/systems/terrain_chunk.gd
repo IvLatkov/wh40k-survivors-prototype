@@ -298,12 +298,15 @@ static func get_building_attempts(coordinate: Vector2i, size: int) -> Array[Buil
 
 
 static func get_building_placements(coordinate: Vector2i, size: int) -> Array[BuildingPlacement]:
+	return _get_building_placements(coordinate, size, get_tank_position(coordinate, size))
+
+
+static func _get_building_placements(coordinate: Vector2i, size: int, tank_at: Vector2) -> Array[BuildingPlacement]:
 	var placed: Array[BuildingPlacement] = []
 	var attempts := get_building_attempts(coordinate, size)
 	if attempts.is_empty():
 		return placed
 	var half_size := BUILDING_FOOTPRINT * 0.5
-	var tank_at := get_tank_position(coordinate, size)
 	var tank_half := TANK_TEXTURE.get_size() * TANK_SCALE * 0.5
 	var tank_bounds := Rect2(tank_at - tank_half, tank_half * 2.0).grow(BUILDING_TANK_GAP) if tank_at != Vector2.INF else Rect2()
 	for candidate in attempts:
@@ -346,7 +349,7 @@ func _populate_large_props() -> void:
 		large_props.add_child(tank)
 		var tank_size := TANK_TEXTURE.get_size() * TANK_SCALE
 		occupied.append(Rect2(tank_at - tank_size * 0.5, tank_size))
-	var buildings := get_building_placements(chunk_coordinate, chunk_size)
+	var buildings := _get_building_placements(chunk_coordinate, chunk_size, tank_at)
 	for building in buildings:
 		var ruin := Sprite2D.new()
 		ruin.name = "BuildingRuin%d" % (building.variant + 1)
@@ -356,7 +359,7 @@ func _populate_large_props() -> void:
 		TerrainObstacles.add_to(ruin)
 		large_props.add_child(ruin)
 		occupied.append(Rect2(building.position - BUILDING_FOOTPRINT * 0.5, BUILDING_FOOTPRINT))
-	for placement in TerrainTrees.get_placements(chunk_coordinate, chunk_size, occupied):
+	for placement in TerrainTrees.get_placements(chunk_coordinate, chunk_size, occupied, roads.layout):
 		var tree := Sprite2D.new()
 		tree.name = "Tree%d" % (placement.variant + 1)
 		tree.texture = TerrainTrees.TEXTURES[placement.variant]
