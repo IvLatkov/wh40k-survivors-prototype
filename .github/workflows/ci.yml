@@ -16,6 +16,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          lfs: true
 
       - name: Setup Godot
         uses: chickensoft-games/setup-godot@v2
@@ -28,7 +30,14 @@ jobs:
         run: godot --version
 
       - name: Import project
-        run: godot --headless --path . --editor --quit
+        shell: bash
+        run: |
+          godot --headless --path . --editor --quit 2>&1 | tee "$RUNNER_TEMP/godot-import.log"
+          # Godot can report import errors while returning exit code 0.
+          if grep -Eq 'ERROR:|SCRIPT ERROR:' "$RUNNER_TEMP/godot-import.log"; then
+            echo "::error::Godot reported errors while importing the project."
+            exit 1
+          fi
 
       - name: Run CI test suite
         run: godot --headless --path . --script tests/run_ci_tests.gd

@@ -1,5 +1,5 @@
 {
-	"asset_count": 69,
+	"asset_count": 72,
 	"assets": [
 		{
 			"category": "enemy",
@@ -1185,6 +1185,54 @@
 			],
 			"type": "image",
 			"width": 16
+		},
+		{
+			"category": "terrain",
+			"extension": "png",
+			"height": 1254,
+			"id": "art_terrain_trees_blasted_tree",
+			"name": "blasted_tree",
+			"path": "res://assets/art/terrain/trees/blasted_tree.png",
+			"tags": [
+				"art",
+				"terrain",
+				"trees",
+				"blasted_tree"
+			],
+			"type": "image",
+			"width": 1254
+		},
+		{
+			"category": "terrain",
+			"extension": "png",
+			"height": 1254,
+			"id": "art_terrain_trees_dead_tree",
+			"name": "dead_tree",
+			"path": "res://assets/art/terrain/trees/dead_tree.png",
+			"tags": [
+				"art",
+				"terrain",
+				"trees",
+				"dead_tree"
+			],
+			"type": "image",
+			"width": 1254
+		},
+		{
+			"category": "terrain",
+			"extension": "png",
+			"height": 1254,
+			"id": "art_terrain_trees_olive_tree",
+			"name": "olive_tree",
+			"path": "res://assets/art/terrain/trees/olive_tree.png",
+			"tags": [
+				"art",
+				"terrain",
+				"trees",
+				"olive_tree"
+			],
+			"type": "image",
+			"width": 1254
 		}
 	],
 	"generated_by": "build_asset_catalog.gd"
