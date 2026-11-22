@@ -1,9 +1,12 @@
-[gd_scene load_steps=13 format=3]
+[gd_scene load_steps=15 format=3]
 
 [ext_resource type="Script" path="res://scripts/ui/main_menu.gd" id="1_menu"]
 [ext_resource type="AudioStream" path="res://assets/audio/Background/Background foley.wav" id="2_music"]
 [ext_resource type="Texture2D" path="res://assets/art/effects/player/ultramarine/Ultramarine_bolter_right_still.png_0001.png" id="3_portrait"]
 [ext_resource type="Texture2D" path="res://assets/art/effects/terrain/buildings/imperial_ruin_3.1.png" id="4_battlefield"]
+[ext_resource type="PackedScene" path="res://scenes/ui/selection_card.tscn" id="5_card"]
+
+[ext_resource type="Script" path="res://scripts/ui/armory_upgrades_page.gd" id="6_armory"]
 
 [sub_resource type="StyleBoxFlat" id="PanelStyle"]
 bg_color = Color(0.045, 0.056, 0.067, 0.96)
@@ -173,6 +176,8 @@ theme_override_constants/h_separation = 18
 theme_override_constants/v_separation = 18
 
 [node name="CharacterPanel" type="PanelContainer" parent="Margin/Scroll/Content/Main/MainContent"]
+mouse_default_cursor_shape = 2
+mouse_filter = 0
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
@@ -326,6 +331,8 @@ theme_override_colors/font_color = Color(0.8, 0.38, 0.36, 1)
 horizontal_alignment = 1
 
 [node name="MissionPanel" type="PanelContainer" parent="Margin/Scroll/Content/Main/MainContent"]
+mouse_default_cursor_shape = 2
+mouse_filter = 0
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
@@ -365,7 +372,7 @@ stretch_mode = 5
 [node name="MissionName" type="Label" parent="Margin/Scroll/Content/Main/MainContent/MissionPanel/Padding/Content"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "BATTLEFIELD"
+text = "BATTLEFIELD ALPHA"
 autowrap_mode = 2
 theme_override_font_sizes/font_size = 22
 
@@ -474,80 +481,260 @@ layout_mode = 2
 
 [node name="Character" type="VBoxContainer" parent="Margin/Scroll/Content/SubmenuCenter/MenuPanel/Padding/Pages"]
 unique_name_in_owner = true
-visible = false
 layout_mode = 2
-theme_override_constants/separation = 20
+visible = false
+theme_override_constants/separation = 10
 
-[node name="Heading" type="Label" parent="Margin/Scroll/Content/SubmenuCenter/MenuPanel/Padding/Pages/Character"]
+
+[node name="Header" type="Label" parent="Margin/Scroll/Content/SubmenuCenter/MenuPanel/Padding/Pages/Character"]
 layout_mode = 2
 text = "CHARACTER SELECT"
-horizontal_alignment = 1
-theme_override_font_sizes/font_size = 21
+autowrap_mode = 2
+theme_override_font_sizes/font_size = 22
 
-[node name="Description" type="Label" parent="Margin/Scroll/Content/SubmenuCenter/MenuPanel/Padding/Pages/Character"]
-layout_mode = 2
-text = "Ultramarine"
-horizontal_alignment = 1
 
-[node name="Selected" type="Label" parent="Margin/Scroll/Content/SubmenuCenter/MenuPanel/Padding/Pages/Character"]
+[node name="CharacterSelection" type="GridContainer" parent="Margin/Scroll/Content/SubmenuCenter/MenuPanel/Padding/Pages/Character"]
+unique_name_in_owner = true
 layout_mode = 2
-text = "Selected"
-horizontal_alignment = 1
-theme_override_colors/font_color = Color(0.58, 0.71, 0.79, 1)
+columns = 2
+theme_override_constants/h_separation = 22
+theme_override_constants/v_separation = 18
+
+
+[node name="CharacterCards" type="VBoxContainer" parent="Margin/Scroll/Content/SubmenuCenter/MenuPanel/Padding/Pages/Character/CharacterSelection"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 0.85
+
+
+[node name="UltramarineCard" parent="Margin/Scroll/Content/SubmenuCenter/MenuPanel/Padding/Pages/Character/CharacterSelection/CharacterCards" instance=ExtResource("5_card")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="CharacterDetails" type="PanelContainer" parent="Margin/Scroll/Content/SubmenuCenter/MenuPanel/Padding/Pages/Character/CharacterSelection"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("PanelStyle")
+
+
+[node name="Padding" type="MarginContainer" parent="Margin/Scroll/Content/SubmenuCenter/MenuPanel/Padding/Pages/Character/CharacterSelection/CharacterDetails"]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_top = 18
+theme_override_constants/margin_bottom = 18
+
+
+[node name="Content" type="VBoxContainer" parent="Margin/Scroll/Content/SubmenuCenter/MenuPanel/Padding/Pages/Character/CharacterSelection/CharacterDetails/Padding"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+
+[node name="Heading" type="Label" parent="Margin/Scroll/Content/SubmenuCenter/MenuPanel/Padding/Pages/Character/CharacterSelection/CharacterDetails/Padding/Content"]
+layout_mode = 2
+text = "SELECTED CHARACTER"
+autowrap_mode = 2
+theme_override_font_sizes/font_size = 12
+
+
+
+[node name="Name" type="Label" parent="Margin/Scroll/Content/SubmenuCenter/MenuPanel/Padding/Pages/Character/CharacterSelection/CharacterDetails/Padding/Content"]
+layout_mode = 2
+text = ""
+autowrap_mode = 2
+theme_override_font_sizes/font_size = 22
+
+
+[node name="Chapter" type="Label" parent="Margin/Scroll/Content/SubmenuCenter/MenuPanel/Padding/Pages/Character/CharacterSelection/CharacterDetails/Padding/Content"]
+layout_mode = 2
+text = ""
+autowrap_mode = 2
+theme_override_font_sizes/font_size = 16
+
+
+[node name="StartingWeapon" type="Label" parent="Margin/Scroll/Content/SubmenuCenter/MenuPanel/Padding/Pages/Character/CharacterSelection/CharacterDetails/Padding/Content"]
+layout_mode = 2
+text = ""
+autowrap_mode = 2
+theme_override_font_sizes/font_size = 16
+
+
+[node name="Stats" type="Label" parent="Margin/Scroll/Content/SubmenuCenter/MenuPanel/Padding/Pages/Character/CharacterSelection/CharacterDetails/Padding/Content"]
+layout_mode = 2
+text = ""
+autowrap_mode = 2
+theme_override_font_sizes/font_size = 16
+
+
+[node name="PassiveBonus" type="Label" parent="Margin/Scroll/Content/SubmenuCenter/MenuPanel/Padding/Pages/Character/CharacterSelection/CharacterDetails/Padding/Content"]
+layout_mode = 2
+text = ""
+autowrap_mode = 2
+theme_override_font_sizes/font_size = 16
+
+
+[node name="UnlockState" type="Label" parent="Margin/Scroll/Content/SubmenuCenter/MenuPanel/Padding/Pages/Character/CharacterSelection/CharacterDetails/Padding/Content"]
+layout_mode = 2
+text = ""
+autowrap_mode = 2
+theme_override_font_sizes/font_size = 16
+
 
 [node name="Back" type="Button" parent="Margin/Scroll/Content/SubmenuCenter/MenuPanel/Padding/Pages/Character"]
-custom_minimum_size = Vector2(0, 42)
 layout_mode = 2
+custom_minimum_size = Vector2(0, 42)
 text = "Back"
+
 
 [node name="Map" type="VBoxContainer" parent="Margin/Scroll/Content/SubmenuCenter/MenuPanel/Padding/Pages"]
 unique_name_in_owner = true
+layout_mode = 2
 visible = false
-layout_mode = 2
-theme_override_constants/separation = 20
+theme_override_constants/separation = 10
 
-[node name="Heading" type="Label" parent="Margin/Scroll/Content/SubmenuCenter/MenuPanel/Padding/Pages/Map"]
-layout_mode = 2
-text = "MAP SELECT"
-horizontal_alignment = 1
-theme_override_font_sizes/font_size = 21
 
-[node name="Description" type="Label" parent="Margin/Scroll/Content/SubmenuCenter/MenuPanel/Padding/Pages/Map"]
+[node name="Header" type="Label" parent="Margin/Scroll/Content/SubmenuCenter/MenuPanel/Padding/Pages/Map"]
 layout_mode = 2
-text = "Current Battlefield"
-horizontal_alignment = 1
+text = "MISSION SELECT"
+autowrap_mode = 2
+theme_override_font_sizes/font_size = 22
 
-[node name="Selected" type="Label" parent="Margin/Scroll/Content/SubmenuCenter/MenuPanel/Padding/Pages/Map"]
+
+[node name="MapSelection" type="GridContainer" parent="Margin/Scroll/Content/SubmenuCenter/MenuPanel/Padding/Pages/Map"]
+unique_name_in_owner = true
 layout_mode = 2
-text = "Selected"
-horizontal_alignment = 1
-theme_override_colors/font_color = Color(0.58, 0.71, 0.79, 1)
+columns = 2
+theme_override_constants/h_separation = 22
+theme_override_constants/v_separation = 18
+
+
+[node name="MapCards" type="VBoxContainer" parent="Margin/Scroll/Content/SubmenuCenter/MenuPanel/Padding/Pages/Map/MapSelection"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 0.85
+
+
+[node name="BattlefieldAlphaCard" parent="Margin/Scroll/Content/SubmenuCenter/MenuPanel/Padding/Pages/Map/MapSelection/MapCards" instance=ExtResource("5_card")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="MissionDetails" type="PanelContainer" parent="Margin/Scroll/Content/SubmenuCenter/MenuPanel/Padding/Pages/Map/MapSelection"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("PanelStyle")
+
+
+[node name="Padding" type="MarginContainer" parent="Margin/Scroll/Content/SubmenuCenter/MenuPanel/Padding/Pages/Map/MapSelection/MissionDetails"]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_top = 18
+theme_override_constants/margin_bottom = 18
+
+
+[node name="Content" type="VBoxContainer" parent="Margin/Scroll/Content/SubmenuCenter/MenuPanel/Padding/Pages/Map/MapSelection/MissionDetails/Padding"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+
+[node name="Heading" type="Label" parent="Margin/Scroll/Content/SubmenuCenter/MenuPanel/Padding/Pages/Map/MapSelection/MissionDetails/Padding/Content"]
+layout_mode = 2
+text = "SELECTED MISSION"
+autowrap_mode = 2
+theme_override_font_sizes/font_size = 12
+
+
+
+[node name="Name" type="Label" parent="Margin/Scroll/Content/SubmenuCenter/MenuPanel/Padding/Pages/Map/MapSelection/MissionDetails/Padding/Content"]
+layout_mode = 2
+text = ""
+autowrap_mode = 2
+theme_override_font_sizes/font_size = 22
+
+
+[node name="Duration" type="Label" parent="Margin/Scroll/Content/SubmenuCenter/MenuPanel/Padding/Pages/Map/MapSelection/MissionDetails/Padding/Content"]
+layout_mode = 2
+text = ""
+autowrap_mode = 2
+theme_override_font_sizes/font_size = 16
+
+
+[node name="EnemyTypes" type="Label" parent="Margin/Scroll/Content/SubmenuCenter/MenuPanel/Padding/Pages/Map/MapSelection/MissionDetails/Padding/Content"]
+layout_mode = 2
+text = ""
+autowrap_mode = 2
+theme_override_font_sizes/font_size = 16
+
+
+[node name="Difficulty" type="Label" parent="Margin/Scroll/Content/SubmenuCenter/MenuPanel/Padding/Pages/Map/MapSelection/MissionDetails/Padding/Content"]
+layout_mode = 2
+text = ""
+autowrap_mode = 2
+theme_override_font_sizes/font_size = 16
+
+
+[node name="Boss" type="Label" parent="Margin/Scroll/Content/SubmenuCenter/MenuPanel/Padding/Pages/Map/MapSelection/MissionDetails/Padding/Content"]
+layout_mode = 2
+text = ""
+autowrap_mode = 2
+theme_override_font_sizes/font_size = 16
+
+
+[node name="UnlockState" type="Label" parent="Margin/Scroll/Content/SubmenuCenter/MenuPanel/Padding/Pages/Map/MapSelection/MissionDetails/Padding/Content"]
+layout_mode = 2
+text = ""
+autowrap_mode = 2
+theme_override_font_sizes/font_size = 16
+
 
 [node name="Back" type="Button" parent="Margin/Scroll/Content/SubmenuCenter/MenuPanel/Padding/Pages/Map"]
-custom_minimum_size = Vector2(0, 42)
 layout_mode = 2
+custom_minimum_size = Vector2(0, 42)
 text = "Back"
+
 
 [node name="Upgrades" type="VBoxContainer" parent="Margin/Scroll/Content/SubmenuCenter/MenuPanel/Padding/Pages"]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
-theme_override_constants/separation = 20
+theme_override_constants/separation = 12
+script = ExtResource("6_armory")
 
-[node name="Heading" type="Label" parent="Margin/Scroll/Content/SubmenuCenter/MenuPanel/Padding/Pages/Upgrades"]
-layout_mode = 2
-text = "UPGRADES"
-horizontal_alignment = 1
-theme_override_font_sizes/font_size = 21
+[node name="ArmoryHeader" type="GridContainer" parent="Margin/Scroll/Content/SubmenuCenter/MenuPanel/Padding/Pages/Upgrades"]
+unique_name_in_owner = true
+columns = 2
+theme_override_constants/h_separation = 18
+
+[node name="Title" type="Label" parent="Margin/Scroll/Content/SubmenuCenter/MenuPanel/Padding/Pages/Upgrades/ArmoryHeader"]
+size_flags_horizontal = 3
+text = "ARMORY UPGRADES"
+autowrap_mode = 2
+theme_override_font_sizes/font_size = 24
+
+[node name="ArmoryCurrency" type="Label" parent="Margin/Scroll/Content/SubmenuCenter/MenuPanel/Padding/Pages/Upgrades/ArmoryHeader"]
+unique_name_in_owner = true
+size_flags_vertical = 4
+text = "Currency: 0"
+theme_override_colors/font_color = Color(0.58, 0.68, 0.74, 1)
 
 [node name="Description" type="Label" parent="Margin/Scroll/Content/SubmenuCenter/MenuPanel/Padding/Pages/Upgrades"]
-layout_mode = 2
-text = "Coming soon"
-horizontal_alignment = 1
+text = "Permanent equipment progression · Coming soon"
+autowrap_mode = 2
+theme_override_font_sizes/font_size = 14
+theme_override_colors/font_color = Color(0.6, 0.69, 0.75, 1)
+
+[node name="UpgradeGrid" type="GridContainer" parent="Margin/Scroll/Content/SubmenuCenter/MenuPanel/Padding/Pages/Upgrades"]
+unique_name_in_owner = true
+columns = 2
+theme_override_constants/h_separation = 16
+theme_override_constants/v_separation = 16
 
 [node name="Back" type="Button" parent="Margin/Scroll/Content/SubmenuCenter/MenuPanel/Padding/Pages/Upgrades"]
 custom_minimum_size = Vector2(0, 42)
-layout_mode = 2
 text = "Back"
 
 [node name="Settings" type="VBoxContainer" parent="Margin/Scroll/Content/SubmenuCenter/MenuPanel/Padding/Pages"]

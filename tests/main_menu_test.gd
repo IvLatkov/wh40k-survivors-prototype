@@ -16,7 +16,9 @@ func check(condition: bool, message: String) -> void:
 		assert(condition, message)
 
 
-func click_button(button: Button) -> void:
+func click_button(button: Control) -> void:
+	await process_frame
+	await process_frame
 	(current_scene.get_node("%Scroll") as ScrollContainer).ensure_control_visible(button)
 	await process_frame
 	await process_frame
@@ -42,6 +44,16 @@ func escape() -> void:
 		event.pressed = pressed
 		Input.parse_input_event(event)
 		await process_frame
+
+
+func capture_page(suffix: String) -> void:
+	if "--capture" not in OS.get_cmdline_user_args() or DisplayServer.get_name() == "headless":
+		return
+	await create_timer(0.15).timeout
+	await RenderingServer.frame_post_draw
+	var output := OS.get_environment("WH40K_MENU_CAPTURE_PATH")
+	if not output.is_empty():
+		check(root.get_texture().get_image().save_png(output.get_basename() + suffix + ".png") == OK, "Selection preview saves successfully")
 
 
 func check_page(menu: MainMenu, expected: MainMenu.Page) -> void:
@@ -83,11 +95,11 @@ func run() -> void:
 	check(menu.get_node("%StartingWeapon").text == "Starting Weapon: Bolter", "Dashboard shows starting Bolter")
 	check(menu.get_node("%Chapter").text == "Chapter: Ultramarines", "Dashboard shows the Chapter")
 	check(menu.get_node("%Portrait").texture.resource_path.contains("Ultramarine_bolter_right_still"), "Portrait reuses the existing player art without instantiating gameplay")
-	check(menu.get_node("%MissionName").text == "BATTLEFIELD", "Dashboard shows Battlefield")
+	check(menu.get_node("%MissionName").text == "BATTLEFIELD ALPHA", "Dashboard shows Battlefield Alpha")
 	check(menu.get_node("%Duration").text == "Duration: 10 Minutes", "Dashboard shows ten-minute mission")
 	check(menu.get_node("%Boss").text == "Boss: Ork Warboss", "Dashboard shows the current boss")
 	check(menu.get_node("%BattlefieldPreview").texture != null, "Mission uses an existing terrain preview")
-	check(menu.get_node("%Summary").text == "Ultramarine\nBolter\nBattlefield\n10:00 Mission", "Deploy summary matches the selected character and mission")
+	check(menu.get_node("%Summary").text == "Ultramarine\nBolter\nBattlefield Alpha\n10:00 Mission", "Deploy summary matches the selected character and mission")
 	check(menu.get_node("%Deploy").text == "DEPLOY" and menu.get_node("%Deploy").size.y > menu.get_node("%OpenSettings").size.y, "Deploy is the prominent primary action")
 	check(menu.find_children("Play", "Button", true, false).is_empty(), "Old primary Play button has been replaced")
 	if "--quit-button" in OS.get_cmdline_user_args():
@@ -109,6 +121,12 @@ func run() -> void:
 	for index in buttons.size():
 		await click_button(menu.get_node("%" + buttons[index]) as Button)
 		check_page(menu, pages[index])
+		if pages[index] == MainMenu.Page.CHARACTER:
+			await capture_page("_character")
+		elif pages[index] == MainMenu.Page.MAP:
+			await capture_page("_mission")
+		elif pages[index] == MainMenu.Page.UPGRADES:
+			await capture_page("_armory")
 		var page: Control = menu.pages[pages[index]]
 		await click_button(page.get_node("Back") as Button)
 		check_page(menu, MainMenu.Page.MAIN)
@@ -117,9 +135,72 @@ func run() -> void:
 		check_page(menu, MainMenu.Page.MAIN)
 	await escape()
 	check_page(menu, MainMenu.Page.MAIN)
-	check(menu.pages[MainMenu.Page.CHARACTER].get_node("Description").text == "Ultramarine", "Current character is shown")
-	check(menu.pages[MainMenu.Page.MAP].get_node("Description").text == "Current Battlefield", "Current battlefield is shown")
-	check(menu.pages[MainMenu.Page.UPGRADES].get_node("Description").text == "Coming soon", "Permanent upgrades remain a placeholder")
+	var details := menu.get_node("%CharacterDetails/Padding/Content")
+	check(details.get_node("Name").text == "ULTRAMARINE", "Selected character details show Ultramarine")
+	check(details.get_node("Chapter").text == "Chapter: Ultramarines" and details.get_node("StartingWeapon").text == "Starting Weapon: Bolter", "Details show the current Chapter and starting weapon")
+	var source := MenuSelectionData.PLAYER_SCENE.instantiate() as Player
+	var expected_stats := "Max HP: %s\nMovement Speed: %s px/s\nArmor: %d\nCrit Chance: %s%%" % [str(source.max_health), str(source.get_movement_speed()), source.combat_stats.get_armor(), str(source.combat_stats.get_crit_chance() * 100.0)]
+	check(details.get_node("Stats").text == expected_stats, "Displayed stats match actual player defaults")
+	check(source.max_health == 50.0 and source.get_movement_speed() == 150.0 and source.combat_stats.get_armor() == 0 and source.combat_stats.get_crit_chance() == 0.0, "Starting stats remain 50 HP, 150 speed, 0 armor and 0% crit")
+	# Scene overrides must reach display data, rather than duplicated UI constants.
+	source.max_health = 75.0
+	source.speed = 180.0
+	source.combat_stats = source.combat_stats.duplicate(true)
+	source.combat_stats.crit_chance = 0.125
+	source.combat_stats.add_modifier(&"armor", 3.0)
+	var alternate := PackedScene.new()
+	check(alternate.pack(source) == OK, "Prepare player-scene override fixture")
+	var override_data := MenuSelectionData.read_character(alternate)
+	check(override_data.max_hp == 75.0 and override_data.movement_speed == 180.0 and override_data.armor == 3 and override_data.crit_chance == 0.125, "Display reader honors scene and stat overrides")
+	source.free()
+	check(details.get_node("PassiveBonus").text == "Passive Bonus: None", "No unearned Chapter perk is presented as a starting passive")
+	for perk in MenuSelectionData.CHAPTER.perks:
+		check(perk.milestone >= 10, "Chapter catalog grants milestone choices, not a starting passive")
+	check(menu.get_node("%UltramarineCard").get_node("%Portrait").texture != null and details.get_node("UnlockState").text == "Unlocked · Selected", "Character details show portrait and real current availability")
+	var mission_details := menu.get_node("%MissionDetails/Padding/Content")
+	check(mission_details.get_node("Name").text == "BATTLEFIELD ALPHA", "Mission details show Battlefield Alpha")
+	check(mission_details.get_node("Duration").text == "Duration: 10 Minutes", "Mission duration matches ten minutes")
+	check(mission_details.get_node("EnemyTypes").text == "Enemy Types:\nSquigs\nOrks\nOrk Warboss", "Mission lists all current enemy types")
+	check(mission_details.get_node("Difficulty").text == "Difficulty: Normal", "Normal is a display value, not a difficulty selector")
+	check(mission_details.get_node("Boss").text == "Boss: Ork Warboss — 10:00" and menu.selection_data.mission.duration_seconds == BossEncounter.SPAWN_SECONDS, "Boss display uses the actual encounter timing")
+	check(mission_details.get_node("UnlockState").text == "Unlocked · Selected" and menu.get_node("%BattlefieldAlphaCard").get_node("%Portrait").texture != null, "Mission details show selection and preview")
+	for card_name: String in ["UltramarineCard", "BattlefieldAlphaCard"]:
+		var card := menu.get_node("%" + card_name) as SelectionCard
+		check(card.button_pressed and card.get_node("%SelectionState").text == "Selected", "Selected card has pressed styling and explicit selected text")
+		check(card.get_node("%UnlockState").text == "Unlocked" and card.get_node("%Portrait").texture != null, "Selection card has availability and portrait")
+	check(menu.get_node("%CharacterCards").get_child_count() == 1 and menu.get_node("%MapCards").get_child_count() == 1, "Only the existing character and stage are available")
+	await click_button(menu.get_node("%CharacterPanel") as Control)
+	check_page(menu, MainMenu.Page.CHARACTER)
+	await click_button(menu.get_node("%UltramarineCard") as Control)
+	check(menu.get_node("%UltramarineCard").button_pressed, "Clicking the only character keeps it selected")
+	await escape()
+	await click_button(menu.get_node("%MissionPanel") as Control)
+	check_page(menu, MainMenu.Page.MAP)
+	await click_button(menu.get_node("%BattlefieldAlphaCard") as Control)
+	check(menu.get_node("%BattlefieldAlphaCard").button_pressed, "Clicking the only mission keeps it selected")
+	await escape()
+	menu.show_page(MainMenu.Page.UPGRADES)
+	var armory: Control = menu.pages[MainMenu.Page.UPGRADES]
+	var upgrade_grid := menu.get_node("%UpgradeGrid") as GridContainer
+	check(armory.get_node("ArmoryHeader/Title").text == "ARMORY UPGRADES", "Armory has a clear permanent-upgrades heading")
+	check(armory.get_node("%ArmoryCurrency").text == "Currency: 0", "Armory currency is display-only zero")
+	check(upgrade_grid.get_child_count() == 4, "Exactly four initial upgrade cards")
+	var titles := ["ARMOR", "BOLTER DAMAGE", "MOVEMENT", "MAX HEALTH"]
+	var descriptions := ["Increase flat damage reduction.", "Increase Bolter base damage.", "Increase movement speed.", "Increase maximum health."]
+	for index in 4:
+		var card := upgrade_grid.get_child(index) as ArmoryUpgradeCard
+		check(card != null and card.get_node("%UpgradeName").text == titles[index], "Requested upgrade title")
+		check(card.get_node("%Rank").text == "0 / 5" and card.get_node("%RankPips").get_child_count() == 5, "Display-only zero rank with five unfilled rank markers")
+		check(card.get_node("%Description").text == descriptions[index], "Short equipment description")
+		check(card.get_node("%Cost").text == "Cost: —", "Placeholder cost does not invent a real price")
+		check(card.get_node("%Availability").text == "LOCKED" and not card.disabled, "Locked presentation remains focusable for inspection")
+		card.grab_focus()
+		check(card.has_focus() and card.get_theme_stylebox("focus") != card.get_theme_stylebox("normal"), "Keyboard focus has a visible distinct border")
+		await click_button(card)
+		check(card.is_hovered() and card.get_theme_stylebox("hover") != card.get_theme_stylebox("normal"), "Mouse hover has a visible distinct style")
+		check(card.get_node("%Rank").text == "0 / 5" and armory.get_node("%ArmoryCurrency").text == "Currency: 0", "Clicks cannot purchase, change ranks or spend currency")
+	check(menu.find_children("*", "Player", true, false).is_empty(), "Armory does not initialize gameplay")
+	await escape()
 	check(menu.pages[MainMenu.Page.COLLECTION].get_node("Description").text == "Coming Soon", "Collection is a placeholder with no new progression")
 	menu.show_page(MainMenu.Page.SETTINGS)
 	for bus: String in ["Master", "Music", "SFX"]:
@@ -159,6 +240,40 @@ func run() -> void:
 			check(menu.get_node("%Quit").get_global_rect().end.y <= window_size.y, "Bottom navigation is immediately visible at the project resolution")
 			var scrollbar := (menu.get_node("%Scroll") as ScrollContainer).get_v_scroll_bar()
 			check(scrollbar.max_value <= scrollbar.page, "Full dashboard fits without scrolling at project resolution")
+		for selection_page: MainMenu.Page in [MainMenu.Page.CHARACTER, MainMenu.Page.MAP]:
+			menu.show_page(selection_page)
+			await process_frame
+			await process_frame
+			await process_frame
+			var selection_grid := menu.get_node("%CharacterSelection" if selection_page == MainMenu.Page.CHARACTER else "%MapSelection") as GridContainer
+			check(selection_grid.columns == (1 if window_size.x < 800 else 2), "Selection details stack on narrow windows")
+			check(menu.panel.get_global_rect().position.x >= 0.0 and menu.panel.get_global_rect().end.x <= window_size.x, "Selection panel stays inside window horizontally")
+			var card := menu.get_node("%UltramarineCard" if selection_page == MainMenu.Page.CHARACTER else "%BattlefieldAlphaCard") as SelectionCard
+			check(card.size.y >= card.get_node("Padding").get_combined_minimum_size().y, "Card expands to fit wrapped details and state labels")
+			check(not selection_grid.get_child(0).get_global_rect().intersects(selection_grid.get_child(1).get_global_rect()), "Card list and details never overlap")
+			await capture_page(("_character" if selection_page == MainMenu.Page.CHARACTER else "_mission") + "_%dx%d" % [window_size.x, window_size.y])
+		menu.show_page(MainMenu.Page.UPGRADES)
+		await process_frame
+		await process_frame
+		await process_frame
+		check(upgrade_grid.columns == (1 if window_size.x < 700 else 2), "Armory switches from 2x2 to a single column on narrow windows")
+		check(menu.panel.get_global_rect().position.x >= 0 and menu.panel.get_global_rect().end.x <= window_size.x, "Armory panel stays inside the window")
+		check(armory.get_node("ArmoryHeader/Title").get_global_rect().position.y >= 0, "Armory opens at its header instead of scrolling to Back")
+		check(armory.get_node("ArmoryHeader/Title").get_global_rect().position.y >= 0, "Opening armory starts at its header, not a stale scroll position")
+		for index in 4:
+			var card := upgrade_grid.get_child(index) as ArmoryUpgradeCard
+			var bounds := card.get_global_rect()
+			check(bounds.position.x >= 0 and bounds.end.x <= window_size.x, "Upgrade card does not clip horizontally")
+			check(card.size.y >= card.get_node("Padding").get_combined_minimum_size().y, "Card grows to contain wrapped titles/descriptions")
+			check(bounds.encloses(card.get_node("%Cost").get_global_rect()), "Cost remains inside card boundaries")
+			for other in range(index):
+				check(not bounds.intersects((upgrade_grid.get_child(other) as Control).get_global_rect()), "Upgrade cards never overlap")
+		if window_size == Vector2i(1152, 648):
+			check(armory.get_node("Back").get_global_rect().end.y <= window_size.y, "Desktop 2x2 armory and Back fit on screen")
+		await capture_page("_armory_%dx%d" % [window_size.x, window_size.y])
+		await click_button(armory.get_node("Back"))
+		check_page(menu, MainMenu.Page.MAIN)
+		menu.show_page(MainMenu.Page.MAIN)
 
 	root.size = Vector2i(360, 480)
 	await process_frame
@@ -181,6 +296,8 @@ func run() -> void:
 	var main := current_scene
 	check(main != null and main.scene_file_path == MainMenu.GAMEPLAY_SCENE, "Play loads the existing gameplay scene")
 	check(main.has_node("Player") and main.has_node("EnemySpawner"), "Production gameplay runs after Play")
+	var deployed_player: Player = main.get_node("Player")
+	check(deployed_player.max_health == 50 and deployed_player.get_movement_speed() == 150 and deployed_player.combat_stats.get_armor() == 0 and deployed_player.get_node("Bolter").get_damage() == 25, "Armory inspection/clicks apply no permanent gameplay effects")
 	var atmosphere := main.get_node("BackgroundAtmosphere") as AudioStreamPlayer
 	await create_timer(0.1).timeout
 	check(root.find_children("*", "AudioStreamPlayer", true, false).size() == 1 and not main.has_node("BackgroundMusic"), "Only one ambience player remains across the entire tree after Play")

@@ -1,0 +1,116 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/armory_upgrade_card.gd" id="1_card"]
+
+[sub_resource type="StyleBoxFlat" id="Normal"]
+bg_color = Color(0.055, 0.073, 0.085, 1)
+border_width_left = 3
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.25, 0.33, 0.38, 1)
+
+[sub_resource type="StyleBoxFlat" id="Hover"]
+bg_color = Color(0.085, 0.12, 0.145, 1)
+border_width_left = 3
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.46, 0.6, 0.68, 1)
+
+[sub_resource type="StyleBoxFlat" id="Pressed"]
+bg_color = Color(0.065, 0.09, 0.11, 1)
+border_width_left = 3
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.52, 0.66, 0.74, 1)
+
+[sub_resource type="StyleBoxFlat" id="Focus"]
+bg_color = Color(0, 0, 0, 0)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.57, 0.72, 0.8, 1)
+
+[sub_resource type="StyleBoxFlat" id="Badge"]
+bg_color = Color(0.15, 0.075, 0.075, 1)
+content_margin_left = 7.0
+content_margin_right = 7.0
+content_margin_top = 3.0
+content_margin_bottom = 3.0
+
+[node name="ArmoryUpgradeCard" type="Button"]
+custom_minimum_size = Vector2(0, 164)
+size_flags_horizontal = 3
+size_flags_vertical = 0
+script = ExtResource("1_card")
+theme_override_styles/normal = SubResource("Normal")
+theme_override_styles/hover = SubResource("Hover")
+theme_override_styles/pressed = SubResource("Pressed")
+theme_override_styles/focus = SubResource("Focus")
+
+[node name="Padding" type="MarginContainer" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_top = 14
+theme_override_constants/margin_bottom = 14
+
+[node name="Content" type="VBoxContainer" parent="Padding"]
+mouse_filter = 2
+theme_override_constants/separation = 10
+
+[node name="Header" type="HBoxContainer" parent="Padding/Content"]
+mouse_filter = 2
+theme_override_constants/separation = 10
+
+[node name="UpgradeName" type="Label" parent="Padding/Content/Header"]
+unique_name_in_owner = true
+size_flags_horizontal = 3
+mouse_filter = 2
+autowrap_mode = 2
+theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(0.87, 0.92, 0.95, 1)
+
+[node name="Availability" type="Label" parent="Padding/Content/Header"]
+unique_name_in_owner = true
+size_flags_vertical = 4
+mouse_filter = 2
+text = "LOCKED"
+theme_override_styles/normal = SubResource("Badge")
+theme_override_font_sizes/font_size = 11
+theme_override_colors/font_color = Color(0.83, 0.5, 0.47, 1)
+
+[node name="RankRow" type="HBoxContainer" parent="Padding/Content"]
+mouse_filter = 2
+
+[node name="Rank" type="Label" parent="Padding/Content/RankRow"]
+unique_name_in_owner = true
+size_flags_horizontal = 3
+mouse_filter = 2
+theme_override_font_sizes/font_size = 28
+theme_override_colors/font_color = Color(0.63, 0.75, 0.82, 1)
+
+[node name="RankPips" type="HBoxContainer" parent="Padding/Content/RankRow"]
+unique_name_in_owner = true
+size_flags_vertical = 4
+mouse_filter = 2
+theme_override_constants/separation = 5
+
+[node name="Description" type="Label" parent="Padding/Content"]
+unique_name_in_owner = true
+mouse_filter = 2
+autowrap_mode = 2
+theme_override_font_sizes/font_size = 14
+theme_override_colors/font_color = Color(0.65, 0.73, 0.78, 1)
+
+[node name="Cost" type="Label" parent="Padding/Content"]
+unique_name_in_owner = true
+mouse_filter = 2
+theme_override_font_sizes/font_size = 14
+theme_override_colors/font_color = Color(0.52, 0.61, 0.66, 1)
