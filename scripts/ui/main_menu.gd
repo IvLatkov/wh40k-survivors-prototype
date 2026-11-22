@@ -114,7 +114,7 @@ func _refresh_selection() -> void:
 	%Duration.text = "Duration: " + selection_data.duration_text()
 	%Boss.text = "Boss: " + mission.boss
 	%BattlefieldPreview.texture = mission.portrait
-	%Summary.text = "%s\n%s\n%s\n%02d:%02d Mission" % [character.name, character.starting_weapon, mission.name, int(mission.duration_seconds) / 60, int(mission.duration_seconds) % 60]
+	%Summary.text = selection_data.deploy_summary_text()
 	%UltramarineCard.configure(character, "Chapter: %s\nStarting Weapon: %s" % [character.chapter, character.starting_weapon])
 	%BattlefieldAlphaCard.configure(mission, "Duration: %s\nEnemy Types: %s\nDifficulty: %s\nBoss: %s" % [selection_data.duration_text(), ", ".join(mission.enemies), mission.difficulty, selection_data.boss_text()])
 	var details := %CharacterDetails.get_node("Padding/Content")

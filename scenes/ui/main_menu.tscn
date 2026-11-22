@@ -284,7 +284,7 @@ mouse_filter = 2
 
 [node name="Status" type="Label" parent="Margin/Scroll/Content/Main/MainContent/DeployPanel/Padding/Content"]
 layout_mode = 2
-text = "AWAITING DEPLOYMENT"
+text = "MISSION LOADOUT"
 autowrap_mode = 2
 theme_override_font_sizes/font_size = 12
 theme_override_colors/font_color = Color(0.6, 0.71, 0.77, 1)
@@ -293,9 +293,9 @@ horizontal_alignment = 1
 [node name="Summary" type="Label" parent="Margin/Scroll/Content/Main/MainContent/DeployPanel/Padding/Content"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Ultramarine\nBolter\nBattlefield\n10:00 Mission"
+text = ""
 autowrap_mode = 2
-theme_override_font_sizes/font_size = 20
+theme_override_font_sizes/font_size = 18
 horizontal_alignment = 1
 
 [node name="Deploy" type="Button" parent="Margin/Scroll/Content/Main/MainContent/DeployPanel/Padding/Content"]
@@ -843,12 +843,27 @@ autowrap_mode = 2
 theme_override_font_sizes/font_size = 21
 horizontal_alignment = 1
 
-[node name="Description" type="Label" parent="Margin/Scroll/Content/SubmenuCenter/MenuPanel/Padding/Pages/Collection"]
+[node name="PlaceholderPanel" type="PanelContainer" parent="Margin/Scroll/Content/SubmenuCenter/MenuPanel/Padding/Pages/Collection"]
+custom_minimum_size = Vector2(0, 140)
+layout_mode = 2
+theme_override_styles/panel = SubResource("DeployPanelStyle")
+
+[node name="Padding" type="MarginContainer" parent="Margin/Scroll/Content/SubmenuCenter/MenuPanel/Padding/Pages/Collection/PlaceholderPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_top = 24
+theme_override_constants/margin_bottom = 24
+
+[node name="ComingSoon" type="Label" parent="Margin/Scroll/Content/SubmenuCenter/MenuPanel/Padding/Pages/Collection/PlaceholderPanel/Padding"]
+unique_name_in_owner = true
 layout_mode = 2
 text = "Coming Soon"
 autowrap_mode = 2
-theme_override_font_sizes/font_size = 16
+theme_override_font_sizes/font_size = 22
+theme_override_colors/font_color = Color(0.6, 0.71, 0.77, 1)
 horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="Back" type="Button" parent="Margin/Scroll/Content/SubmenuCenter/MenuPanel/Padding/Pages/Collection"]
 layout_mode = 2

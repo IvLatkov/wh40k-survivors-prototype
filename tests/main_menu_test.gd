@@ -99,7 +99,21 @@ func run() -> void:
 	check(menu.get_node("%Duration").text == "Duration: 10 Minutes", "Dashboard shows ten-minute mission")
 	check(menu.get_node("%Boss").text == "Boss: Ork Warboss", "Dashboard shows the current boss")
 	check(menu.get_node("%BattlefieldPreview").texture != null, "Mission uses an existing terrain preview")
-	check(menu.get_node("%Summary").text == "Ultramarine\nBolter\nBattlefield Alpha\n10:00 Mission", "Deploy summary matches the selected character and mission")
+	check(menu.get_node("%Summary").text == "Ultramarine\nBolter\nBattlefield Alpha\n10:00 Mission\nNormal Difficulty", "Deploy summary shows the current character, weapon, mission, duration and difficulty")
+	# Future choices must flow through the existing shared display data, not a second set of labels.
+	var original_character: Dictionary = menu.selection_data.character.duplicate()
+	var original_mission: Dictionary = menu.selection_data.mission.duplicate()
+	menu.selection_data.character.name = "Preview Character"
+	menu.selection_data.character.starting_weapon = "Preview Weapon"
+	menu.selection_data.mission.name = "Preview Mission"
+	menu.selection_data.mission.duration_seconds = 725
+	menu.selection_data.mission.difficulty = "Preview"
+	menu._refresh_selection()
+	check(menu.get_node("%Summary").text == "Preview Character\nPreview Weapon\nPreview Mission\n12:05 Mission\nPreview Difficulty", "Summary refresh follows all five shared selection values")
+	check(menu.get_node("%CharacterName").text == "PREVIEW CHARACTER" and menu.get_node("%MissionName").text == "PREVIEW MISSION", "Summary and selection panels share their data source")
+	menu.selection_data.character = original_character
+	menu.selection_data.mission = original_mission
+	menu._refresh_selection()
 	check(menu.get_node("%Deploy").text == "DEPLOY" and menu.get_node("%Deploy").size.y > menu.get_node("%OpenSettings").size.y, "Deploy is the prominent primary action")
 	check(menu.find_children("Play", "Button", true, false).is_empty(), "Old primary Play button has been replaced")
 	if "--quit-button" in OS.get_cmdline_user_args():
@@ -201,7 +215,10 @@ func run() -> void:
 		check(card.get_node("%Rank").text == "0 / 5" and armory.get_node("%ArmoryCurrency").text == "Currency: 0", "Clicks cannot purchase, change ranks or spend currency")
 	check(menu.find_children("*", "Player", true, false).is_empty(), "Armory does not initialize gameplay")
 	await escape()
-	check(menu.pages[MainMenu.Page.COLLECTION].get_node("Description").text == "Coming Soon", "Collection is a placeholder with no new progression")
+	var collection: Control = menu.pages[MainMenu.Page.COLLECTION]
+	check(collection.get_node("Heading").text == "COLLECTION" and menu.get_node("%ComingSoon").text == "Coming Soon", "Collection has its heading and intentionally unavailable content")
+	check(collection.get_node("PlaceholderPanel") is PanelContainer, "Collection placeholder uses a styled panel")
+	check(collection.find_children("*", "Button", true, false).size() == 1, "Collection only exposes Back, with no unlock or tracking actions")
 	menu.show_page(MainMenu.Page.SETTINGS)
 	for bus: String in ["Master", "Music", "SFX"]:
 		var index := AudioServer.get_bus_index(bus)
@@ -234,6 +251,19 @@ func run() -> void:
 				check(not rect.intersects(previous.get_global_rect()), "Dashboard cards never overlap")
 			previous = card
 		check((menu.get_node("%GameTitle") as Control).get_global_rect().end.x <= window_size.x, "Title remains within the window")
+		var summary := menu.get_node("%Summary") as Label
+		var deploy := menu.get_node("%Deploy") as Button
+		check(menu.get_node("%DeployPanel").get_global_rect().encloses(summary.get_global_rect()), "Mission summary stays inside the Deploy panel")
+		check(summary.size.y >= summary.get_minimum_size().y, "All five summary lines remain readable when wrapped")
+		check(summary.get_global_rect().end.y <= deploy.get_global_rect().position.y, "Summary never overlaps DEPLOY")
+		check(deploy.get_theme_font_size("font_size") > summary.get_theme_font_size("font_size"), "DEPLOY retains the strongest type hierarchy")
+		await capture_page("_dashboard_%dx%d" % [window_size.x, window_size.y])
+		if window_size.x < 900:
+			(menu.get_node("%Scroll") as ScrollContainer).ensure_control_visible(menu.get_node("%DeployPanel"))
+			await process_frame
+			await process_frame
+			check(summary.get_global_rect().position.y >= 0 and deploy.get_global_rect().end.y <= window_size.y, "Stacked summary and DEPLOY can be viewed together by scrolling")
+			await capture_page("_loadout_%dx%d" % [window_size.x, window_size.y])
 		var currency := menu.get_node("%CurrencyDisplay") as Label
 		check(currency.size.x >= currency.get_minimum_size().x and currency.get_global_rect().end.x <= window_size.x and currency.size.y < 50.0, "Currency is readable and remains within the top bar")
 		if window_size == Vector2i(1152, 648):
@@ -272,6 +302,19 @@ func run() -> void:
 			check(armory.get_node("Back").get_global_rect().end.y <= window_size.y, "Desktop 2x2 armory and Back fit on screen")
 		await capture_page("_armory_%dx%d" % [window_size.x, window_size.y])
 		await click_button(armory.get_node("Back"))
+		check_page(menu, MainMenu.Page.MAIN)
+		await click_button(menu.get_node("%OpenCollection"))
+		check_page(menu, MainMenu.Page.COLLECTION)
+		var placeholder := collection.get_node("PlaceholderPanel") as PanelContainer
+		var coming_soon := menu.get_node("%ComingSoon") as Label
+		check(menu.panel.get_global_rect().position.x >= 0 and menu.panel.get_global_rect().end.x <= window_size.x, "Collection panel fits the window width")
+		check(placeholder.get_global_rect().encloses(coming_soon.get_global_rect()) and coming_soon.size.y >= coming_soon.get_minimum_size().y, "Coming Soon stays readable within its panel")
+		check(placeholder.get_global_rect().end.y <= collection.get_node("Back").get_global_rect().position.y, "Collection content never overlaps Back")
+		await capture_page("_collection_%dx%d" % [window_size.x, window_size.y])
+		await click_button(collection.get_node("Back"))
+		check_page(menu, MainMenu.Page.MAIN)
+		await click_button(menu.get_node("%OpenCollection"))
+		await escape()
 		check_page(menu, MainMenu.Page.MAIN)
 		menu.show_page(MainMenu.Page.MAIN)
 

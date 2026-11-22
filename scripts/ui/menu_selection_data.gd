@@ -49,6 +49,11 @@ func duration_text() -> String:
 	return "%d Minutes" % (int(mission.duration_seconds) / 60)
 
 
+func deploy_summary_text() -> String:
+	var seconds := int(mission.duration_seconds)
+	return "%s\n%s\n%s\n%02d:%02d Mission\n%s Difficulty" % [character.name, character.starting_weapon, mission.name, seconds / 60, seconds % 60, mission.difficulty]
+
+
 func boss_text() -> String:
 	var seconds := int(mission.duration_seconds)
 	return "%s — %d:%02d" % [mission.boss, seconds / 60, seconds % 60]
