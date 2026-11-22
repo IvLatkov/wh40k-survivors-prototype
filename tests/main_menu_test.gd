@@ -17,6 +17,7 @@ func check(condition: bool, message: String) -> void:
 
 
 func click_button(button: Button) -> void:
+	(current_scene.get_node("%Scroll") as ScrollContainer).ensure_control_visible(button)
 	await process_frame
 	await process_frame
 	var at := button.get_global_rect().get_center()
@@ -76,7 +77,19 @@ func run() -> void:
 	var menu_playback := music.get_stream_playback()
 	check_page(menu, MainMenu.Page.MAIN)
 	check(not paused, "Menu startup does not pause the tree")
-	check((menu.panel.get_node("Padding/Content/Title") as Label).text == "WH40K SURVIVOR", "Menu displays the game title")
+	check((menu.get_node("%GameTitle") as Label).text == "WH40K SURVIVOR", "Menu displays the game title")
+	check(menu.get_node("%CurrencyDisplay").text == "Currency: 0", "Currency is a display-only zero placeholder")
+	check(menu.get_node("%CharacterName").text == "ULTRAMARINE", "Dashboard shows selected Ultramarine")
+	check(menu.get_node("%StartingWeapon").text == "Starting Weapon: Bolter", "Dashboard shows starting Bolter")
+	check(menu.get_node("%Chapter").text == "Chapter: Ultramarines", "Dashboard shows the Chapter")
+	check(menu.get_node("%Portrait").texture.resource_path.contains("Ultramarine_bolter_right_still"), "Portrait reuses the existing player art without instantiating gameplay")
+	check(menu.get_node("%MissionName").text == "BATTLEFIELD", "Dashboard shows Battlefield")
+	check(menu.get_node("%Duration").text == "Duration: 10 Minutes", "Dashboard shows ten-minute mission")
+	check(menu.get_node("%Boss").text == "Boss: Ork Warboss", "Dashboard shows the current boss")
+	check(menu.get_node("%BattlefieldPreview").texture != null, "Mission uses an existing terrain preview")
+	check(menu.get_node("%Summary").text == "Ultramarine\nBolter\nBattlefield\n10:00 Mission", "Deploy summary matches the selected character and mission")
+	check(menu.get_node("%Deploy").text == "DEPLOY" and menu.get_node("%Deploy").size.y > menu.get_node("%OpenSettings").size.y, "Deploy is the prominent primary action")
+	check(menu.find_children("Play", "Button", true, false).is_empty(), "Old primary Play button has been replaced")
 	if "--quit-button" in OS.get_cmdline_user_args():
 		print("Checking desktop Quit through mouse input...")
 		await click_button(menu.get_node("%Quit") as Button)
@@ -91,8 +104,8 @@ func run() -> void:
 			capture_path = OS.get_environment("TEMP").path_join("wh40k_main_menu.png")
 		check(root.get_texture().get_image().save_png(capture_path) == OK, "Rendered menu preview saves successfully")
 		print("Menu preview: ", capture_path)
-	var buttons: Array[String] = ["CharacterSelect", "MapSelect", "OpenUpgrades", "OpenSettings"]
-	var pages: Array[MainMenu.Page] = [MainMenu.Page.CHARACTER, MainMenu.Page.MAP, MainMenu.Page.UPGRADES, MainMenu.Page.SETTINGS]
+	var buttons: Array[String] = ["CharacterSelect", "MapSelect", "OpenUpgrades", "OpenCollection", "OpenSettings"]
+	var pages: Array[MainMenu.Page] = [MainMenu.Page.CHARACTER, MainMenu.Page.MAP, MainMenu.Page.UPGRADES, MainMenu.Page.COLLECTION, MainMenu.Page.SETTINGS]
 	for index in buttons.size():
 		await click_button(menu.get_node("%" + buttons[index]) as Button)
 		check_page(menu, pages[index])
@@ -107,6 +120,7 @@ func run() -> void:
 	check(menu.pages[MainMenu.Page.CHARACTER].get_node("Description").text == "Ultramarine", "Current character is shown")
 	check(menu.pages[MainMenu.Page.MAP].get_node("Description").text == "Current Battlefield", "Current battlefield is shown")
 	check(menu.pages[MainMenu.Page.UPGRADES].get_node("Description").text == "Coming soon", "Permanent upgrades remain a placeholder")
+	check(menu.pages[MainMenu.Page.COLLECTION].get_node("Description").text == "Coming Soon", "Collection is a placeholder with no new progression")
 	menu.show_page(MainMenu.Page.SETTINGS)
 	for bus: String in ["Master", "Music", "SFX"]:
 		var index := AudioServer.get_bus_index(bus)
@@ -123,19 +137,43 @@ func run() -> void:
 	# The same runtime AudioServer survives the scene transition without an autoload.
 	(menu.pages[MainMenu.Page.SETTINGS].get_node("Music/Slider") as HSlider).value = 63.0
 	menu.show_page(MainMenu.Page.MAIN)
+	for window_size: Vector2i in [Vector2i(1152, 648), Vector2i(1600, 900), Vector2i(960, 540), Vector2i(800, 600), Vector2i(360, 480)]:
+		root.size = window_size
+		await process_frame
+		await process_frame
+		await process_frame
+		var grid := menu.get_node("%MainContent") as GridContainer
+		check(grid.columns == (1 if window_size.x < 900 else 3), "Dashboard columns adapt to window width")
+		var previous: Control
+		for panel_name: String in ["CharacterPanel", "DeployPanel", "MissionPanel"]:
+			var card := menu.get_node("%" + panel_name) as Control
+			var rect := card.get_global_rect()
+			check(rect.position.x >= 0.0 and rect.end.x <= window_size.x, "Dashboard card stays inside window horizontally")
+			if previous != null:
+				check(not rect.intersects(previous.get_global_rect()), "Dashboard cards never overlap")
+			previous = card
+		check((menu.get_node("%GameTitle") as Control).get_global_rect().end.x <= window_size.x, "Title remains within the window")
+		var currency := menu.get_node("%CurrencyDisplay") as Label
+		check(currency.size.x >= currency.get_minimum_size().x and currency.get_global_rect().end.x <= window_size.x and currency.size.y < 50.0, "Currency is readable and remains within the top bar")
+		if window_size == Vector2i(1152, 648):
+			check(menu.get_node("%Quit").get_global_rect().end.y <= window_size.y, "Bottom navigation is immediately visible at the project resolution")
+			var scrollbar := (menu.get_node("%Scroll") as ScrollContainer).get_v_scroll_bar()
+			check(scrollbar.max_value <= scrollbar.page, "Full dashboard fits without scrolling at project resolution")
+
 	root.size = Vector2i(360, 480)
 	await process_frame
 	await process_frame
-	check(menu.panel.get_global_rect().position.x >= 0.0 and menu.panel.get_global_rect().end.x <= 360.0, "Menu fits a narrow window without horizontal clipping")
-	await click_button(menu.get_node("%CharacterSelect") as Button)
-	check_page(menu, MainMenu.Page.CHARACTER)
-	await click_button(menu.pages[MainMenu.Page.CHARACTER].get_node("Back") as Button)
+	check((menu.get_node("%MainContent") as Control).get_global_rect().end.x <= 360.0, "Dashboard fits a narrow window without horizontal clipping")
+	await click_button(menu.get_node("%OpenCollection") as Button)
+	check_page(menu, MainMenu.Page.COLLECTION)
+	check(menu.panel.get_global_rect().position.x >= 0.0 and menu.panel.get_global_rect().end.x <= 360.0, "Submenu fits a narrow window")
+	await click_button(menu.pages[MainMenu.Page.COLLECTION].get_node("Back") as Button)
 	check_page(menu, MainMenu.Page.MAIN)
 	root.size = Vector2i(1152, 648)
 	await process_frame
 	await process_frame
 	check(music.playing and music.get_stream_playback() == menu_playback, "Navigation and settings keep the same menu playback")
-	await click_button(menu.get_node("%Play") as Button)
+	await click_button(menu.get_node("%Deploy") as Button)
 	await process_frame
 	await process_frame
 	check(not is_instance_valid(menu), "Play frees the menu instead of retaining it behind gameplay")

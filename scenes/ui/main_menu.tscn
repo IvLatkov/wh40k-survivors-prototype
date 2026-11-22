@@ -1,39 +1,49 @@
-[gd_scene load_steps=9 format=3]
+[gd_scene load_steps=13 format=3]
 
 [ext_resource type="Script" path="res://scripts/ui/main_menu.gd" id="1_menu"]
 [ext_resource type="AudioStream" path="res://assets/audio/Background/Background foley.wav" id="2_music"]
+[ext_resource type="Texture2D" path="res://assets/art/effects/player/ultramarine/Ultramarine_bolter_right_still.png_0001.png" id="3_portrait"]
+[ext_resource type="Texture2D" path="res://assets/art/effects/terrain/buildings/imperial_ruin_3.1.png" id="4_battlefield"]
 
 [sub_resource type="StyleBoxFlat" id="PanelStyle"]
-bg_color = Color(0.025, 0.032, 0.04, 1)
+bg_color = Color(0.045, 0.056, 0.067, 0.96)
 border_width_left = 1
 border_width_top = 1
 border_width_right = 1
 border_width_bottom = 1
-border_color = Color(0.48, 0.46, 0.36, 1)
+border_color = Color(0.19, 0.24, 0.28, 1)
+
+[sub_resource type="StyleBoxFlat" id="DeployPanelStyle"]
+bg_color = Color(0.055, 0.075, 0.09, 0.98)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.3, 0.4, 0.46, 1)
 
 [sub_resource type="StyleBoxFlat" id="ButtonNormal"]
-bg_color = Color(0.065, 0.075, 0.085, 1)
+bg_color = Color(0.07, 0.09, 0.105, 1)
 border_width_left = 1
 border_width_top = 1
 border_width_right = 1
 border_width_bottom = 1
-border_color = Color(0.26, 0.28, 0.29, 1)
+border_color = Color(0.26, 0.32, 0.36, 1)
 
 [sub_resource type="StyleBoxFlat" id="ButtonHover"]
-bg_color = Color(0.12, 0.13, 0.14, 1)
+bg_color = Color(0.12, 0.17, 0.2, 1)
 border_width_left = 1
 border_width_top = 1
 border_width_right = 1
 border_width_bottom = 1
-border_color = Color(0.65, 0.59, 0.42, 1)
+border_color = Color(0.48, 0.62, 0.7, 1)
 
 [sub_resource type="StyleBoxFlat" id="ButtonPressed"]
-bg_color = Color(0.16, 0.15, 0.11, 1)
+bg_color = Color(0.17, 0.23, 0.27, 1)
 border_width_left = 1
 border_width_top = 1
 border_width_right = 1
 border_width_bottom = 1
-border_color = Color(0.78, 0.69, 0.44, 1)
+border_color = Color(0.57, 0.7, 0.78, 1)
 
 [sub_resource type="StyleBoxFlat" id="ButtonFocus"]
 bg_color = Color(0, 0, 0, 0)
@@ -41,14 +51,22 @@ border_width_left = 2
 border_width_top = 2
 border_width_right = 2
 border_width_bottom = 2
-border_color = Color(0.78, 0.69, 0.44, 1)
+border_color = Color(0.57, 0.7, 0.78, 1)
+
+[sub_resource type="StyleBoxFlat" id="DeployButtonStyle"]
+bg_color = Color(0.18, 0.28, 0.34, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.5, 0.65, 0.73, 1)
 
 [sub_resource type="Theme" id="MenuTheme"]
-default_font_size = 17
-Label/colors/font_color = Color(0.88, 0.9, 0.91, 1)
-Button/colors/font_color = Color(0.9, 0.9, 0.87, 1)
-Button/colors/font_hover_color = Color(1, 0.96, 0.82, 1)
-Button/colors/font_focus_color = Color(1, 0.96, 0.82, 1)
+default_font_size = 16
+Label/colors/font_color = Color(0.83, 0.87, 0.89, 1)
+Button/colors/font_color = Color(0.83, 0.88, 0.91, 1)
+Button/colors/font_hover_color = Color(0.96, 0.98, 1, 1)
+Button/colors/font_focus_color = Color(0.96, 0.98, 1, 1)
 Button/styles/normal = SubResource("ButtonNormal")
 Button/styles/hover = SubResource("ButtonHover")
 Button/styles/pressed = SubResource("ButtonPressed")
@@ -78,287 +96,576 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-color = Color(0.009, 0.013, 0.018, 1)
+color = Color(0.014, 0.02, 0.026, 1)
 
 [node name="Margin" type="MarginContainer" parent="."]
+unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/margin_left = 24
+theme_override_constants/margin_left = 28
 theme_override_constants/margin_top = 24
-theme_override_constants/margin_right = 24
-theme_override_constants/margin_bottom = 24
+theme_override_constants/margin_right = 28
+theme_override_constants/margin_bottom = 20
 
 [node name="Scroll" type="ScrollContainer" parent="Margin"]
+unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 horizontal_scroll_mode = 0
+follow_focus = true
 
-[node name="Center" type="CenterContainer" parent="Margin/Scroll"]
+[node name="Content" type="VBoxContainer" parent="Margin/Scroll"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
+theme_override_constants/separation = 16
 
-[node name="MenuPanel" type="PanelContainer" parent="Margin/Scroll/Center"]
+[node name="TopBar" type="GridContainer" parent="Margin/Scroll/Content"]
+unique_name_in_owner = true
+layout_mode = 2
+columns = 2
+theme_override_constants/h_separation = 20
+
+[node name="GameTitle" type="Label" parent="Margin/Scroll/Content/TopBar"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "WH40K SURVIVOR"
+autowrap_mode = 2
+theme_override_font_sizes/font_size = 30
+theme_override_colors/font_color = Color(0.84, 0.89, 0.92, 1)
+
+[node name="CurrencyDisplay" type="Label" parent="Margin/Scroll/Content/TopBar"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Currency: 0"
+horizontal_alignment = 2
+theme_override_font_sizes/font_size = 16
+theme_override_colors/font_color = Color(0.58, 0.68, 0.74, 1)
+
+[node name="TopRule" type="HSeparator" parent="Margin/Scroll/Content"]
+layout_mode = 2
+
+[node name="Main" type="VBoxContainer" parent="Margin/Scroll/Content"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 12
+
+[node name="Heading" type="Label" parent="Margin/Scroll/Content/Main"]
+layout_mode = 2
+text = "MISSION PREPARATION  /  COMMAND TERMINAL"
+autowrap_mode = 2
+theme_override_font_sizes/font_size = 13
+theme_override_colors/font_color = Color(0.47, 0.59, 0.66, 1)
+
+[node name="MainContent" type="GridContainer" parent="Margin/Scroll/Content/Main"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+columns = 3
+theme_override_constants/h_separation = 18
+theme_override_constants/v_separation = 18
+
+[node name="CharacterPanel" type="PanelContainer" parent="Margin/Scroll/Content/Main/MainContent"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("PanelStyle")
+
+[node name="Padding" type="MarginContainer" parent="Margin/Scroll/Content/Main/MainContent/CharacterPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_top = 18
+theme_override_constants/margin_bottom = 18
+
+[node name="Content" type="VBoxContainer" parent="Margin/Scroll/Content/Main/MainContent/CharacterPanel/Padding"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Heading" type="Label" parent="Margin/Scroll/Content/Main/MainContent/CharacterPanel/Padding/Content"]
+layout_mode = 2
+text = "01  /  CHARACTER"
+autowrap_mode = 2
+theme_override_font_sizes/font_size = 13
+theme_override_colors/font_color = Color(0.5, 0.64, 0.73, 1)
+
+[node name="Rule" type="HSeparator" parent="Margin/Scroll/Content/Main/MainContent/CharacterPanel/Padding/Content"]
+layout_mode = 2
+
+[node name="Portrait" type="TextureRect" parent="Margin/Scroll/Content/Main/MainContent/CharacterPanel/Padding/Content"]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(0, 140)
+texture = ExtResource("3_portrait")
+texture_filter = 1
+expand_mode = 1
+stretch_mode = 5
+
+[node name="CharacterName" type="Label" parent="Margin/Scroll/Content/Main/MainContent/CharacterPanel/Padding/Content"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "ULTRAMARINE"
+autowrap_mode = 2
+theme_override_font_sizes/font_size = 22
+
+[node name="Chapter" type="Label" parent="Margin/Scroll/Content/Main/MainContent/CharacterPanel/Padding/Content"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Chapter: Ultramarines"
+autowrap_mode = 2
+theme_override_font_sizes/font_size = 14
+theme_override_colors/font_color = Color(0.54, 0.63, 0.69, 1)
+
+[node name="StartingWeapon" type="Label" parent="Margin/Scroll/Content/Main/MainContent/CharacterPanel/Padding/Content"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Starting Weapon: Bolter"
+autowrap_mode = 2
+theme_override_font_sizes/font_size = 16
+
+[node name="Space" type="Control" parent="Margin/Scroll/Content/Main/MainContent/CharacterPanel/Padding/Content"]
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 2
+
+[node name="CharacterSelect" type="Button" parent="Margin/Scroll/Content/Main/MainContent/CharacterPanel/Padding/Content"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+custom_minimum_size = Vector2(0, 32)
+text = "VIEW DOSSIER"
+theme_override_font_sizes/font_size = 12
+
+[node name="DeployPanel" type="PanelContainer" parent="Margin/Scroll/Content/Main/MainContent"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("DeployPanelStyle")
+
+[node name="Padding" type="MarginContainer" parent="Margin/Scroll/Content/Main/MainContent/DeployPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_top = 18
+theme_override_constants/margin_bottom = 18
+
+[node name="Content" type="VBoxContainer" parent="Margin/Scroll/Content/Main/MainContent/DeployPanel/Padding"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Heading" type="Label" parent="Margin/Scroll/Content/Main/MainContent/DeployPanel/Padding/Content"]
+layout_mode = 2
+text = "02  /  DEPLOY"
+autowrap_mode = 2
+theme_override_font_sizes/font_size = 13
+theme_override_colors/font_color = Color(0.5, 0.64, 0.73, 1)
+
+[node name="Rule" type="HSeparator" parent="Margin/Scroll/Content/Main/MainContent/DeployPanel/Padding/Content"]
+layout_mode = 2
+
+[node name="Space" type="Control" parent="Margin/Scroll/Content/Main/MainContent/DeployPanel/Padding/Content"]
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 2
+
+[node name="Status" type="Label" parent="Margin/Scroll/Content/Main/MainContent/DeployPanel/Padding/Content"]
+layout_mode = 2
+text = "AWAITING DEPLOYMENT"
+autowrap_mode = 2
+theme_override_font_sizes/font_size = 12
+theme_override_colors/font_color = Color(0.6, 0.71, 0.77, 1)
+horizontal_alignment = 1
+
+[node name="Summary" type="Label" parent="Margin/Scroll/Content/Main/MainContent/DeployPanel/Padding/Content"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Ultramarine\nBolter\nBattlefield\n10:00 Mission"
+autowrap_mode = 2
+theme_override_font_sizes/font_size = 20
+horizontal_alignment = 1
+
+[node name="Deploy" type="Button" parent="Margin/Scroll/Content/Main/MainContent/DeployPanel/Padding/Content"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+custom_minimum_size = Vector2(0, 68)
+text = "DEPLOY"
+theme_override_font_sizes/font_size = 25
+theme_override_styles/normal = SubResource("DeployButtonStyle")
+
+[node name="Directive" type="Label" parent="Margin/Scroll/Content/Main/MainContent/DeployPanel/Padding/Content"]
+layout_mode = 2
+text = "SURVIVE. ADAPT. ELIMINATE."
+autowrap_mode = 2
+theme_override_font_sizes/font_size = 11
+theme_override_colors/font_color = Color(0.5, 0.61, 0.67, 1)
+horizontal_alignment = 1
+
+[node name="BottomSpace" type="Control" parent="Margin/Scroll/Content/Main/MainContent/DeployPanel/Padding/Content"]
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 2
+
+[node name="PlayError" type="Label" parent="Margin/Scroll/Content/Main/MainContent/DeployPanel/Padding/Content"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+text = "Unable to start the game. Please try again."
+autowrap_mode = 2
+theme_override_font_sizes/font_size = 14
+theme_override_colors/font_color = Color(0.8, 0.38, 0.36, 1)
+horizontal_alignment = 1
+
+[node name="MissionPanel" type="PanelContainer" parent="Margin/Scroll/Content/Main/MainContent"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("PanelStyle")
+
+[node name="Padding" type="MarginContainer" parent="Margin/Scroll/Content/Main/MainContent/MissionPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_top = 18
+theme_override_constants/margin_bottom = 18
+
+[node name="Content" type="VBoxContainer" parent="Margin/Scroll/Content/Main/MainContent/MissionPanel/Padding"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Heading" type="Label" parent="Margin/Scroll/Content/Main/MainContent/MissionPanel/Padding/Content"]
+layout_mode = 2
+text = "03  /  MISSION"
+autowrap_mode = 2
+theme_override_font_sizes/font_size = 13
+theme_override_colors/font_color = Color(0.5, 0.64, 0.73, 1)
+
+[node name="Rule" type="HSeparator" parent="Margin/Scroll/Content/Main/MainContent/MissionPanel/Padding/Content"]
+layout_mode = 2
+
+[node name="BattlefieldPreview" type="TextureRect" parent="Margin/Scroll/Content/Main/MainContent/MissionPanel/Padding/Content"]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(0, 122)
+texture = ExtResource("4_battlefield")
+texture_filter = 1
+expand_mode = 1
+stretch_mode = 5
+
+[node name="MissionName" type="Label" parent="Margin/Scroll/Content/Main/MainContent/MissionPanel/Padding/Content"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "BATTLEFIELD"
+autowrap_mode = 2
+theme_override_font_sizes/font_size = 22
+
+[node name="CurrentMap" type="Label" parent="Margin/Scroll/Content/Main/MainContent/MissionPanel/Padding/Content"]
+layout_mode = 2
+text = "Current Map"
+autowrap_mode = 2
+theme_override_font_sizes/font_size = 14
+theme_override_colors/font_color = Color(0.54, 0.63, 0.69, 1)
+
+[node name="Duration" type="Label" parent="Margin/Scroll/Content/Main/MainContent/MissionPanel/Padding/Content"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Duration: 10 Minutes"
+autowrap_mode = 2
+theme_override_font_sizes/font_size = 16
+
+[node name="Boss" type="Label" parent="Margin/Scroll/Content/Main/MainContent/MissionPanel/Padding/Content"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Boss: Ork Warboss"
+autowrap_mode = 2
+theme_override_font_sizes/font_size = 16
+theme_override_colors/font_color = Color(0.78, 0.47, 0.44, 1)
+
+[node name="Space" type="Control" parent="Margin/Scroll/Content/Main/MainContent/MissionPanel/Padding/Content"]
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 2
+
+[node name="MapSelect" type="Button" parent="Margin/Scroll/Content/Main/MainContent/MissionPanel/Padding/Content"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+custom_minimum_size = Vector2(0, 32)
+text = "MISSION BRIEF"
+theme_override_font_sizes/font_size = 12
+
+[node name="BottomRule" type="HSeparator" parent="Margin/Scroll/Content/Main"]
+layout_mode = 2
+
+[node name="BottomNavigation" type="GridContainer" parent="Margin/Scroll/Content/Main"]
+unique_name_in_owner = true
+layout_mode = 2
+columns = 4
+theme_override_constants/h_separation = 12
+theme_override_constants/v_separation = 10
+
+[node name="OpenUpgrades" type="Button" parent="Margin/Scroll/Content/Main/BottomNavigation"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+custom_minimum_size = Vector2(0, 42)
+text = "UPGRADES"
+
+[node name="OpenCollection" type="Button" parent="Margin/Scroll/Content/Main/BottomNavigation"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+custom_minimum_size = Vector2(0, 42)
+text = "COLLECTION"
+
+[node name="OpenSettings" type="Button" parent="Margin/Scroll/Content/Main/BottomNavigation"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+custom_minimum_size = Vector2(0, 42)
+text = "SETTINGS"
+
+[node name="Quit" type="Button" parent="Margin/Scroll/Content/Main/BottomNavigation"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+custom_minimum_size = Vector2(0, 42)
+text = "QUIT"
+
+[node name="Footer" type="Label" parent="Margin/Scroll/Content/Main"]
+layout_mode = 2
+text = "FOR THE EMPEROR"
+autowrap_mode = 2
+theme_override_font_sizes/font_size = 11
+theme_override_colors/font_color = Color(0.36, 0.45, 0.51, 1)
+horizontal_alignment = 1
+
+[node name="SubmenuCenter" type="CenterContainer" parent="Margin/Scroll/Content"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="MenuPanel" type="PanelContainer" parent="Margin/Scroll/Content/SubmenuCenter"]
 unique_name_in_owner = true
 layout_mode = 2
 custom_minimum_size = Vector2(460, 0)
 theme_override_styles/panel = SubResource("PanelStyle")
 
-[node name="Padding" type="MarginContainer" parent="Margin/Scroll/Center/MenuPanel"]
+[node name="Padding" type="MarginContainer" parent="Margin/Scroll/Content/SubmenuCenter/MenuPanel"]
 layout_mode = 2
 theme_override_constants/margin_left = 24
 theme_override_constants/margin_right = 24
 theme_override_constants/margin_top = 24
 theme_override_constants/margin_bottom = 24
 
-[node name="Content" type="VBoxContainer" parent="Margin/Scroll/Center/MenuPanel/Padding"]
-layout_mode = 2
-theme_override_constants/separation = 16
-
-[node name="Title" type="Label" parent="Margin/Scroll/Center/MenuPanel/Padding/Content"]
-layout_mode = 2
-text = "WH40K SURVIVOR"
-horizontal_alignment = 1
-autowrap_mode = 2
-theme_override_font_sizes/font_size = 29
-theme_override_colors/font_color = Color(0.78, 0.69, 0.44, 1)
-
-[node name="Subtitle" type="Label" parent="Margin/Scroll/Center/MenuPanel/Padding/Content"]
-layout_mode = 2
-text = "FOR THE EMPEROR"
-horizontal_alignment = 1
-theme_override_font_sizes/font_size = 13
-theme_override_colors/font_color = Color(0.52, 0.55, 0.57, 1)
-
-[node name="Divider" type="HSeparator" parent="Margin/Scroll/Center/MenuPanel/Padding/Content"]
+[node name="Pages" type="VBoxContainer" parent="Margin/Scroll/Content/SubmenuCenter/MenuPanel/Padding"]
 layout_mode = 2
 
-[node name="Main" type="VBoxContainer" parent="Margin/Scroll/Center/MenuPanel/Padding/Content"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_constants/separation = 8
-
-[node name="Play" type="Button" parent="Margin/Scroll/Center/MenuPanel/Padding/Content/Main"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 42)
-layout_mode = 2
-text = "Play"
-
-[node name="CharacterSelect" type="Button" parent="Margin/Scroll/Center/MenuPanel/Padding/Content/Main"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 42)
-layout_mode = 2
-text = "Character Select"
-
-[node name="MapSelect" type="Button" parent="Margin/Scroll/Center/MenuPanel/Padding/Content/Main"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 42)
-layout_mode = 2
-text = "Map Select"
-
-[node name="OpenUpgrades" type="Button" parent="Margin/Scroll/Center/MenuPanel/Padding/Content/Main"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 42)
-layout_mode = 2
-text = "Upgrades"
-
-[node name="OpenSettings" type="Button" parent="Margin/Scroll/Center/MenuPanel/Padding/Content/Main"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 42)
-layout_mode = 2
-text = "Settings"
-
-[node name="Quit" type="Button" parent="Margin/Scroll/Center/MenuPanel/Padding/Content/Main"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 42)
-layout_mode = 2
-text = "Quit"
-
-[node name="PlayError" type="Label" parent="Margin/Scroll/Center/MenuPanel/Padding/Content/Main"]
-layout_mode = 2
-text = "Unable to start the game. Please try again."
-horizontal_alignment = 1
-unique_name_in_owner = true
-visible = false
-autowrap_mode = 2
-theme_override_colors/font_color = Color(0.9, 0.4, 0.4, 1)
-
-[node name="Character" type="VBoxContainer" parent="Margin/Scroll/Center/MenuPanel/Padding/Content"]
+[node name="Character" type="VBoxContainer" parent="Margin/Scroll/Content/SubmenuCenter/MenuPanel/Padding/Pages"]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
 theme_override_constants/separation = 20
 
-[node name="Heading" type="Label" parent="Margin/Scroll/Center/MenuPanel/Padding/Content/Character"]
+[node name="Heading" type="Label" parent="Margin/Scroll/Content/SubmenuCenter/MenuPanel/Padding/Pages/Character"]
 layout_mode = 2
 text = "CHARACTER SELECT"
 horizontal_alignment = 1
 theme_override_font_sizes/font_size = 21
 
-[node name="Description" type="Label" parent="Margin/Scroll/Center/MenuPanel/Padding/Content/Character"]
+[node name="Description" type="Label" parent="Margin/Scroll/Content/SubmenuCenter/MenuPanel/Padding/Pages/Character"]
 layout_mode = 2
 text = "Ultramarine"
 horizontal_alignment = 1
 
-
-[node name="Selected" type="Label" parent="Margin/Scroll/Center/MenuPanel/Padding/Content/Character"]
+[node name="Selected" type="Label" parent="Margin/Scroll/Content/SubmenuCenter/MenuPanel/Padding/Pages/Character"]
 layout_mode = 2
 text = "Selected"
 horizontal_alignment = 1
-theme_override_colors/font_color = Color(0.78, 0.69, 0.44, 1)
+theme_override_colors/font_color = Color(0.58, 0.71, 0.79, 1)
 
-[node name="Back" type="Button" parent="Margin/Scroll/Center/MenuPanel/Padding/Content/Character"]
+[node name="Back" type="Button" parent="Margin/Scroll/Content/SubmenuCenter/MenuPanel/Padding/Pages/Character"]
 custom_minimum_size = Vector2(0, 42)
 layout_mode = 2
 text = "Back"
 
-[node name="Map" type="VBoxContainer" parent="Margin/Scroll/Center/MenuPanel/Padding/Content"]
+[node name="Map" type="VBoxContainer" parent="Margin/Scroll/Content/SubmenuCenter/MenuPanel/Padding/Pages"]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
 theme_override_constants/separation = 20
 
-[node name="Heading" type="Label" parent="Margin/Scroll/Center/MenuPanel/Padding/Content/Map"]
+[node name="Heading" type="Label" parent="Margin/Scroll/Content/SubmenuCenter/MenuPanel/Padding/Pages/Map"]
 layout_mode = 2
 text = "MAP SELECT"
 horizontal_alignment = 1
 theme_override_font_sizes/font_size = 21
 
-[node name="Description" type="Label" parent="Margin/Scroll/Center/MenuPanel/Padding/Content/Map"]
+[node name="Description" type="Label" parent="Margin/Scroll/Content/SubmenuCenter/MenuPanel/Padding/Pages/Map"]
 layout_mode = 2
 text = "Current Battlefield"
 horizontal_alignment = 1
 
-
-[node name="Selected" type="Label" parent="Margin/Scroll/Center/MenuPanel/Padding/Content/Map"]
+[node name="Selected" type="Label" parent="Margin/Scroll/Content/SubmenuCenter/MenuPanel/Padding/Pages/Map"]
 layout_mode = 2
 text = "Selected"
 horizontal_alignment = 1
-theme_override_colors/font_color = Color(0.78, 0.69, 0.44, 1)
+theme_override_colors/font_color = Color(0.58, 0.71, 0.79, 1)
 
-[node name="Back" type="Button" parent="Margin/Scroll/Center/MenuPanel/Padding/Content/Map"]
+[node name="Back" type="Button" parent="Margin/Scroll/Content/SubmenuCenter/MenuPanel/Padding/Pages/Map"]
 custom_minimum_size = Vector2(0, 42)
 layout_mode = 2
 text = "Back"
 
-[node name="Upgrades" type="VBoxContainer" parent="Margin/Scroll/Center/MenuPanel/Padding/Content"]
+[node name="Upgrades" type="VBoxContainer" parent="Margin/Scroll/Content/SubmenuCenter/MenuPanel/Padding/Pages"]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
 theme_override_constants/separation = 20
 
-[node name="Heading" type="Label" parent="Margin/Scroll/Center/MenuPanel/Padding/Content/Upgrades"]
+[node name="Heading" type="Label" parent="Margin/Scroll/Content/SubmenuCenter/MenuPanel/Padding/Pages/Upgrades"]
 layout_mode = 2
 text = "UPGRADES"
 horizontal_alignment = 1
 theme_override_font_sizes/font_size = 21
 
-[node name="Description" type="Label" parent="Margin/Scroll/Center/MenuPanel/Padding/Content/Upgrades"]
+[node name="Description" type="Label" parent="Margin/Scroll/Content/SubmenuCenter/MenuPanel/Padding/Pages/Upgrades"]
 layout_mode = 2
 text = "Coming soon"
 horizontal_alignment = 1
 
-
-[node name="Back" type="Button" parent="Margin/Scroll/Center/MenuPanel/Padding/Content/Upgrades"]
+[node name="Back" type="Button" parent="Margin/Scroll/Content/SubmenuCenter/MenuPanel/Padding/Pages/Upgrades"]
 custom_minimum_size = Vector2(0, 42)
 layout_mode = 2
 text = "Back"
 
-[node name="Settings" type="VBoxContainer" parent="Margin/Scroll/Center/MenuPanel/Padding/Content"]
+[node name="Settings" type="VBoxContainer" parent="Margin/Scroll/Content/SubmenuCenter/MenuPanel/Padding/Pages"]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
 theme_override_constants/separation = 20
 
-[node name="Heading" type="Label" parent="Margin/Scroll/Center/MenuPanel/Padding/Content/Settings"]
+[node name="Heading" type="Label" parent="Margin/Scroll/Content/SubmenuCenter/MenuPanel/Padding/Pages/Settings"]
 layout_mode = 2
 text = "SETTINGS"
 horizontal_alignment = 1
 theme_override_font_sizes/font_size = 21
 
-[node name="Master" type="VBoxContainer" parent="Margin/Scroll/Center/MenuPanel/Padding/Content/Settings"]
+[node name="Master" type="VBoxContainer" parent="Margin/Scroll/Content/SubmenuCenter/MenuPanel/Padding/Pages/Settings"]
 layout_mode = 2
 theme_override_constants/separation = 6
 
-[node name="Header" type="HBoxContainer" parent="Margin/Scroll/Center/MenuPanel/Padding/Content/Settings/Master"]
+[node name="Header" type="HBoxContainer" parent="Margin/Scroll/Content/SubmenuCenter/MenuPanel/Padding/Pages/Settings/Master"]
 layout_mode = 2
 
-[node name="Name" type="Label" parent="Margin/Scroll/Center/MenuPanel/Padding/Content/Settings/Master/Header"]
+[node name="Name" type="Label" parent="Margin/Scroll/Content/SubmenuCenter/MenuPanel/Padding/Pages/Settings/Master/Header"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Master Volume"
 
-[node name="Value" type="Label" parent="Margin/Scroll/Center/MenuPanel/Padding/Content/Settings/Master/Header"]
+[node name="Value" type="Label" parent="Margin/Scroll/Content/SubmenuCenter/MenuPanel/Padding/Pages/Settings/Master/Header"]
 layout_mode = 2
 text = "100%"
 
-[node name="Slider" type="HSlider" parent="Margin/Scroll/Center/MenuPanel/Padding/Content/Settings/Master"]
+[node name="Slider" type="HSlider" parent="Margin/Scroll/Content/SubmenuCenter/MenuPanel/Padding/Pages/Settings/Master"]
 custom_minimum_size = Vector2(0, 28)
 layout_mode = 2
 max_value = 100.0
 step = 1.0
 value = 100.0
 
-[node name="Music" type="VBoxContainer" parent="Margin/Scroll/Center/MenuPanel/Padding/Content/Settings"]
+[node name="Music" type="VBoxContainer" parent="Margin/Scroll/Content/SubmenuCenter/MenuPanel/Padding/Pages/Settings"]
 layout_mode = 2
 theme_override_constants/separation = 6
 
-[node name="Header" type="HBoxContainer" parent="Margin/Scroll/Center/MenuPanel/Padding/Content/Settings/Music"]
+[node name="Header" type="HBoxContainer" parent="Margin/Scroll/Content/SubmenuCenter/MenuPanel/Padding/Pages/Settings/Music"]
 layout_mode = 2
 
-[node name="Name" type="Label" parent="Margin/Scroll/Center/MenuPanel/Padding/Content/Settings/Music/Header"]
+[node name="Name" type="Label" parent="Margin/Scroll/Content/SubmenuCenter/MenuPanel/Padding/Pages/Settings/Music/Header"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Music Volume"
 
-[node name="Value" type="Label" parent="Margin/Scroll/Center/MenuPanel/Padding/Content/Settings/Music/Header"]
+[node name="Value" type="Label" parent="Margin/Scroll/Content/SubmenuCenter/MenuPanel/Padding/Pages/Settings/Music/Header"]
 layout_mode = 2
 text = "100%"
 
-[node name="Slider" type="HSlider" parent="Margin/Scroll/Center/MenuPanel/Padding/Content/Settings/Music"]
+[node name="Slider" type="HSlider" parent="Margin/Scroll/Content/SubmenuCenter/MenuPanel/Padding/Pages/Settings/Music"]
 custom_minimum_size = Vector2(0, 28)
 layout_mode = 2
 max_value = 100.0
 step = 1.0
 value = 100.0
 
-[node name="SFX" type="VBoxContainer" parent="Margin/Scroll/Center/MenuPanel/Padding/Content/Settings"]
+[node name="SFX" type="VBoxContainer" parent="Margin/Scroll/Content/SubmenuCenter/MenuPanel/Padding/Pages/Settings"]
 layout_mode = 2
 theme_override_constants/separation = 6
 
-[node name="Header" type="HBoxContainer" parent="Margin/Scroll/Center/MenuPanel/Padding/Content/Settings/SFX"]
+[node name="Header" type="HBoxContainer" parent="Margin/Scroll/Content/SubmenuCenter/MenuPanel/Padding/Pages/Settings/SFX"]
 layout_mode = 2
 
-[node name="Name" type="Label" parent="Margin/Scroll/Center/MenuPanel/Padding/Content/Settings/SFX/Header"]
+[node name="Name" type="Label" parent="Margin/Scroll/Content/SubmenuCenter/MenuPanel/Padding/Pages/Settings/SFX/Header"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "SFX Volume"
 
-[node name="Value" type="Label" parent="Margin/Scroll/Center/MenuPanel/Padding/Content/Settings/SFX/Header"]
+[node name="Value" type="Label" parent="Margin/Scroll/Content/SubmenuCenter/MenuPanel/Padding/Pages/Settings/SFX/Header"]
 layout_mode = 2
 text = "100%"
 
-[node name="Slider" type="HSlider" parent="Margin/Scroll/Center/MenuPanel/Padding/Content/Settings/SFX"]
+[node name="Slider" type="HSlider" parent="Margin/Scroll/Content/SubmenuCenter/MenuPanel/Padding/Pages/Settings/SFX"]
 custom_minimum_size = Vector2(0, 28)
 layout_mode = 2
 max_value = 100.0
 step = 1.0
 value = 100.0
 
-[node name="SessionHint" type="Label" parent="Margin/Scroll/Center/MenuPanel/Padding/Content/Settings"]
+[node name="SessionHint" type="Label" parent="Margin/Scroll/Content/SubmenuCenter/MenuPanel/Padding/Pages/Settings"]
 layout_mode = 2
 text = "Changes apply for this session."
 horizontal_alignment = 1
 theme_override_font_sizes/font_size = 13
 theme_override_colors/font_color = Color(0.58, 0.6, 0.61, 1)
 
-[node name="Back" type="Button" parent="Margin/Scroll/Center/MenuPanel/Padding/Content/Settings"]
+[node name="Back" type="Button" parent="Margin/Scroll/Content/SubmenuCenter/MenuPanel/Padding/Pages/Settings"]
 custom_minimum_size = Vector2(0, 42)
 layout_mode = 2
+text = "Back"
+
+[node name="Collection" type="VBoxContainer" parent="Margin/Scroll/Content/SubmenuCenter/MenuPanel/Padding/Pages"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="Heading" type="Label" parent="Margin/Scroll/Content/SubmenuCenter/MenuPanel/Padding/Pages/Collection"]
+layout_mode = 2
+text = "COLLECTION"
+autowrap_mode = 2
+theme_override_font_sizes/font_size = 21
+horizontal_alignment = 1
+
+[node name="Description" type="Label" parent="Margin/Scroll/Content/SubmenuCenter/MenuPanel/Padding/Pages/Collection"]
+layout_mode = 2
+text = "Coming Soon"
+autowrap_mode = 2
+theme_override_font_sizes/font_size = 16
+horizontal_alignment = 1
+
+[node name="Back" type="Button" parent="Margin/Scroll/Content/SubmenuCenter/MenuPanel/Padding/Pages/Collection"]
+layout_mode = 2
+size_flags_horizontal = 3
+custom_minimum_size = Vector2(0, 42)
 text = "Back"
 
