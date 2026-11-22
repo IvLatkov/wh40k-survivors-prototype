@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=3]
+[gd_scene load_steps=16 format=3]
 
 [ext_resource type="Script" path="res://scripts/ui/main_menu.gd" id="1_menu"]
 [ext_resource type="AudioStream" path="res://assets/audio/Background/Background foley.wav" id="2_music"]
@@ -7,6 +7,7 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/selection_card.tscn" id="5_card"]
 
 [ext_resource type="Script" path="res://scripts/ui/armory_upgrades_page.gd" id="6_armory"]
+[ext_resource type="Script" path="res://scripts/ui/main_menu_polish.gd" id="7_polish"]
 
 [sub_resource type="StyleBoxFlat" id="PanelStyle"]
 bg_color = Color(0.045, 0.056, 0.067, 0.96)
@@ -90,6 +91,9 @@ stream = ExtResource("2_music")
 volume_db = -26.0
 autoplay = true
 bus = &"Music"
+
+[node name="MenuPolish" type="Node" parent="."]
+script = ExtResource("7_polish")
 
 [node name="Background" type="ColorRect" parent="."]
 layout_mode = 1
@@ -205,10 +209,20 @@ theme_override_colors/font_color = Color(0.5, 0.64, 0.73, 1)
 [node name="Rule" type="HSeparator" parent="Margin/Scroll/Content/Main/MainContent/CharacterPanel/Padding/Content"]
 layout_mode = 2
 
-[node name="Portrait" type="TextureRect" parent="Margin/Scroll/Content/Main/MainContent/CharacterPanel/Padding/Content"]
-unique_name_in_owner = true
+[node name="PortraitSlot" type="Control" parent="Margin/Scroll/Content/Main/MainContent/CharacterPanel/Padding/Content"]
 layout_mode = 2
 custom_minimum_size = Vector2(0, 140)
+mouse_filter = 2
+
+[node name="Portrait" type="TextureRect" parent="Margin/Scroll/Content/Main/MainContent/CharacterPanel/Padding/Content/PortraitSlot"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
 texture = ExtResource("3_portrait")
 texture_filter = 1
 expand_mode = 1

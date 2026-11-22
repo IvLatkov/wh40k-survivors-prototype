@@ -13,6 +13,7 @@ var _starting_game: bool = false
 var selection_data := SelectionData.new()
 
 @onready var panel: PanelContainer = %MenuPanel
+@onready var polish: MainMenuPolish = $MenuPolish
 @onready var pages: Dictionary[int, Control] = {
 	Page.MAIN: %Main,
 	Page.CHARACTER: %Character,
@@ -53,10 +54,13 @@ func _ready() -> void:
 		slider.value_changed.connect(_set_volume.bind(bus))
 	get_viewport().size_changed.connect(_resize_panel)
 	_resize_panel()
+	polish.setup(self)
 	show_page(Page.MAIN)
 
 
 func show_page(page: Page) -> void:
+	var changed := current_page != page
+	polish.finish_transition()
 	current_page = page
 	for key: int in pages:
 		pages[key].visible = key == page
@@ -69,6 +73,8 @@ func show_page(page: Page) -> void:
 		%Scroll.set_deferred(&"scroll_vertical", 0)
 	else:
 		(pages[page].get_node("Back") as Button).grab_focus()
+	if changed:
+		polish.reveal(pages[page])
 
 
 func _unhandled_key_input(event: InputEvent) -> void:
@@ -78,6 +84,7 @@ func _unhandled_key_input(event: InputEvent) -> void:
 
 
 func _resize_panel() -> void:
+	polish.finish_transition()
 	# Stack the dashboard on narrow windows; the scroll keeps every control reachable.
 	var compact := size.x < 900.0
 	%MainContent.columns = 1 if compact else 3

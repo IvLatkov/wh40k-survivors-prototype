@@ -49,7 +49,7 @@ func escape() -> void:
 func capture_page(suffix: String) -> void:
 	if "--capture" not in OS.get_cmdline_user_args() or DisplayServer.get_name() == "headless":
 		return
-	await create_timer(0.15).timeout
+	await create_timer(0.26).timeout
 	await RenderingServer.frame_post_draw
 	var output := OS.get_environment("WH40K_MENU_CAPTURE_PATH")
 	if not output.is_empty():
@@ -63,6 +63,101 @@ func check_page(menu: MainMenu, expected: MainMenu.Page) -> void:
 	check(menu.find_children("*", "Player", true, false).is_empty(), "No gameplay player runs behind the menu")
 	check(menu.find_children("*", "AudioStreamPlayer", true, false).size() == 1, "Every menu page keeps exactly one music player")
 	check(not menu.has_node("BackgroundAtmosphere"), "Gameplay ambience does not play in the menu")
+
+
+func check_polish(menu: MainMenu) -> void:
+	var portrait := menu.get_node("%Portrait") as TextureRect
+	var character_portrait := menu.get_node("%UltramarineCard").get_node("%Portrait") as TextureRect
+	var portrait_slot := portrait.get_parent() as Control
+	var slot_position := portrait_slot.position
+	var background := menu.get_node("Background") as ColorRect
+	var min_background := background.color.b
+	var max_background := min_background
+	var min_portrait := 0.0
+	var max_portrait := -2.0
+	var deploy := menu.get_node("%Deploy") as Button
+	var normal_style := deploy.get_theme_stylebox("normal") as StyleBoxFlat
+	var min_border := normal_style.border_color.b
+	var max_border := min_border
+	await capture_page("_motion_begin")
+	for _sample in 24:
+		await create_timer(0.15).timeout
+		min_background = minf(min_background, background.color.b)
+		max_background = maxf(max_background, background.color.b)
+		min_portrait = minf(min_portrait, portrait.position.y)
+		max_portrait = maxf(max_portrait, portrait.position.y)
+		min_border = minf(min_border, normal_style.border_color.b)
+		max_border = maxf(max_border, normal_style.border_color.b)
+		check(portrait.position.y == roundf(portrait.position.y) and portrait.position.y >= -2 and portrait.position.y <= 0, "Portrait motion is bounded to two whole pixels")
+		check(character_portrait.position.y == roundf(character_portrait.position.y) and character_portrait.position.y >= -2 and character_portrait.position.y <= 0, "Character Select portrait also moves in whole pixels")
+	check(max_background - min_background > 0.002 and min_background >= 0.0259 and max_background <= 0.0431, "Background has a restrained six-second color pulse")
+	check(max_portrait - min_portrait == 2 and portrait_slot.position == slot_position, "Image moves while its reserved layout slot stays fixed")
+	check(portrait.scale == Vector2.ONE and portrait.texture_filter == CanvasItem.TEXTURE_FILTER_NEAREST, "Portrait keeps original scale and nearest filtering")
+	check(max_border - min_border > 0.02, "DEPLOY has a slow idle border emphasis")
+	await capture_page("_motion_later")
+	var secondary := menu.get_node("%OpenCollection") as Button
+	secondary.grab_focus()
+	await create_timer(0.16).timeout
+	check(is_equal_approx((secondary.get_theme_stylebox("focus") as StyleBoxFlat).shadow_color.a, 0.12), "Keyboard focus fades in a restrained secondary glow")
+	deploy.grab_focus()
+	await create_timer(0.16).timeout
+	check(is_equal_approx((deploy.get_theme_stylebox("focus") as StyleBoxFlat).shadow_color.a, 0.22), "DEPLOY focus uses the stronger glow")
+	check((secondary.get_theme_stylebox("normal") as StyleBoxFlat).shadow_color.a == 0, "Moving focus removes the previous glow")
+	var hover := InputEventMouseMotion.new()
+	hover.position = secondary.get_global_rect().get_center()
+	Input.parse_input_event(hover)
+	await create_timer(0.16).timeout
+	check(secondary.is_hovered() and is_equal_approx((secondary.get_theme_stylebox("hover") as StyleBoxFlat).shadow_color.a, 0.12), "Mouse entry fades in the same secondary glow without keyboard focus")
+	hover = InputEventMouseMotion.new()
+	hover.position = Vector2.ONE
+	Input.parse_input_event(hover)
+	await create_timer(0.16).timeout
+	check((secondary.get_theme_stylebox("hover") as StyleBoxFlat).shadow_color.a == 0, "Mouse exit fades the hover glow back out")
+	check(deploy.scale == Vector2.ONE and secondary.scale == Vector2.ONE, "Button feedback never shifts or scales the hit target")
+	for page: MainMenu.Page in [MainMenu.Page.CHARACTER, MainMenu.Page.MAP, MainMenu.Page.UPGRADES, MainMenu.Page.COLLECTION, MainMenu.Page.SETTINGS, MainMenu.Page.MAIN]:
+		menu.show_page(page)
+		await process_frame
+		await process_frame
+		await process_frame
+		var target: Control = menu.pages[page]
+		check(menu.polish.is_transitioning() and target.modulate.a < 1, "Every page, including return, fades into view")
+		check(target.position.y > menu.polish._rest_position.y and target.position.y <= menu.polish._rest_position.y + 10, "Transition uses a bounded downward slide")
+		if page == MainMenu.Page.CHARACTER and "--capture" in OS.get_cmdline_user_args() and DisplayServer.get_name() != "headless":
+			await RenderingServer.frame_post_draw
+			var output := OS.get_environment("WH40K_MENU_CAPTURE_PATH")
+			if not output.is_empty():
+				check(root.get_texture().get_image().save_png(output.get_basename() + "_transition_character.png") == OK, "In-flight transition preview saves")
+		await create_timer(0.22).timeout
+		check(not menu.polish.is_transitioning() and target.modulate.a == 1, "Transition settles without leaving transparent controls")
+		var landed := target.position
+		(target.get_parent() as Container).queue_sort()
+		await process_frame
+		await process_frame
+		check(target.position.is_equal_approx(landed), "Slide returns to the container's authoritative position")
+	for index in 30:
+		menu.show_page(MainMenu.Page.CHARACTER if index % 2 == 0 else MainMenu.Page.COLLECTION)
+	menu.show_page(MainMenu.Page.MAIN)
+	await create_timer(0.26).timeout
+	check_page(menu, MainMenu.Page.MAIN)
+	check(not menu.polish.is_transitioning(), "Rapid navigation settles on the final requested page")
+	menu.show_page(MainMenu.Page.CHARACTER)
+	await process_frame
+	await process_frame
+	root.size = Vector2i(800, 600)
+	await process_frame
+	await process_frame
+	await create_timer(0.24).timeout
+	check(not menu.polish.is_transitioning(), "Resize cancels any in-flight slide")
+	await escape()
+	await escape()
+	await create_timer(0.25).timeout
+	check_page(menu, MainMenu.Page.MAIN)
+	for page: Control in menu.pages.values():
+		check(page.modulate.a == 1, "Interrupted and hidden pages keep no leftover fade")
+	root.size = Vector2i(1152, 648)
+	await process_frame
+	await process_frame
+	check(get_processed_tweens().size() <= 5, "No accumulating transition or hover tweens after rapid input")
 
 
 func run() -> void:
@@ -123,6 +218,7 @@ func run() -> void:
 		push_error("Quit did not close the process")
 		quit(1)
 		return
+	await check_polish(menu)
 	if "--capture" in OS.get_cmdline_user_args() and DisplayServer.get_name() != "headless":
 		await RenderingServer.frame_post_draw
 		var capture_path := OS.get_environment("WH40K_MENU_CAPTURE_PATH")
@@ -331,10 +427,12 @@ func run() -> void:
 	await process_frame
 	await process_frame
 	check(music.playing and music.get_stream_playback() == menu_playback, "Navigation and settings keep the same menu playback")
+	var polish_reference: WeakRef = weakref(menu.polish)
 	await click_button(menu.get_node("%Deploy") as Button)
 	await process_frame
 	await process_frame
 	check(not is_instance_valid(menu), "Play frees the menu instead of retaining it behind gameplay")
+	check(polish_reference.get_ref() == null, "Menu polish and its bound tweens unload with the menu")
 	check(not is_instance_valid(music), "Play frees the menu music player so it cannot overlap gameplay")
 	var main := current_scene
 	check(main != null and main.scene_file_path == MainMenu.GAMEPLAY_SCENE, "Play loads the existing gameplay scene")
