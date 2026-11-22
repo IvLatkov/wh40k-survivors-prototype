@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=3]
+[gd_scene load_steps=17 format=3]
 
 [ext_resource type="Script" path="res://scripts/ui/main_menu.gd" id="1_menu"]
 [ext_resource type="AudioStream" path="res://assets/audio/Background/Background foley.wav" id="2_music"]
@@ -8,6 +8,7 @@
 
 [ext_resource type="Script" path="res://scripts/ui/armory_upgrades_page.gd" id="6_armory"]
 [ext_resource type="Script" path="res://scripts/ui/main_menu_polish.gd" id="7_polish"]
+[ext_resource type="AudioStream" path="res://assets/audio/Background/background_atmos.wav" id="8_atmosphere"]
 
 [sub_resource type="StyleBoxFlat" id="PanelStyle"]
 bg_color = Color(0.045, 0.056, 0.067, 0.96)
@@ -89,6 +90,12 @@ theme = SubResource("MenuTheme")
 [node name="BackgroundMusic" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("2_music")
 volume_db = -26.0
+autoplay = true
+bus = &"Music"
+
+[node name="BackgroundAtmosphere" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("8_atmosphere")
+volume_db = -34.0
 autoplay = true
 bus = &"Music"
 

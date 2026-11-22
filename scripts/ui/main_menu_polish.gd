@@ -80,9 +80,12 @@ func reveal(target: Control) -> void:
 
 func _start_slide(target: Control, generation: int) -> void:
 	# Let the existing containers settle before recording their authoritative position.
-	await get_tree().process_frame
-	await get_tree().process_frame
-	if generation != _generation:
+	var tree := get_tree()
+	await tree.process_frame
+	if generation != _generation or not is_inside_tree():
+		return
+	await tree.process_frame
+	if generation != _generation or not is_inside_tree():
 		return
 	_rest_position = target.position
 	_sliding = true
@@ -117,3 +120,8 @@ func finish_transition() -> void:
 
 func is_transitioning() -> bool:
 	return _transition_target != null
+
+
+func _exit_tree() -> void:
+	# DEPLOY may unload the scene between the two layout waits.
+	_generation += 1
