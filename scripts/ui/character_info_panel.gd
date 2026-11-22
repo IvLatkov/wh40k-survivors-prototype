@@ -1,8 +1,27 @@
 extends CanvasLayer
 
 const UPGRADE_SLOT_SCENE := preload("res://scenes/ui/character_upgrade_slot.tscn")
-const ACCENT_COLOR := Color(0.78, 0.69, 0.44, 1.0)
-const HEALTH_COLOR := Color(0.9, 0.4, 0.4, 1.0)
+const STAT_ROW_SCENE := preload("res://scenes/ui/character_stat_row.tscn")
+const ACCENT_COLOR := Color(0.58, 0.68, 0.78, 1.0)
+const HEALTH_COLOR := Color(0.76, 0.38, 0.37, 1.0)
+const STAT_ICONS: Dictionary = {
+	"Health": preload("res://addons/pixel_ui_scifi/icons/heart.png"),
+	"Armor": preload("res://addons/pixel_ui_scifi/icons/shield.png"),
+	"Health Regen": preload("res://addons/pixel_ui_scifi/icons/health.png"),
+	"Movement Speed": preload("res://addons/pixel_ui_scifi/icons/arrow_right.png"),
+	"Pickup Radius": preload("res://addons/pixel_ui_scifi/icons/info.png"),
+	"XP Gain": preload("res://addons/pixel_ui_scifi/icons/star.png"),
+	"Dodge Chance": preload("res://addons/pixel_ui_scifi/icons/arrow_right.png"),
+	"Better XP Drop Chance": preload("res://addons/pixel_ui_scifi/icons/star.png"),
+	"Bolter Damage": preload("res://addons/pixel_ui_scifi/icons/crosshair.png"),
+	"Bolter Projectiles": preload("res://addons/pixel_ui_scifi/icons/rocket.png"),
+	"Bolter Fire Rate": preload("res://addons/pixel_ui_scifi/icons/energy.png"),
+	"Crit Chance": preload("res://addons/pixel_ui_scifi/icons/crosshair.png"),
+	"Crit Bonus": preload("res://addons/pixel_ui_scifi/icons/crosshair.png"),
+	"Knife Damage": preload("res://addons/pixel_ui_scifi/icons/info.png"),
+	"Knife Range": preload("res://addons/pixel_ui_scifi/icons/info.png"),
+	"Knife Attack Rate": preload("res://addons/pixel_ui_scifi/icons/energy.png"),
+}
 
 var player: Player
 var rewards: UpgradeSystem
@@ -11,13 +30,15 @@ var _owns_pause: bool = false
 var run_ended: bool = false
 var _value_labels: Dictionary = {}
 var _stat_labels: Dictionary = {}
+var _stat_rows: Dictionary[String, CharacterStatRow] = {}
+var _health_bar: ProgressBar
 
 @onready var sheet_panel: PanelContainer = $Overlay/Center/Panel
 @onready var content: VBoxContainer = $Overlay/Center/Panel/Margin/Scroll/Content
 @onready var title: Label = content.get_node("Body/Details/Header/Title")
 @onready var chapter_label: Label = content.get_node("Body/Details/Header/Identity/Chapter")
 @onready var level_label: Label = content.get_node("Body/Details/Header/Identity/Level")
-@onready var stats_grid: HBoxContainer = content.get_node("Body/Details/Stats")
+@onready var stats_grid: GridContainer = content.get_node("Body/Details/Stats")
 
 
 func _ready() -> void:
@@ -27,7 +48,11 @@ func _ready() -> void:
 	for section: String in ["Weapons", "Generic"]:
 		var slots := content.get_node("Upgrades/" + section + "/Slots")
 		for _index in _slot_limit(UpgradeDefinition.Category.WEAPON if section == "Weapons" else UpgradeDefinition.Category.GENERIC):
-			slots.add_child(UPGRADE_SLOT_SCENE.instantiate())
+			var slot := UPGRADE_SLOT_SCENE.instantiate() as PanelContainer
+			slot.add_theme_stylebox_override("panel", sheet_panel.theme.get_stylebox("panel", "UpgradeSlot"))
+			for label_name: String in ["Group", "Level"]:
+				slot.get_node("Row/" + label_name).add_theme_color_override("font_color", ACCENT_COLOR)
+			slots.add_child(slot)
 	get_viewport().size_changed.connect(_resize_panel)
 	_resize_panel()
 
@@ -36,36 +61,36 @@ func _resize_panel() -> void:
 	var viewport_size := get_viewport().get_visible_rect().size
 	sheet_panel.custom_minimum_size = Vector2(minf(1000.0, maxf(0.0, viewport_size.x - 32.0)), minf(616.0, maxf(0.0, viewport_size.y - 32.0)))
 	(content.get_node("Upgrades") as GridContainer).columns = 1 if viewport_size.x < 800.0 else 2
+	stats_grid.columns = 1 if viewport_size.x < 760.0 else 2
+	var portrait := content.get_node("Body/Portrait") as TextureRect
+	portrait.custom_minimum_size.x = 128 if viewport_size.x < 760.0 else 190
+	portrait.size_flags_vertical = Control.SIZE_SHRINK_BEGIN if viewport_size.x < 760.0 else Control.SIZE_FILL
 
 
 func _add_stat_section(heading: String, names: Array[String]) -> void:
 	var section := VBoxContainer.new()
 	section.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	section.add_theme_constant_override("separation", 6)
+	section.add_theme_constant_override("separation", 1)
 	stats_grid.add_child(section)
 	var heading_label := Label.new()
 	heading_label.text = heading
 	heading_label.add_theme_color_override("font_color", ACCENT_COLOR)
 	section.add_child(heading_label)
-	var grid := GridContainer.new()
-	grid.columns = 2
-	grid.add_theme_constant_override("h_separation", 14)
-	grid.add_theme_constant_override("v_separation", 3)
-	section.add_child(grid)
 	for stat_name in names:
-		var label := Label.new()
-		label.text = {"Armor": "Ceramite Plating", "Health Regen": "Gene-Seed Resilience"}.get(stat_name, stat_name) + ":"
-		grid.add_child(label)
-		var value := Label.new()
-		value.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		value.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-		grid.add_child(value)
-		if stat_name in ["Health", "Health Regen"]:
-			label.add_theme_color_override("font_color", HEALTH_COLOR)
-			value.add_theme_color_override("font_color", HEALTH_COLOR)
-		_stat_labels[stat_name] = label
-		_value_labels[stat_name] = value
-
+		var row := STAT_ROW_SCENE.instantiate() as CharacterStatRow
+		row.name = stat_name.replace(" ", "") + "Row"
+		section.add_child(row)
+		var health_stat := stat_name in ["Health", "Health Regen"]
+		var display_name: String = {"Armor": "Ceramite Plating", "Health Regen": "Gene-Seed Resilience"}.get(stat_name, stat_name)
+		row.configure(display_name, STAT_ICONS[stat_name], HEALTH_COLOR if health_stat else ACCENT_COLOR, stat_name == "Health")
+		if health_stat:
+			row.stat_label.add_theme_color_override("font_color", HEALTH_COLOR)
+			row.value_label.add_theme_color_override("font_color", HEALTH_COLOR)
+		if stat_name == "Health":
+			_health_bar = row.health_bar
+		_stat_rows[stat_name] = row
+		_stat_labels[stat_name] = row.stat_label
+		_value_labels[stat_name] = row.value_label
 
 func bind_player(value: Player, upgrade_system: UpgradeSystem, menus: Array[CanvasLayer]) -> void:
 	player = value
@@ -139,6 +164,8 @@ func refresh_stats() -> void:
 	chapter_label.text = "Chapter: " + player.ChapterTypes.Type.keys()[player.chapter].capitalize()
 	level_label.text = "Level: %d" % player.level
 	_value_labels["Health"].text = "%d / %d" % [roundi(player.current_health + Player.HEALTH_ROUNDING_EPSILON), roundi(player.max_health + Player.HEALTH_ROUNDING_EPSILON)]
+	_health_bar.max_value = player.max_health
+	_health_bar.value = player.current_health
 	_value_labels["Health Regen"].text = "%.1f HP/s" % player.get_health_regen()
 	_value_labels["Movement Speed"].text = _number(player.get_movement_speed())
 	_value_labels["Pickup Radius"].text = "%s px" % _number(player.get_pickup_radius())
@@ -212,8 +239,8 @@ func _refresh_upgrade_slots(section_name: String, heading: String, category: Upg
 		name_label.text = _upgrade_display_name(selected[index]) if occupied else "Empty"
 		count_label.text = selected[index].get_level_text(player.combat_stats, int(rewards.levels[selected[index].id])) if occupied else ""
 		name_label.add_theme_color_override("font_color", Color(0.88, 0.9, 0.91) if occupied else Color(0.43, 0.47, 0.5))
-		var style := slot.get_theme_stylebox("panel").duplicate() as StyleBoxFlat
-		style.bg_color = Color(0.065, 0.075, 0.085) if occupied else Color(0.035, 0.042, 0.05)
+		var style := slot.get_theme_stylebox("panel").duplicate() as StyleBoxTexture
+		style.modulate_color = Color(1, 0.55, 0.8) if occupied else Color(0.55, 0.28, 0.42)
 		slot.add_theme_stylebox_override("panel", style)
 	var overflow := section.get_node("Overflow") as Label
 	var extra: PackedStringArray = []

@@ -1,0 +1,154 @@
+[gd_resource type="Theme" load_steps=21 format=3]
+
+[ext_resource type="Texture2D" path="res://addons/pixel_ui_scifi/themes/cyan/panel.png" id="panel"]
+[ext_resource type="Texture2D" path="res://addons/pixel_ui_scifi/themes/cyan/panel_inset.png" id="inset"]
+[ext_resource type="Texture2D" path="res://addons/pixel_ui_scifi/themes/cyan/bracket.png" id="bracket"]
+[ext_resource type="Texture2D" path="res://addons/pixel_ui_scifi/themes/cyan/button_normal.png" id="button"]
+[ext_resource type="Texture2D" path="res://addons/pixel_ui_scifi/themes/cyan/button_hover.png" id="hover"]
+[ext_resource type="Texture2D" path="res://addons/pixel_ui_scifi/themes/cyan/button_pressed.png" id="pressed"]
+[ext_resource type="Texture2D" path="res://addons/pixel_ui_scifi/themes/cyan/focus.png" id="focus"]
+[ext_resource type="Texture2D" path="res://addons/pixel_ui_scifi/themes/cyan/progress_bg.png" id="progress"]
+[ext_resource type="Texture2D" path="res://addons/pixel_ui_scifi/bars/bar_red.png" id="fill"]
+[ext_resource type="FontFile" path="res://addons/pixel_ui_scifi/font/pixel_ui_scifi_font.fnt" id="font"]
+
+[sub_resource type="StyleBoxTexture" id="Frame"]
+texture = ExtResource("panel")
+texture_margin_left = 4.0
+content_margin_left = 1.0
+texture_margin_top = 4.0
+content_margin_top = 1.0
+texture_margin_right = 4.0
+content_margin_right = 1.0
+texture_margin_bottom = 4.0
+content_margin_bottom = 1.0
+modulate_color = Color(1, 0.55, 0.8, 1)
+
+[sub_resource type="StyleBoxTexture" id="Slot"]
+texture = ExtResource("inset")
+texture_margin_left = 3.0
+content_margin_left = 10.0
+texture_margin_top = 3.0
+content_margin_top = 3.0
+texture_margin_right = 3.0
+content_margin_right = 10.0
+texture_margin_bottom = 3.0
+content_margin_bottom = 3.0
+modulate_color = Color(1, 0.55, 0.8, 1)
+
+[sub_resource type="StyleBoxTexture" id="Portrait"]
+texture = ExtResource("bracket")
+texture_margin_left = 5.0
+content_margin_left = 0.0
+texture_margin_top = 5.0
+content_margin_top = 0.0
+texture_margin_right = 5.0
+content_margin_right = 0.0
+texture_margin_bottom = 5.0
+content_margin_bottom = 0.0
+modulate_color = Color(1, 0.55, 0.8, 1)
+
+[sub_resource type="StyleBoxTexture" id="Button"]
+texture = ExtResource("button")
+texture_margin_left = 4.0
+content_margin_left = 10.0
+texture_margin_top = 4.0
+content_margin_top = 3.0
+texture_margin_right = 4.0
+content_margin_right = 10.0
+texture_margin_bottom = 4.0
+content_margin_bottom = 3.0
+modulate_color = Color(1, 0.45, 0.65, 1)
+
+[sub_resource type="StyleBoxTexture" id="Hover"]
+texture = ExtResource("hover")
+texture_margin_left = 4.0
+content_margin_left = 10.0
+texture_margin_top = 4.0
+content_margin_top = 3.0
+texture_margin_right = 4.0
+content_margin_right = 10.0
+texture_margin_bottom = 4.0
+content_margin_bottom = 3.0
+modulate_color = Color(1, 0.6, 0.8, 1)
+
+[sub_resource type="StyleBoxTexture" id="Pressed"]
+texture = ExtResource("pressed")
+texture_margin_left = 4.0
+content_margin_left = 10.0
+texture_margin_top = 4.0
+content_margin_top = 3.0
+texture_margin_right = 4.0
+content_margin_right = 10.0
+texture_margin_bottom = 4.0
+content_margin_bottom = 3.0
+modulate_color = Color(1, 0.55, 0.75, 1)
+
+[sub_resource type="StyleBoxTexture" id="Focus"]
+texture = ExtResource("focus")
+texture_margin_left = 4.0
+content_margin_left = 0.0
+texture_margin_top = 4.0
+content_margin_top = 0.0
+texture_margin_right = 4.0
+content_margin_right = 0.0
+texture_margin_bottom = 4.0
+content_margin_bottom = 0.0
+modulate_color = Color(1, 0.7, 0.9, 1)
+
+[sub_resource type="StyleBoxTexture" id="HealthBackground"]
+texture = ExtResource("progress")
+texture_margin_left = 3.0
+content_margin_left = 0.0
+texture_margin_top = 3.0
+content_margin_top = 0.0
+texture_margin_right = 3.0
+content_margin_right = 0.0
+texture_margin_bottom = 3.0
+content_margin_bottom = 0.0
+modulate_color = Color(1, 0.4, 0.55, 1)
+
+[sub_resource type="StyleBoxTexture" id="HealthFill"]
+texture = ExtResource("fill")
+texture_margin_left = 2.0
+content_margin_left = 0.0
+texture_margin_top = 3.0
+content_margin_top = 0.0
+texture_margin_right = 2.0
+content_margin_right = 0.0
+texture_margin_bottom = 2.0
+content_margin_bottom = 0.0
+modulate_color = Color(0.75, 0.65, 0.65, 1)
+axis_stretch_horizontal = 1
+
+[sub_resource type="StyleBoxFlat" id="StatRow"]
+bg_color = Color(0.035, 0.045, 0.058, 0.8)
+border_width_bottom = 1
+border_color = Color(0.16, 0.21, 0.26, 0.5)
+content_margin_left = 6.0
+content_margin_right = 6.0
+content_margin_top = 2.0
+content_margin_bottom = 2.0
+
+[resource]
+default_font_size = 14
+Label/colors/font_color = Color(0.86, 0.89, 0.91, 1)
+PanelContainer/styles/panel = SubResource("Frame")
+Button/styles/normal = SubResource("Button")
+Button/styles/hover = SubResource("Hover")
+Button/styles/pressed = SubResource("Pressed")
+Button/styles/focus = SubResource("Focus")
+Button/colors/font_color = Color(0.78, 0.84, 0.89, 1)
+Button/colors/font_hover_color = Color(0.94, 0.96, 0.98, 1)
+UpgradeSlot/base_type = &"PanelContainer"
+UpgradeSlot/styles/panel = SubResource("Slot")
+PortraitFrame/base_type = &"Panel"
+PortraitFrame/styles/panel = SubResource("Portrait")
+SheetTitle/base_type = &"Label"
+SheetTitle/fonts/font = ExtResource("font")
+SheetTitle/font_sizes/font_size = 24
+SheetTitle/colors/font_color = Color(0.58, 0.68, 0.78, 1)
+SheetHealthBar/base_type = &"ProgressBar"
+SheetHealthBar/styles/background = SubResource("HealthBackground")
+SheetHealthBar/styles/fill = SubResource("HealthFill")
+CharacterStatRow/base_type = &"PanelContainer"
+CharacterStatRow/styles/panel = SubResource("StatRow")

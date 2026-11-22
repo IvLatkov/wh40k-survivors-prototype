@@ -1,19 +1,9 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=4 format=3]
 
 [ext_resource type="Script" path="res://scripts/ui/character_info_panel.gd" id="1"]
 [ext_resource type="Texture2D" path="res://assets/art/effects/player/ultramarine/Ultramarine_bolter_right_still.png_0001.png" id="2"]
 
-[sub_resource type="StyleBoxFlat" id="PanelStyle"]
-bg_color = Color(0.025, 0.032, 0.04, 0.98)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-border_color = Color(0.48, 0.46, 0.36, 1)
-
-[sub_resource type="Theme" id="SheetTheme"]
-default_font_size = 14
-Label/colors/font_color = Color(0.88, 0.9, 0.91, 1)
+[ext_resource type="Theme" path="res://resources/ui/character_info_theme.tres" id="3_theme"]
 
 [node name="CharacterInfoPanel" type="CanvasLayer"]
 process_mode = 3
@@ -36,8 +26,8 @@ mouse_filter = 2
 [node name="Panel" type="PanelContainer" parent="Overlay/Center"]
 custom_minimum_size = Vector2(1000, 616)
 layout_mode = 2
-theme = SubResource("SheetTheme")
-theme_override_styles/panel = SubResource("PanelStyle")
+texture_filter = 1
+theme = ExtResource("3_theme")
 
 [node name="Margin" type="MarginContainer" parent="Overlay/Center/Panel"]
 layout_mode = 2
@@ -69,6 +59,16 @@ expand_mode = 1
 stretch_mode = 5
 mouse_filter = 2
 
+[node name="Frame" type="Panel" parent="Overlay/Center/Panel/Margin/Scroll/Content/Body/Portrait"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_type_variation = &"PortraitFrame"
+
 [node name="Details" type="VBoxContainer" parent="Overlay/Center/Panel/Margin/Scroll/Content/Body"]
 layout_mode = 2
 size_flags_horizontal = 3
@@ -80,8 +80,9 @@ theme_override_constants/separation = 2
 
 [node name="Title" type="Label" parent="Overlay/Center/Panel/Margin/Scroll/Content/Body/Details/Header"]
 layout_mode = 2
+theme_type_variation = &"SheetTitle"
 theme_override_font_sizes/font_size = 24
-theme_override_colors/font_color = Color(0.78, 0.69, 0.44, 1)
+theme_override_colors/font_color = Color(0.58, 0.68, 0.78, 1)
 text = "CHARACTER"
 
 [node name="Identity" type="HBoxContainer" parent="Overlay/Center/Panel/Margin/Scroll/Content/Body/Details/Header"]
@@ -97,10 +98,12 @@ text = "Chapter: Ultramarines"
 layout_mode = 2
 text = "Level: 1"
 
-[node name="Stats" type="HBoxContainer" parent="Overlay/Center/Panel/Margin/Scroll/Content/Body/Details"]
+[node name="Stats" type="GridContainer" parent="Overlay/Center/Panel/Margin/Scroll/Content/Body/Details"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/separation = 24
+columns = 2
+theme_override_constants/h_separation = 24
+theme_override_constants/v_separation = 12
 
 [node name="Upgrades" type="GridContainer" parent="Overlay/Center/Panel/Margin/Scroll/Content"]
 layout_mode = 2
@@ -114,7 +117,7 @@ theme_override_constants/separation = 3
 
 [node name="Title" type="Label" parent="Overlay/Center/Panel/Margin/Scroll/Content/Upgrades/Weapons"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.78, 0.69, 0.44, 1)
+theme_override_colors/font_color = Color(0.58, 0.68, 0.78, 1)
 text = "WEAPON UPGRADES"
 
 [node name="Count" type="Label" parent="Overlay/Center/Panel/Margin/Scroll/Content/Upgrades/Weapons"]
@@ -137,7 +140,7 @@ theme_override_constants/separation = 3
 
 [node name="Title" type="Label" parent="Overlay/Center/Panel/Margin/Scroll/Content/Upgrades/Generic"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.78, 0.69, 0.44, 1)
+theme_override_colors/font_color = Color(0.58, 0.68, 0.78, 1)
 text = "GENERIC UPGRADES"
 
 [node name="Count" type="Label" parent="Overlay/Center/Panel/Margin/Scroll/Content/Upgrades/Generic"]
@@ -171,7 +174,7 @@ theme_override_constants/separation = 2
 
 [node name="Title" type="Label" parent="Overlay/Center/Panel/Margin/Scroll/Content/ChapterPerks"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.78, 0.69, 0.44, 1)
+theme_override_colors/font_color = Color(0.58, 0.68, 0.78, 1)
 text = "ULTRAMARINES PERKS"
 
 [node name="Owned" type="Label" parent="Overlay/Center/Panel/Margin/Scroll/Content/ChapterPerks"]
