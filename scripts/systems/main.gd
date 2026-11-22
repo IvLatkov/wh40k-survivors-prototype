@@ -6,7 +6,7 @@ const DEBUG_BOSS_SKIP_ENABLED: bool = true
 @onready var player: Player = $Player
 @onready var health_hud: HealthHud = $HealthHUD
 @onready var enemy_spawner: EnemySpawner = $EnemySpawner
-@onready var background_audio: Array[AudioStreamPlayer] = [$BackgroundMusic, $BackgroundAtmosphere]
+@onready var background_audio: Array[AudioStreamPlayer] = [$BackgroundAtmosphere]
 
 
 func _ready() -> void:
@@ -42,7 +42,7 @@ func _ready() -> void:
 
 
 func _on_reward_queue_started() -> void:
-	# Only the background layers keep processing while rewards pause gameplay.
+	# Only the ambience keeps processing while rewards pause gameplay.
 	for audio in background_audio:
 		audio.process_mode = Node.PROCESS_MODE_ALWAYS
 

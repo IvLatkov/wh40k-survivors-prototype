@@ -1,6 +1,7 @@
-[gd_scene load_steps=8 format=3]
+[gd_scene load_steps=9 format=3]
 
 [ext_resource type="Script" path="res://scripts/ui/main_menu.gd" id="1_menu"]
+[ext_resource type="AudioStream" path="res://assets/audio/Background/Background foley.wav" id="2_music"]
 
 [sub_resource type="StyleBoxFlat" id="PanelStyle"]
 bg_color = Color(0.025, 0.032, 0.04, 1)
@@ -62,6 +63,12 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_menu")
 theme = SubResource("MenuTheme")
+
+[node name="BackgroundMusic" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("2_music")
+volume_db = -26.0
+autoplay = true
+bus = &"Music"
 
 [node name="Background" type="ColorRect" parent="."]
 layout_mode = 1
