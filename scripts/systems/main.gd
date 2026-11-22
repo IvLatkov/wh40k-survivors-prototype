@@ -19,7 +19,7 @@ func _ready() -> void:
 	enemy_spawner.bind_run_clock($RunClock)
 	health_hud.bind_player(player)
 	health_hud.bind_enemy_spawner(enemy_spawner)
-	$UpgradeSystem.choices_ready.connect($UpgradeMenu.show_choices)
+	$UpgradeSystem.choices_ready.connect(_show_upgrade_choices)
 	$UpgradeSystem.selection_finished.connect($UpgradeMenu.hide)
 	$UpgradeMenu.upgrade_selected.connect($UpgradeSystem.select_upgrade)
 	$ChapterPerkManager.bind_player(player)
@@ -34,6 +34,16 @@ func _ready() -> void:
 	var reward_menus: Array[CanvasLayer] = [$UpgradeMenu, $ChapterPerkMenu]
 	$CharacterInfoPanel.bind_player(player, $UpgradeSystem, reward_menus)
 	$BossEncounter.bind_run($RunClock, player, enemy_spawner, $UpgradeSystem, $CharacterInfoPanel, reward_menus)
+	$SupplyCrateEncounter.bind_run($RunClock, player, $ChunkManager, $UpgradeSystem, $BossEncounter)
+	for menu in reward_menus:
+		player.health_depleted.connect(menu.end_run)
+
+
+func _show_upgrade_choices(choices: Array, levels: Dictionary) -> void:
+	if $UpgradeSystem.is_supply_reward():
+		$UpgradeMenu.show_supply_choices(choices, levels)
+	else:
+		$UpgradeMenu.show_choices(choices, levels)
 
 
 func _unhandled_key_input(event: InputEvent) -> void:

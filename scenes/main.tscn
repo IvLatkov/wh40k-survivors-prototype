@@ -1,4 +1,4 @@
-[gd_scene load_steps=32 format=3]
+[gd_scene load_steps=33 format=3]
 
 [ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="1_player"]
 [ext_resource type="PackedScene" path="res://scenes/systems/chunk_manager.tscn" id="2_chunks"]
@@ -19,6 +19,7 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/character_info_panel.tscn" id="14_character_info"]
 
 [ext_resource type="PackedScene" path="res://scenes/systems/boss_encounter.tscn" id="15_boss"]
+[ext_resource type="Script" path="res://scripts/systems/supply_crate_encounter.gd" id="18_crate"]
 
 [sub_resource type="Resource" id="Upgrade_bolter_damage"]
 script = ExtResource("9_definition")
@@ -180,6 +181,9 @@ stat_cap = 0.4
 
 [node name="Main" type="Node2D"]
 script = ExtResource("4_main")
+
+[node name="SupplyCrateEncounter" type="Node" parent="."]
+script = ExtResource("18_crate")
 
 [node name="RunClock" type="Node" parent="."]
 process_mode = 1

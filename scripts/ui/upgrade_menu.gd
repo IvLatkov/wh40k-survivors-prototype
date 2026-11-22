@@ -14,6 +14,8 @@ func end_run() -> void:
 
 
 func show_choices(choices: Array, levels: Dictionary) -> void:
+	$Overlay/Center/Panel/Margin/Content/Title.text = "LEVEL UP — CHOOSE ONE UPGRADE"
+	$Overlay/Center/Panel/Margin/Content/Subtitle.hide()
 	for child in choices_container.get_children():
 		choices_container.remove_child(child)
 		child.queue_free()
@@ -39,6 +41,12 @@ func show_choices(choices: Array, levels: Dictionary) -> void:
 	show()
 	if choices_container.get_child_count() > 0:
 		choices_container.get_child(0).grab_focus()
+
+
+func show_supply_choices(choices: Array, levels: Dictionary) -> void:
+	show_choices(choices, levels)
+	$Overlay/Center/Panel/Margin/Content/Title.text = "SUPPLY CRATE"
+	$Overlay/Center/Panel/Margin/Content/Subtitle.show()
 
 
 func _select(id: StringName) -> void:

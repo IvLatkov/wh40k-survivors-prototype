@@ -10,6 +10,7 @@ const TESTS := [
 	"res://tests/terrain_tree_test.gd",
 	"res://tests/main_menu_test.gd",
 	"res://tests/background_music_test.gd",
+	"res://tests/supply_crate_test.gd",
 ]
 
 

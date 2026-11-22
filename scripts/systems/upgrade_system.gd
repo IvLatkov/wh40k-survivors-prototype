@@ -10,6 +10,8 @@ signal selection_finished
 
 const MAX_WEAPON_TYPES: int = 4
 const MAX_GENERIC_TYPES: int = 4
+# Player level rewards are positive; zero identifies one free normal crate reward.
+const SUPPLY_REWARD: int = 0
 
 @export var ultimate_definitions: Array[UltimateDefinition] = [
 	preload("res://resources/ultimates/devastator_shells.tres"),
@@ -40,6 +42,7 @@ func bind_player(value: Player) -> void:
 	player = value
 	stats = player.combat_stats
 	player.leveled_up.connect(queue_level)
+	player.health_depleted.connect(end_run)
 
 
 func get_selected_upgrade_ids(category: UpgradeDefinition.Category) -> Array[StringName]:
@@ -136,13 +139,25 @@ func get_selected_ultimates() -> Array[UltimateDefinition]:
 
 
 func queue_level() -> void:
+	_queue_reward(player.level)
+
+
+func queue_supply_reward() -> void:
+	_queue_reward(SUPPLY_REWARD)
+
+
+func is_supply_reward() -> bool:
+	return not reward_levels.is_empty() and reward_levels[0] == SUPPLY_REWARD
+
+
+func _queue_reward(reward_level: int) -> void:
 	if run_ended:
 		return
 	if pending_levels == 0:
 		# Allow an informational overlay to release its pause before rewards own it.
 		reward_queue_started.emit()
 	# Capture now: add_xp may emit several times before the first choice is made.
-	reward_levels.append(player.level)
+	reward_levels.append(reward_level)
 	pending_levels = reward_levels.size()
 	if pending_levels == 1:
 		_was_paused = get_tree().paused
@@ -156,12 +171,16 @@ func _offer_choices() -> void:
 	if reward_levels.is_empty():
 		return
 	var reward_level := reward_levels[0]
-	if chapter_manager != null and chapter_manager.is_milestone(reward_level):
+	if not is_supply_reward() and chapter_manager != null and chapter_manager.is_milestone(reward_level):
 		chapter_offered = chapter_manager.choices_for(reward_level)
 		chapter_choices_ready.emit(chapter_offered.duplicate(), chapter_manager.catalog.display_name, reward_level)
 		return
 	offered = get_eligible_upgrades()
-	offered_ultimates = get_eligible_ultimates()
+	# Crate v1 grants normal upgrades only, never Chapter perks or evolution.
+	if is_supply_reward():
+		offered_ultimates.clear()
+	else:
+		offered_ultimates = get_eligible_ultimates()
 	if offered.is_empty() and offered_ultimates.is_empty():
 		# No invalid substitute rewards or empty modal: retain XP/level progression.
 		normal_choices_exhausted.emit(reward_level)

@@ -39,6 +39,13 @@ theme_override_font_sizes/font_size = 26
 text = "LEVEL UP — CHOOSE ONE UPGRADE"
 horizontal_alignment = 1
 
+[node name="Subtitle" type="Label" parent="Overlay/Center/Panel/Margin/Content"]
+visible = false
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Choose Requisition"
+horizontal_alignment = 1
+
 [node name="Choices" type="VBoxContainer" parent="Overlay/Center/Panel/Margin/Content"]
 layout_mode = 2
 theme_override_constants/separation = 12
