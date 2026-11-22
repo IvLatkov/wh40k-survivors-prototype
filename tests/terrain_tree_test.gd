@@ -42,49 +42,65 @@ func run() -> void:
 		check(source.load_png_from_buffer(FileAccess.get_file_as_bytes(texture.resource_path)) == OK and source.get_size() == Vector2i(1254, 1254), "Original high-resolution tree PNGs remain intact")
 		imported_bytes += texture.get_image().get_data().size()
 	print("TREE_TEXTURE_BYTES ", imported_bytes)
-	var selected := 0
+	check(TerrainTrees.TREES_PER_CHUNK == 2, "Every chunk attempts two trees")
 	var placed := 0
+	var histogram: Array[int] = [0, 0, 0]
 	var variants: Array[int] = [0, 0, 0]
 	var example := Vector2i.ZERO
-	for ry in range(-10, 10):
-		for rx in range(-10, 10):
-			var region := Vector2i(rx, ry)
-			var chunks := TerrainTrees.get_region_tree_chunks(region)
-			check(chunks.size() in [2, 3] and chunks == TerrainTrees.get_region_tree_chunks(region), "Each six-chunk region selects two or three stable tree chunks")
-			selected += chunks.size()
-			var seen: Array[Vector2i] = []
-			for y in 2:
-				for x in 3:
-					var coordinate := region * Vector2i(3, 2) + Vector2i(x, y)
-					check(TerrainTrees.get_region(coordinate) == region, "Negative and positive coordinates use floor-based region ownership")
-					var occupied := occupied_at(coordinate)
-					var trees := TerrainTrees.get_placements(coordinate, 1024, occupied)
-					var road_layout := TerrainRoads.get_layout(coordinate, 1024)
-					var prepared := TerrainTrees.get_placements(coordinate, 1024, occupied, road_layout)
-					check(trees.size() == prepared.size(), "Reusing an existing road layout preserves tree counts")
-					check(trees.size() <= 1 and (trees.is_empty() or chunks.has(coordinate)), "At most one tree in a selected chunk")
-					var repeated := TerrainTrees.get_placements(coordinate, 1024, occupied)
-					check(trees.size() == repeated.size(), "Placement independent of generation order")
-					for tree in trees:
-						check(tree.position == prepared[0].position and tree.variant == prepared[0].variant, "Reused road layout preserves exact tree variant and position")
-						check(not seen.has(coordinate), "No duplicate tree chunk in a region")
-						seen.append(coordinate)
-						check(tree.position == repeated[0].position and tree.variant == repeated[0].variant, "Variant and position deterministic")
-						variants[tree.variant] += 1
-						example = coordinate
-						placed += 1
-						var bounds := Rect2(tree.position - TerrainTrees.FOOTPRINT * 0.5, TerrainTrees.FOOTPRINT)
-						check(Rect2(Vector2.ONE * TerrainTrees.EDGE_GAP, Vector2.ONE * (1024 - TerrainTrees.EDGE_GAP * 2.0)).encloses(bounds), "Full tree footprint clears chunk boundaries and neighboring trees")
-						var world_bounds := Rect2(bounds.position + Vector2(coordinate) * 1024, bounds.size)
-						check(Vector2.ZERO.clamp(world_bounds.position, world_bounds.end).length() >= TerrainTrees.START_CLEARANCE, "Full tree footprint clears starting area")
-						for prop in occupied:
-							check(not bounds.intersects(prop.grow(TerrainTrees.PROP_GAP)), "Tree avoids existing ruins and tanks with walking clearance")
-						for road in TerrainRoads.get_layout(coordinate, 1024):
-							check(not bounds.intersects(Rect2(Vector2(road.x, road.y) * 256, Vector2.ONE * 256).grow(TerrainTrees.ROAD_GAP)), "Tree avoids roads and roadside clearance")
-	check(placed >= selected * 0.95, "Safety exclusions retain the target sparse density across the world")
+	var no_roads: Array[Vector3i] = []
+	for y in range(-20, 20):
+		for x in range(-30, 30):
+			var coordinate := Vector2i(x, y)
+			check(TerrainTrees.get_placements(coordinate, 1024, [], no_roads).size() == 2, "Every unobstructed positive or negative chunk gets two trees")
+			var occupied := occupied_at(coordinate)
+			var trees := TerrainTrees.get_placements(coordinate, 1024, occupied)
+			var road_layout := TerrainRoads.get_layout(coordinate, 1024)
+			var prepared := TerrainTrees.get_placements(coordinate, 1024, occupied, road_layout)
+			check(trees.size() == prepared.size(), "Reusing an existing road layout preserves tree counts")
+			check(trees.size() <= 2, "No chunk creates more than two trees")
+			histogram[trees.size()] += 1
+			if trees.size() == 2:
+				example = coordinate
+			var repeated := TerrainTrees.get_placements(coordinate, 1024, occupied)
+			check(trees.size() == repeated.size(), "Placement independent of generation order")
+			var seen_variants: Array[int] = []
+			var seen_bounds: Array[Rect2] = []
+			for index in trees.size():
+				var tree := trees[index]
+				check(tree.position == prepared[index].position and tree.variant == prepared[index].variant, "Reused road layout preserves exact tree variant and position")
+				check(not seen_variants.has(tree.variant), "A chunk uses two different tree variants")
+				seen_variants.append(tree.variant)
+				check(tree.position == repeated[index].position and tree.variant == repeated[index].variant, "Variant and position deterministic")
+				variants[tree.variant] += 1
+				placed += 1
+				var bounds := Rect2(tree.position - TerrainTrees.FOOTPRINT * 0.5, TerrainTrees.FOOTPRINT)
+				check(Rect2(Vector2.ONE * TerrainTrees.EDGE_GAP, Vector2.ONE * (1024 - TerrainTrees.EDGE_GAP * 2.0)).encloses(bounds), "Full tree footprint clears chunk boundaries and neighboring trees")
+				var world_bounds := Rect2(bounds.position + Vector2(coordinate) * 1024, bounds.size)
+				check(Vector2.ZERO.clamp(world_bounds.position, world_bounds.end).length() >= TerrainTrees.START_CLEARANCE, "Full tree footprint clears starting area")
+				for previous in seen_bounds:
+					check(not bounds.intersects(previous.grow(TerrainTrees.PROP_GAP)), "Trees leave walking clearance between their footprints")
+				seen_bounds.append(bounds)
+				for prop in occupied:
+					check(not bounds.intersects(prop.grow(TerrainTrees.PROP_GAP)), "Tree avoids existing ruins and tanks with walking clearance")
+				for road in road_layout:
+					check(not bounds.intersects(Rect2(Vector2(road.x, road.y) * 256, Vector2.ONE * 256).grow(TerrainTrees.ROAD_GAP)), "Tree avoids roads and roadside clearance")
+	check(histogram[2] >= 2160, "At least ninety percent of real chunks retain both trees after road and obstacle exclusions")
 	check(variants.all(func(count: int) -> bool: return count > 0), "All three generated tree variants are used")
 	check(TerrainTrees.get_placements(example, 256, []).is_empty(), "Small chunks safely skip oversized trees")
 	check(TerrainTrees.get_placements(example, 1024, [Rect2(Vector2.ZERO, Vector2.ONE * 1024)]).is_empty(), "Fully occupied chunks skip trees instead of blocking paths")
+	var starter_chunk := Vector2i.ZERO
+	var full_road: Array[Vector3i] = []
+	for y in 4:
+		for x in 4:
+			full_road.append(Vector3i(x, y, 1))
+	check(TerrainTrees.get_placements(starter_chunk, 1024, [], full_road).is_empty(), "A chunk covered by roads stays tree-free")
+	var nearby_blocker := Rect2(Vector2.ZERO, Vector2(600, 320))
+	var blocked_start: Array[Rect2] = [nearby_blocker]
+	var fallback := TerrainTrees.get_placements(starter_chunk, 1024, blocked_start, no_roads)
+	check(fallback.size() == 2, "Blocked opening-view positions fall back to two safe positions elsewhere in the chunk")
+	for tree in fallback:
+		var fallback_bounds := Rect2(tree.position - TerrainTrees.FOOTPRINT * 0.5, TerrainTrees.FOOTPRINT)
+		check(not fallback_bounds.intersects(nearby_blocker.grow(TerrainTrees.PROP_GAP)), "Startup visibility preference never overrides obstacle clearance")
 	seed(481)
 	var expected := randf()
 	seed(481)
@@ -96,7 +112,7 @@ func run() -> void:
 		chunk.configure(example, 1024)
 		root.add_child(chunk)
 		var actual := signature(chunk)
-		check(actual.size() == 1, "Selected tree appears in the real terrain scene")
+		check(actual.size() == 2, "Both trees appear in the real terrain scene")
 		if reload_index == 0:
 			original = actual
 		check(actual == original, "Unload and reload preserve tree visuals")
@@ -117,8 +133,16 @@ func run() -> void:
 	manager.set_process(false)
 	manager.set_physics_process(false)
 	var before: Dictionary[Vector2i, Array] = {}
+	var visible_start_trees := 0
+	# Default 1152x648 gameplay view, centered on the player at world origin.
+	var start_view := Rect2(Vector2(-576, -324), Vector2(1152, 648))
 	for coordinate: Vector2i in manager.active_chunks:
 		before[coordinate] = signature(manager.active_chunks[coordinate])
+		for tree: Sprite2D in manager.active_chunks[coordinate].large_props.find_children("Tree*", "Sprite2D", false, false):
+			var bounds := Rect2(tree.global_position - TerrainTrees.FOOTPRINT * 0.5, TerrainTrees.FOOTPRINT)
+			if tree.is_visible_in_tree() and start_view.encloses(bounds):
+				visible_start_trees += 1
+	check(visible_start_trees >= 1, "A new run shows at least one complete tree in the opening gameplay view")
 	player.position = Vector2(8192, -8192)
 	manager.update_chunks()
 	check(manager.active_chunks.size() == 9, "Distant travel preserves the 3x3 active grid")
@@ -129,6 +153,6 @@ func run() -> void:
 	main.queue_free()
 	await process_frame
 	await create_timer(0.15).timeout
-	print("TREE_DENSITY regions=400 chunks=2400 selected=", selected, " placed=", placed, " per_six=", placed / 400.0, " variants=", variants)
+	print("TREE_DENSITY chunks=2400 placed=", placed, " empty/one/two=", histogram, " average_per_chunk=", placed / 2400.0, " variants=", variants)
 	print("PASS: ", checks, " tree density/determinism/clearance/streaming checks")
 	quit()

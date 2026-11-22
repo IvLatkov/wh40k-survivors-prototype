@@ -61,3 +61,17 @@
 - The completion report must describe actual changes, decisions, repository-relative files, observed check results, limitations, and a real relevant commit SHA or `null` for uncommitted changes. Preserve independent guides and existing task-note relationships; do not replace them or use separate note/status writes as a fallback.
 - After an uncertain completion response, retry identical arguments with the same completion key. A revision conflict requires review and reconciliation. Confirm the returned state; a replay reporting To Do has not completed the task again. Let No-Te's existing seven-day archive handle completed tasks.
 - Do not automatically commit, push, deploy, change permissions/configuration, or install these instructions into other repositories.
+
+## No-Te living game documentation
+
+- Maintain four canonical independent documents in the mapped WH40k Survivor Game project (`54238fa8-e6c1-415e-b747-f257b5a790d9`). Identify them by stable note ID, not title alone:
+  - Mechanics: `17650336-23d2-4133-bec4-b8e32dc236a3` — gameplay rules, player/weapons/enemies, progression, upgrades, encounters, world placement and UI/pause behavior.
+  - Optimization: `d44e15b5-3917-4629-ad47-d6731e55bf54` — performance changes, profiling, benchmarks, pooling, streaming, memory and supporting development tooling.
+  - Animation and Design Choices: `8d5f5fce-7e9a-4a6e-afb8-45040bef2ce9` — animations, artwork, feedback, audio, presentation and reasons behind design decisions.
+  - Bugs: `ff6e68d2-b355-4185-8f20-ddf09c54ae1c` — symptoms, causes, fixes, regression checks and known unresolved limitations.
+- Write these guides in plain language with short explanations. Explain what the player experiences, what changed and why. Keep essential balance values; leave detailed code names, command lists and benchmark tables in repository reports unless needed to explain a decision.
+- For future coding tasks, read the relevant documents and add verified outcomes to the matching document or documents. A task can affect multiple categories. Include its task ID, actual changes, observed checks, limitations and whether changes are committed; distinguish current behavior from dated historical evidence.
+- Update these canonical documents in place using supported No-Te tools after reading their latest content/revision. Preserve unrelated content and task-note relationships. Do not create replacement or duplicate guides for each task, choose a different project, or bypass the connector through direct database writes.
+- If the available connector cannot update an existing document, report the missing capability and the pending category updates; do not claim they were saved. Leave the task in To Do when required documentation is incomplete, unless the user explicitly waives that requirement.
+- Category updates supplement the task-linked implementation report required by transactional `complete_task`; they do not replace or unlink that report. Questions, brainstorming and planning still do not automatically create tasks.
+- The user deleted the older technical guides and the original complete reference before authorizing the four plain-language replacements above. Do not use their deleted note IDs or recreate those older guides. Retain historical technical evidence in the repository reports under `docs/`; route new No-Te updates to the four canonical documents.

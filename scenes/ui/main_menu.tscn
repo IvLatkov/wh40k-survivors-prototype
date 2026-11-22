@@ -1,0 +1,357 @@
+[gd_scene load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/main_menu.gd" id="1_menu"]
+
+[sub_resource type="StyleBoxFlat" id="PanelStyle"]
+bg_color = Color(0.025, 0.032, 0.04, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.48, 0.46, 0.36, 1)
+
+[sub_resource type="StyleBoxFlat" id="ButtonNormal"]
+bg_color = Color(0.065, 0.075, 0.085, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.26, 0.28, 0.29, 1)
+
+[sub_resource type="StyleBoxFlat" id="ButtonHover"]
+bg_color = Color(0.12, 0.13, 0.14, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.65, 0.59, 0.42, 1)
+
+[sub_resource type="StyleBoxFlat" id="ButtonPressed"]
+bg_color = Color(0.16, 0.15, 0.11, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.78, 0.69, 0.44, 1)
+
+[sub_resource type="StyleBoxFlat" id="ButtonFocus"]
+bg_color = Color(0, 0, 0, 0)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.78, 0.69, 0.44, 1)
+
+[sub_resource type="Theme" id="MenuTheme"]
+default_font_size = 17
+Label/colors/font_color = Color(0.88, 0.9, 0.91, 1)
+Button/colors/font_color = Color(0.9, 0.9, 0.87, 1)
+Button/colors/font_hover_color = Color(1, 0.96, 0.82, 1)
+Button/colors/font_focus_color = Color(1, 0.96, 0.82, 1)
+Button/styles/normal = SubResource("ButtonNormal")
+Button/styles/hover = SubResource("ButtonHover")
+Button/styles/pressed = SubResource("ButtonPressed")
+Button/styles/focus = SubResource("ButtonFocus")
+
+[node name="MainMenu" type="Control"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_menu")
+theme = SubResource("MenuTheme")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.009, 0.013, 0.018, 1)
+
+[node name="Margin" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 24
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 24
+
+[node name="Scroll" type="ScrollContainer" parent="Margin"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="Center" type="CenterContainer" parent="Margin/Scroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="MenuPanel" type="PanelContainer" parent="Margin/Scroll/Center"]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(460, 0)
+theme_override_styles/panel = SubResource("PanelStyle")
+
+[node name="Padding" type="MarginContainer" parent="Margin/Scroll/Center/MenuPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_top = 24
+theme_override_constants/margin_bottom = 24
+
+[node name="Content" type="VBoxContainer" parent="Margin/Scroll/Center/MenuPanel/Padding"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="Title" type="Label" parent="Margin/Scroll/Center/MenuPanel/Padding/Content"]
+layout_mode = 2
+text = "WH40K SURVIVOR"
+horizontal_alignment = 1
+autowrap_mode = 2
+theme_override_font_sizes/font_size = 29
+theme_override_colors/font_color = Color(0.78, 0.69, 0.44, 1)
+
+[node name="Subtitle" type="Label" parent="Margin/Scroll/Center/MenuPanel/Padding/Content"]
+layout_mode = 2
+text = "FOR THE EMPEROR"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 13
+theme_override_colors/font_color = Color(0.52, 0.55, 0.57, 1)
+
+[node name="Divider" type="HSeparator" parent="Margin/Scroll/Center/MenuPanel/Padding/Content"]
+layout_mode = 2
+
+[node name="Main" type="VBoxContainer" parent="Margin/Scroll/Center/MenuPanel/Padding/Content"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Play" type="Button" parent="Margin/Scroll/Center/MenuPanel/Padding/Content/Main"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 42)
+layout_mode = 2
+text = "Play"
+
+[node name="CharacterSelect" type="Button" parent="Margin/Scroll/Center/MenuPanel/Padding/Content/Main"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 42)
+layout_mode = 2
+text = "Character Select"
+
+[node name="MapSelect" type="Button" parent="Margin/Scroll/Center/MenuPanel/Padding/Content/Main"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 42)
+layout_mode = 2
+text = "Map Select"
+
+[node name="OpenUpgrades" type="Button" parent="Margin/Scroll/Center/MenuPanel/Padding/Content/Main"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 42)
+layout_mode = 2
+text = "Upgrades"
+
+[node name="OpenSettings" type="Button" parent="Margin/Scroll/Center/MenuPanel/Padding/Content/Main"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 42)
+layout_mode = 2
+text = "Settings"
+
+[node name="Quit" type="Button" parent="Margin/Scroll/Center/MenuPanel/Padding/Content/Main"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 42)
+layout_mode = 2
+text = "Quit"
+
+[node name="PlayError" type="Label" parent="Margin/Scroll/Center/MenuPanel/Padding/Content/Main"]
+layout_mode = 2
+text = "Unable to start the game. Please try again."
+horizontal_alignment = 1
+unique_name_in_owner = true
+visible = false
+autowrap_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.4, 0.4, 1)
+
+[node name="Character" type="VBoxContainer" parent="Margin/Scroll/Center/MenuPanel/Padding/Content"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="Heading" type="Label" parent="Margin/Scroll/Center/MenuPanel/Padding/Content/Character"]
+layout_mode = 2
+text = "CHARACTER SELECT"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 21
+
+[node name="Description" type="Label" parent="Margin/Scroll/Center/MenuPanel/Padding/Content/Character"]
+layout_mode = 2
+text = "Ultramarine"
+horizontal_alignment = 1
+
+
+[node name="Selected" type="Label" parent="Margin/Scroll/Center/MenuPanel/Padding/Content/Character"]
+layout_mode = 2
+text = "Selected"
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.78, 0.69, 0.44, 1)
+
+[node name="Back" type="Button" parent="Margin/Scroll/Center/MenuPanel/Padding/Content/Character"]
+custom_minimum_size = Vector2(0, 42)
+layout_mode = 2
+text = "Back"
+
+[node name="Map" type="VBoxContainer" parent="Margin/Scroll/Center/MenuPanel/Padding/Content"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="Heading" type="Label" parent="Margin/Scroll/Center/MenuPanel/Padding/Content/Map"]
+layout_mode = 2
+text = "MAP SELECT"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 21
+
+[node name="Description" type="Label" parent="Margin/Scroll/Center/MenuPanel/Padding/Content/Map"]
+layout_mode = 2
+text = "Current Battlefield"
+horizontal_alignment = 1
+
+
+[node name="Selected" type="Label" parent="Margin/Scroll/Center/MenuPanel/Padding/Content/Map"]
+layout_mode = 2
+text = "Selected"
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.78, 0.69, 0.44, 1)
+
+[node name="Back" type="Button" parent="Margin/Scroll/Center/MenuPanel/Padding/Content/Map"]
+custom_minimum_size = Vector2(0, 42)
+layout_mode = 2
+text = "Back"
+
+[node name="Upgrades" type="VBoxContainer" parent="Margin/Scroll/Center/MenuPanel/Padding/Content"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="Heading" type="Label" parent="Margin/Scroll/Center/MenuPanel/Padding/Content/Upgrades"]
+layout_mode = 2
+text = "UPGRADES"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 21
+
+[node name="Description" type="Label" parent="Margin/Scroll/Center/MenuPanel/Padding/Content/Upgrades"]
+layout_mode = 2
+text = "Coming soon"
+horizontal_alignment = 1
+
+
+[node name="Back" type="Button" parent="Margin/Scroll/Center/MenuPanel/Padding/Content/Upgrades"]
+custom_minimum_size = Vector2(0, 42)
+layout_mode = 2
+text = "Back"
+
+[node name="Settings" type="VBoxContainer" parent="Margin/Scroll/Center/MenuPanel/Padding/Content"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="Heading" type="Label" parent="Margin/Scroll/Center/MenuPanel/Padding/Content/Settings"]
+layout_mode = 2
+text = "SETTINGS"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 21
+
+[node name="Master" type="VBoxContainer" parent="Margin/Scroll/Center/MenuPanel/Padding/Content/Settings"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="Header" type="HBoxContainer" parent="Margin/Scroll/Center/MenuPanel/Padding/Content/Settings/Master"]
+layout_mode = 2
+
+[node name="Name" type="Label" parent="Margin/Scroll/Center/MenuPanel/Padding/Content/Settings/Master/Header"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Master Volume"
+
+[node name="Value" type="Label" parent="Margin/Scroll/Center/MenuPanel/Padding/Content/Settings/Master/Header"]
+layout_mode = 2
+text = "100%"
+
+[node name="Slider" type="HSlider" parent="Margin/Scroll/Center/MenuPanel/Padding/Content/Settings/Master"]
+custom_minimum_size = Vector2(0, 28)
+layout_mode = 2
+max_value = 100.0
+step = 1.0
+value = 100.0
+
+[node name="Music" type="VBoxContainer" parent="Margin/Scroll/Center/MenuPanel/Padding/Content/Settings"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="Header" type="HBoxContainer" parent="Margin/Scroll/Center/MenuPanel/Padding/Content/Settings/Music"]
+layout_mode = 2
+
+[node name="Name" type="Label" parent="Margin/Scroll/Center/MenuPanel/Padding/Content/Settings/Music/Header"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Music Volume"
+
+[node name="Value" type="Label" parent="Margin/Scroll/Center/MenuPanel/Padding/Content/Settings/Music/Header"]
+layout_mode = 2
+text = "100%"
+
+[node name="Slider" type="HSlider" parent="Margin/Scroll/Center/MenuPanel/Padding/Content/Settings/Music"]
+custom_minimum_size = Vector2(0, 28)
+layout_mode = 2
+max_value = 100.0
+step = 1.0
+value = 100.0
+
+[node name="SFX" type="VBoxContainer" parent="Margin/Scroll/Center/MenuPanel/Padding/Content/Settings"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="Header" type="HBoxContainer" parent="Margin/Scroll/Center/MenuPanel/Padding/Content/Settings/SFX"]
+layout_mode = 2
+
+[node name="Name" type="Label" parent="Margin/Scroll/Center/MenuPanel/Padding/Content/Settings/SFX/Header"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "SFX Volume"
+
+[node name="Value" type="Label" parent="Margin/Scroll/Center/MenuPanel/Padding/Content/Settings/SFX/Header"]
+layout_mode = 2
+text = "100%"
+
+[node name="Slider" type="HSlider" parent="Margin/Scroll/Center/MenuPanel/Padding/Content/Settings/SFX"]
+custom_minimum_size = Vector2(0, 28)
+layout_mode = 2
+max_value = 100.0
+step = 1.0
+value = 100.0
+
+[node name="SessionHint" type="Label" parent="Margin/Scroll/Center/MenuPanel/Padding/Content/Settings"]
+layout_mode = 2
+text = "Changes apply for this session."
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 13
+theme_override_colors/font_color = Color(0.58, 0.6, 0.61, 1)
+
+[node name="Back" type="Button" parent="Margin/Scroll/Center/MenuPanel/Padding/Content/Settings"]
+custom_minimum_size = Vector2(0, 42)
+layout_mode = 2
+text = "Back"
+

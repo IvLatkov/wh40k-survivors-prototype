@@ -8,9 +8,11 @@ large props. The original 1254x1254 PNGs are preserved; Godot's import size limi
 is 256px per tree, reducing imported RGBA pixel storage from 18,870,192 bytes
 to 786,432 bytes. Their 160x160 world footprints and trunk collisions stay the same.
 
-Each fixed 3x2-chunk region selects two or three distinct tree
-chunks; each selected chunk tries up to 64 safe positions. Conflicting chunks
-may remain empty. All three variants share a 160x160 visual footprint, nearest
+Every chunk attempts two trees, choosing two different variants from the three
+available sprites with a locally seeded shuffle. Each tree tries up to 64 safe
+positions. Chunks touching spawn first try positions in the opening view, then
+fall back to the full chunk. Roads and existing props take priority, so crowded
+chunks can contain fewer than two trees. All three variants share a 160x160 visual footprint, nearest
 filtering, and the existing prop layer below combatants. Trees now have solid
 trunk/root circles; their branches remain visually overlapping and walkable.
 Tanks and ruins have cached convex collision outlines. All use the dedicated
@@ -19,11 +21,13 @@ Roads, base ground, and small ground decorations have no collision. Collider
 nodes belong to the prop sprites, so chunk unload and reconfigure remove them
 automatically. Projectile and pickup collision masks are unchanged.
 Placement clears the starting area's 300px radius, keeps 48px from road cells,
-64px from tank/ruin footprints, and 96px from chunk edges. Independent seeded
+64px from other tree/tank/ruin footprints, and 96px from chunk edges. Independent seeded
 RNG preserves gameplay RNG and existing ground, roads, tanks, and ruins.
 
-A 2,400-chunk sample placed 950 trees: 2.375 per six chunks. Tests cover density,
-all variants, safety bounds, RNG isolation, reconfiguration, and streamed return.
+A 2,400-chunk sample placed 4,540 trees (1.892 per chunk): 2,184 chunks had two
+trees, 172 had one, and 44 had none after safety exclusions. Tests cover two
+distinct variants per unobstructed chunk, road/tree/prop clearance, startup
+visibility, RNG isolation, reconfiguration, and streamed return.
 
 ## olive_tree.png
 
