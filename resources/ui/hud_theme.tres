@@ -1,0 +1,57 @@
+[gd_resource type="Theme" load_steps=10 format=3]
+
+[ext_resource type="Texture2D" path="res://addons/pixel_ui_scifi/themes/cyan/panel.png" id="frame"]
+[ext_resource type="Texture2D" path="res://addons/pixel_ui_scifi/themes/cyan/progress_bg.png" id="track"]
+[ext_resource type="Texture2D" path="res://addons/pixel_ui_scifi/bars/bar_red.png" id="red"]
+[ext_resource type="Texture2D" path="res://addons/pixel_ui_scifi/bars/bar_blue.png" id="blue"]
+[ext_resource type="FontFile" path="res://addons/pixel_ui_scifi/font/pixel_ui_scifi_font.fnt" id="font"]
+
+[sub_resource type="StyleBoxTexture" id="Frame"]
+texture = ExtResource("frame")
+texture_margin_left = 4.0
+texture_margin_top = 4.0
+texture_margin_right = 4.0
+texture_margin_bottom = 4.0
+modulate_color = Color(1, 0.55, 0.8, 1)
+
+[sub_resource type="StyleBoxTexture" id="Track"]
+texture = ExtResource("track")
+texture_margin_left = 3.0
+texture_margin_top = 3.0
+texture_margin_right = 3.0
+texture_margin_bottom = 3.0
+modulate_color = Color(1, 0.55, 0.8, 1)
+
+[sub_resource type="StyleBoxTexture" id="Health"]
+texture = ExtResource("red")
+texture_margin_left = 2.0
+texture_margin_top = 3.0
+texture_margin_right = 2.0
+texture_margin_bottom = 2.0
+modulate_color = Color(0.75, 0.65, 0.65, 1)
+axis_stretch_horizontal = 1
+
+[sub_resource type="StyleBoxTexture" id="XP"]
+texture = ExtResource("blue")
+texture_margin_left = 2.0
+texture_margin_top = 3.0
+texture_margin_right = 2.0
+texture_margin_bottom = 2.0
+modulate_color = Color(0.7, 0.8, 0.9, 1)
+axis_stretch_horizontal = 1
+
+[resource]
+default_font_size = 14
+Label/colors/font_color = Color(0.86, 0.89, 0.91, 1)
+Label/colors/font_outline_color = Color(0.015, 0.02, 0.025, 1)
+Label/constants/outline_size = 2
+Panel/styles/panel = SubResource("Frame")
+HUDClock/base_type = &"Label"
+HUDClock/fonts/font = ExtResource("font")
+HUDClock/font_sizes/font_size = 24
+HUDHealth/base_type = &"ProgressBar"
+HUDHealth/styles/background = SubResource("Track")
+HUDHealth/styles/fill = SubResource("Health")
+HUDXP/base_type = &"ProgressBar"
+HUDXP/styles/background = SubResource("Track")
+HUDXP/styles/fill = SubResource("XP")
